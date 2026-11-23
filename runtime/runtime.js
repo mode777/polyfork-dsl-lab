@@ -62,7 +62,7 @@ const jsonSafe = (v) => (typeof v === 'function' ? String(v) : v);
 // ---------------------------------------------------------------- fields
 function compileField(src) {
   if (typeof src !== 'string') return () => src;
-  const fn = new Function('x', 'y', 'z', 'i', 'k', 'u', 'v', 'p', 'n', 's', 'q', `
+  const fn = new Function('x', 'y', 'z', 'i', 'k', 'u', 'v', 'p', 'n', 's', 'q', 'r0', 'r1', 'r2', 'r3', `
     const {sin,cos,tan,asin,acos,atan,atan2,sqrt,abs,min,max,floor,ceil,round,pow,exp,log,hypot,sign,PI}=Math;
     const TAU=Math.PI*2;
     const lerp=(a,b,t)=>a+(b-a)*t;
@@ -79,9 +79,9 @@ function compileField(src) {
     return (${src});
   `);
   return (ctx = {}) => {
-    const r = fn(ctx.x ?? 0, ctx.y ?? 0, ctx.z ?? 0, ctx.i ?? 0, ctx.k ?? 0, ctx.u ?? 0, ctx.v ?? 0, ctx.p ?? [0, 0, 0], ctx.n ?? [0, 1, 0], ctx.s ?? {}, ctx);
+    const r = fn(ctx.x ?? 0, ctx.y ?? 0, ctx.z ?? 0, ctx.i ?? 0, ctx.k ?? 0, ctx.u ?? 0, ctx.v ?? 0, ctx.p ?? [0, 0, 0], ctx.n ?? [0, 1, 0], ctx.s ?? {}, ctx, ctx.r0 ?? 0, ctx.r1 ?? 0, ctx.r2 ?? 0, ctx.r3 ?? 0);
     return typeof r === 'function'
-      ? r(ctx.x ?? 0, ctx.y ?? 0, ctx.z ?? 0, ctx.i ?? 0, ctx.k ?? 0, ctx.u ?? 0, ctx.v ?? 0, ctx.p ?? [0, 0, 0], ctx.n ?? [0, 1, 0], ctx.s ?? {})
+      ? r(ctx.x ?? 0, ctx.y ?? 0, ctx.z ?? 0, ctx.i ?? 0, ctx.k ?? 0, ctx.u ?? 0, ctx.v ?? 0, ctx.p ?? [0, 0, 0], ctx.n ?? [0, 1, 0], ctx.s ?? {}, ctx, ctx.r0 ?? 0, ctx.r1 ?? 0, ctx.r2 ?? 0, ctx.r3 ?? 0)
       : r;
   };
 }
@@ -654,17 +654,22 @@ node('deform', { in: { geom: V.geom, expr: V.field }, out: V.geom }, ({ p }) => 
 
 node('join', { in: { geoms: V.any }, out: V.geom }, ({ p }) => geom(p.geoms.flatMap((g) => (g.__kind === 'geom' ? g.parts : []))));
 
-node('scatter', { in: { count: V.int, minDist: V.number, seed: V.int, tries: V.int, sample: V.field, height: V.field, size: V.field }, out: V.points }, ({ p, ctx }) => {
+node('scatter', { in: { count: V.int, minDist: V.number, seed: V.int, tries: V.int, sample: V.field, height: V.field, size: V.field, prng: V.bool }, out: V.points }, ({ p, ctx }) => {
   let s = (p.seed ?? 1) >>> 0;
   const rnd = () => (s = (s * 16807) % 2147483647) / 2147483647;
   const out = [];
   for (let t = 0; t < (p.tries ?? 800) && out.length < (p.count ?? 1); t++) {
-    const q = fieldValue(p.sample, { i: t, s: ctx.params }) ?? [0, 0];
+    if (p.prng) { var r0 = rnd(), r1 = rnd(); }
+    const q = p.prng
+      ? (fieldValue(p.sample, { i: t, s: ctx.params, r0, r1 }) ?? [0, 0])
+      : (fieldValue(p.sample, { i: t, s: ctx.params }) ?? [0, 0]);
     const [x, z] = q;
     if (out.some((r) => Math.hypot(r[0] - x, r[2] - z) < (p.minDist ?? 0))) continue;
-    const y = p.height ? fieldValue(p.height, { x, z, s: ctx.params }) : 0;
-    const sz = p.size ? fieldValue(p.size, { x, z, i: out.length, s: ctx.params }) : 1;
-    out.push([x, y, z, sz, rnd() * TAU]);
+    const y = p.height ? fieldValue(p.height, { x, z, s: ctx.params, r2: 0 }) : 0;
+    if (p.prng) { var r2 = rnd(); }
+    const sz = p.size ? fieldValue(p.size, { x, z, i: out.length, s: ctx.params, r2: r2 ?? 0 }) : 1;
+    if (p.prng) { var r3 = rnd(); }
+    out.push([x, y, z, sz, p.prng ? r3 * TAU : hash01(t, 4, p.seed ?? 1) * TAU]);
   }
   return pts(out);
 });

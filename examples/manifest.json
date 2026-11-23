@@ -5,11 +5,11 @@
     "description": "Parametric loft, seeded scatter and instanced chips.",
     "category": "props",
     "file": "cookie.pfn",
-    "bytes": 778,
-    "nodes": 6,
+    "bytes": 996,
+    "nodes": 9,
     "cam": [
       25,
-      15
+      35
     ],
     "fit": 1.25
   },
