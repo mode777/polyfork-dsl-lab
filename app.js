@@ -151,7 +151,7 @@ function frame(o, animate = false) {
   const c = box.getCenter(new THREE.Vector3());
   const s = box.getSize(new THREE.Vector3());
   const r = Math.max(s.x, s.y, s.z, 0.2);
-  const d = r * 2.0;
+  const d = r * 1.65;
   controls.target.copy(c);
   const dir = new THREE.Vector3(0.85, 0.55, 1).normalize();
   const target = c.clone().addScaledVector(dir, d);

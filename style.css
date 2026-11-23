@@ -41,7 +41,7 @@ body { display: flex; flex-direction: column; min-height: 100vh; }
   min-height: 0;
 }
 .side-head { padding: 14px 16px 8px; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
-.list { overflow: auto; padding: 4px 8px 12px; }
+.list { overflow: auto; padding: 4px 8px 12px; scrollbar-width: thin; scrollbar-color: #2a3646 transparent; }
 .group-label { padding: 12px 10px 6px; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: #627084; }
 .item {
   display: block; width: 100%; text-align: left; background: transparent; border: 1px solid transparent;
@@ -73,7 +73,7 @@ body { display: flex; flex-direction: column; min-height: 100vh; }
 .btn:hover { border-color: #3b4b60; }
 .btn.accent { background: #153c34; border-color: #2b6a5b; color: #bff6e7; }
 .btn.ghost { background: transparent; }
-.code-wrap { flex: 1; min-height: 0; position: relative; overflow: auto; }
+.code-wrap { flex: 1; min-height: 0; position: relative; overflow: auto; scrollbar-width: thin; scrollbar-color: #2a3646 transparent; }
 .code {
   margin: 0; padding: 14px 0 40px; font: 12px/1.55 var(--mono); color: var(--code);
   white-space: pre; tab-size: 2;
