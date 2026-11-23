@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Polyfork DSL Lab — declarative three.js geometry</title>
+<meta name="description" content="A small declarative node-graph DSL for stylized three.js assets. Browse examples, edit the graph, tweak parameters, see the mesh.">
+<link rel="stylesheet" href="style.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.180.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.180.0/examples/jsm/",
+    "manifold-3d": "https://cdn.jsdelivr.net/npm/manifold-3d@3.5.5/manifold.js"
+  }
+}
+</script>
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <span class="mark" aria-hidden="true"></span>
+    <div>
+      <h1>Polyfork DSL Lab</h1>
+      <p>declarative graphs → three.js meshes</p>
+    </div>
+  </div>
+  <nav class="topnav">
+    <a href="#examples">examples</a>
+    <a href="#about">about</a>
+    <a id="repo" href="https://github.com/mode777/polyfork-dsl-lab" target="_blank" rel="noreferrer">github ↗</a>
+  </nav>
+</header>
+
+<main class="shell">
+  <aside class="sidebar" id="examples">
+    <div class="side-head">Examples</div>
+    <div id="list" class="list"></div>
+    <div class="side-foot">
+      <span class="dot"></span> no Polyfork source included
+    </div>
+  </aside>
+
+  <section class="work">
+    <div class="split" id="split">
+      <div class="pane code-pane">
+        <div class="pane-head">
+          <div class="tabs"><span class="tab active">DSL</span><span id="file" class="file"></span></div>
+          <div class="actions">
+            <button id="edit" class="btn ghost">edit</button>
+            <button id="run" class="btn accent" hidden>run ⌘↵</button>
+            <button id="copy" class="btn ghost">copy</button>
+            <a id="download" class="btn ghost" download>download</a>
+          </div>
+        </div>
+        <div class="code-wrap" id="codeWrap">
+          <pre id="code" class="code" tabindex="0"></pre>
+          <textarea id="editor" class="editor" spellcheck="false" hidden></textarea>
+        </div>
+      </div>
+
+      <div class="gutter" id="gutter" role="separator" aria-orientation="vertical" tabindex="0"></div>
+
+      <div class="pane view-pane">
+        <div class="viewport" id="viewport">
+          <canvas id="view"></canvas>
+          <div class="badge" id="badge">drag to orbit · scroll to zoom</div>
+          <div class="error" id="error" hidden></div>
+        </div>
+        <div class="hud">
+          <div class="stats" id="stats"></div>
+          <div class="controls-head">
+            <span>parameters</span>
+            <span id="staticNote" class="muted" hidden>static graph — this example bakes its parameters</span>
+          </div>
+          <div class="controls" id="controls"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<section class="about" id="about">
+  <div>
+    <h2>What is this?</h2>
+    <p>
+      A compact, typed node-graph DSL for stylized three.js assets. Each example on the left is a
+      <code>.pfn</code> graph: nodes, refs, literals, field expressions and inputs. The viewer parses
+      the graph, cooks it and puts the result on the right. Geometry only — one vertex-colour material,
+      flat shading, no textures.
+    </p>
+  </div>
+  <div>
+    <h2>What is included?</h2>
+    <p>
+      The runtime (<code>runtime/</code>), the example graphs (<code>examples/</code>) and the viewer.
+      <strong>No Polyfork source code or assets are redistributed.</strong> The examples are original
+      DSL constructions written for this study; they are informed by the public catalogue's techniques,
+      not copied from it. Polyfork assets remain under Polyfork's terms.
+    </p>
+  </div>
+  <div>
+    <h2>Format</h2>
+    <p>
+      <code>n id type key=value</code> per node · <code>@id</code> refs · <code>$name</code> inputs ·
+      backticks for fields · <code>~`…`</code> for parameter expressions · <code>group … end</code> for
+      subgraphs · <code>script</code>/<code>module</code> are marked escape hatches.
+    </p>
+  </div>
+</section>
+
+<footer class="foot">
+  <span>MIT-licensed runtime and examples · research project · not affiliated with Polyfork</span>
+  <span id="version">graph v2</span>
+</footer>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+# polyfork graph v2 — sign
+graph sign
+in word string OPEN
+n n0 box w=1.5 h=0.55 d=0.07 y=1.15 zone=panel
+n n1 text text=$word size=0.24 stroke=0.032 depth=0.03 x=0 y=1.06 z=0.04 align=center zone=letters
+n n2 box w=0.07 h=1 d=0.07 x=-0.52 y=0 z=0 zone=post
+n n3 box w=0.07 h=1 d=0.07 x=0.52 y=0 z=0 zone=post
+n n4 box w=1.7 h=0.08 d=0.5 y=-0.04 zone=post
+n n5 join geoms=[@n0,@n1,@n4,@n2,@n3]
+n n6 mesh geom=@n5 zones={panel:#e8e2d4,letters:#242a33,post:#4a5568}
+out mesh=@n6
+end

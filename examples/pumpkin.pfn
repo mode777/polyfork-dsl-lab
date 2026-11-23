@@ -1,0 +1,8 @@
+# polyfork graph v2 — pumpkin
+graph pumpkin
+n n0 revolve profile=[[0.01,0],[0.11199999999999999,0.03],[0.16,0.108],[0.128,0.24],[0.02,0.2448]] seg=16 zone=rind mod=`(x,y,z,i,k)=>{ const base=x; return base*(1+0.06*Math.cos(i*5)); }`
+n n1 cylinder r1=0.025 r2=0.02 h=0.08 seg=6 y=0.24 zone=stem
+n n2 join geoms=[@n0,@n1]
+n n3 mesh geom=@n2 zones={rind:#d9822b,stem:#5f6b3a}
+out mesh=@n3
+end

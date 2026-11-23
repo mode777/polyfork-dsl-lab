@@ -1,0 +1,16 @@
+# polyfork graph v2 — cookie
+graph cookie
+in thickness float 0.024 min=0.014 max=0.034
+in chips int 9 min=3 max=14
+in chipColor color #3d2113
+n n0 ring n=20 radius=`0.05*(0.96+rand(1000+i*7)()*0.07)`
+n n1 ring n=20 radius=`0.05*(0.96+rand(1000+i*7)()*0.07)` y=~`s => s.thickness*0.42`
+n n2 ring n=20 radius=`0.05*(0.96+rand(1000+i*7)()*0.07)` y=~`s => s.thickness*0.80` sx=0.93 sz=0.93
+n n3 loft rings=[@n0,@n1,@n2] capTop=~`s => [0, s.thickness, 0]` capBottom=[0,0,0] zones={band:edge,capTop:dough,capBottom:edge}
+n n4 scatter count=$chips minDist=~`s => s.chips > 9 ? 0.015 : 0.019` seed=42 tries=800 sample=`(()=>{const a=hash(i,1)*TAU,f=0.16+hash(i,2)*0.54;return [cos(a)*f*0.05,sin(a)*f*0.05];})()` height=`s.thickness*(0.8+0.2*(1-hypot(x,z)/0.05/0.93))-0.0025` size=`0.0085+hash(i,3)*0.0025`
+n n5 cone n=6 r=1 h=0.8 zone=chip
+n n6 instance points=@n4 proto=@n5
+n n7 join geoms=[@n3,@n6]
+n n8 mesh geom=@n7 zones={dough:#e0aa5e,edge:#c4843c,chip:$chipColor}
+out mesh=@n8
+end

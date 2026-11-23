@@ -1,0 +1,20 @@
+# polyfork graph v2 — jacket
+graph jacket
+n n0 ring n=16 r=0.15 y=0.9 sz=0.62
+n n1 ring n=16 r=0.1734998072888245 y=1 sz=0.62
+n n2 ring n=16 r=0.17921542892634584 y=1.12 sz=0.62
+n n3 ring n=16 r=0.16282139640701487 y=1.24 sz=0.62
+n n4 ring n=16 r=0.13672438670115442 y=1.36 sz=0.62
+n n5 ring n=16 r=0.12067409647004709 y=1.44 sz=0.62
+n n6 wrapShell rings=[@n0,@n1,@n2,@n3,@n4,@n5] ease=0.025 thickness=0.006 gap=0.55 zones={outer:jacket,inner:lining,rim:trim}
+n n7 cylinder r1=0.045 r2=0.036 h=0.32 seg=8 x=-0.18 y=1.12 z=0 rz=-0.28 zone=jacket
+n n8 cylinder r1=0.045 r2=0.036 h=0.32 seg=8 x=0.18 y=1.12 z=0 rz=0.28 zone=jacket
+n n9 bandOnSurface pts=[[0.14,1.45,0.02],[0.1,1.46,0.06],[0,1.47,0.08],[-0.1,1.46,0.06],[-0.14,1.45,0.02]] width=0.07 height=0.022 ease=0.01 zone=collar
+n n10 path pts=[[0.02,1.42,0.17],[0.05,1.28,0.19],[0.07,1.12,0.18],[0.09,0.96,0.16]]
+n n11 ribbon path=@n10 width=0.055 fold=0.008 zone=trim
+n n12 path pts=[[-0.02,1.42,0.17],[-0.05,1.28,0.19],[-0.07,1.12,0.18],[-0.09,0.96,0.16]]
+n n13 ribbon path=@n12 width=0.055 fold=0.008 zone=trim
+n n14 join geoms=[@n6,@n7,@n8,@n11,@n13,@n9]
+n n15 mesh geom=@n14 zones={jacket:#3f4a5a,lining:#8a5a3c,trim:#2a303a,collar:#2a303a}
+out mesh=@n15
+end
