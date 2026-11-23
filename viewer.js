@@ -324,6 +324,7 @@ function cook(reframe) {
     `<span class="stat">meshes <b>${s.meshes}</b></span>`,
     `<span class="stat">nodes <b>${graph.nodes.length}</b></span>`,
     `<span class="stat">cook <b>${cookMs < 0.05 ? '<0.1' : cookMs.toFixed(1)} ms</b></span>`,
+    `<span class="stat">cam <b>${camera.position.toArray().map((x) => x.toFixed(2)).join(',')}</b></span>`,
   ].join('');
 }
 
