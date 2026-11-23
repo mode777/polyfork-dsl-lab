@@ -86,8 +86,8 @@
     "description": "Lofted body, bone tree and soft skin weights.",
     "category": "character",
     "file": "creature.pfn",
-    "bytes": 6510,
-    "nodes": 19
+    "bytes": 6745,
+    "nodes": 21
   },
   {
     "id": "basket",

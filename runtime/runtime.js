@@ -864,11 +864,11 @@ node('skeleton', { in: { bones: V.any }, out: V.any }, ({ p }) => {
   return { __kind: 'skeleton', root, list, byName, defs };
 });
 
-node('skin', { in: { geom: V.geom, skeleton: V.any, soft: V.bool }, out: V.object }, ({ p }) => {
+node('skin', { in: { geom: V.geom, skeleton: V.any, soft: V.bool, zones: V.any }, out: V.object }, ({ p }) => {
   const sk = p.skeleton, parts = p.geom.parts;
   const pos = [], col = [];
   for (const { pos: pp, zone } of parts) {
-    const c = new THREE.Color(zoneColor(zone));
+    const c = new THREE.Color(p.zones?.[zone] ?? zoneColor(zone));
     for (let i = 0; i < pp.length; i += 3) { pos.push(pp[i], pp[i + 1], pp[i + 2]); col.push(c.r, c.g, c.b); }
   }
   const geo = new THREE.BufferGeometry();
