@@ -1,12 +1,21 @@
 # polyfork graph v2 — sign
 graph sign
-in word string OPEN
-n n0 box w=1.5 h=0.55 d=0.07 y=1.15 zone=panel
-n n1 text text=$word size=0.24 stroke=0.032 depth=0.03 x=0 y=1.06 z=0.04 align=center zone=letters
-n n2 box w=0.07 h=1 d=0.07 x=-0.52 y=0 z=0 zone=post
-n n3 box w=0.07 h=1 d=0.07 x=0.52 y=0 z=0 zone=post
-n n4 box w=1.7 h=0.08 d=0.5 y=-0.04 zone=post
-n n5 join geoms=[@n0,@n1,@n4,@n2,@n3]
-n n6 mesh geom=@n5 zones={panel:#e8e2d4,letters:#242a33,post:#4a5568}
-out mesh=@n6
+in word string EXIT
+n n0 box w=1.76 h=0.62 d=0.15 y=1.16 zone=housing
+n n1 box w=1.58 h=0.44 d=0.02 y=1.16 z=0.085 zone=face
+n n2 box w=1.58 h=0.035 d=0.022 x=0 y=1.385 z=0.098 zone=ink
+n n3 box w=1.58 h=0.035 d=0.022 x=0 y=0.935 z=0.098 zone=ink
+n n4 box w=0.035 h=0.44 d=0.022 x=-0.772 y=1.16 z=0.098 zone=ink
+n n5 box w=0.035 h=0.44 d=0.022 x=0.772 y=1.16 z=0.098 zone=ink
+n n6 text text=$word size=0.22 tracking=0.1 stroke=0.032 depth=0.024 x=-0.34 y=1.075 z=0.098 align=center zone=ink
+n n7 box w=0.3 h=0.075 d=0.022 x=0.3 y=1.16 z=0.098 zone=ink
+n n8 extrude profile=[[0,0],[0.17,0.085],[0,0.17]] depth=0.022 z0=0.098 cap=true
+n n9 transform geom=@n8 tx=0.42 ty=1.075 tz=0 s=1
+n n10 box w=0.075 h=0.92 d=0.075 x=-0.56 y=0.02 z=0 zone=post
+n n11 box w=0.22 h=0.05 d=0.22 x=-0.56 y=-0.44 z=0 zone=post
+n n12 box w=0.075 h=0.92 d=0.075 x=0.56 y=0.02 z=0 zone=post
+n n13 box w=0.22 h=0.05 d=0.22 x=0.56 y=-0.44 z=0 zone=post
+n n14 join geoms=[@n0,@n1,@n2,@n3,@n4,@n5,@n6,@n7,@n9,@n10,@n12,@n11,@n13]
+n n15 mesh geom=@n14 zones={housing:#6f7a72,face:#d8c84a,ink:#1c2026,post:#5b636b}
+out mesh=@n15
 end

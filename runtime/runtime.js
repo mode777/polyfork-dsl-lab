@@ -374,14 +374,22 @@ node('loft', { in: { rings: V.any, capTop: V.any, capBottom: V.any, zones: V.any
     for (let i = 0; i < n; i++) { const j = (i + 1) % n; quad(pos, A[i], A[j], B[j], B[i]); }
     put(typeof zones.band === 'function' ? zones.band(k) : (zones.band ?? 'a'), pos);
   }
+  const triOut = (out, a, b, c, hint) => {
+    const n = cross3(sub3(b, a), sub3(c, a));
+    if (dot3(n, hint) >= 0) tri(out, a, b, c); else tri(out, a, c, b);
+  };
   if (p.capTop) {
     const A = rings[rings.length - 1], n = A.length, pos = [];
-    for (let i = 0; i < n; i++) tri(pos, p.capTop, A[(i + 1) % n], A[i]);
+    const c = A.reduce((q, r) => add3(q, mul3(r, 1 / n)), [0, 0, 0]);
+    const hint = norm(sub3(p.capTop, c));
+    for (let i = 0; i < n; i++) triOut(pos, p.capTop, A[(i + 1) % n], A[i], hint);
     put(zones.capTop ?? 'a', pos);
   }
   if (p.capBottom) {
     const A = rings[0], n = A.length, pos = [];
-    for (let i = 0; i < n; i++) tri(pos, p.capBottom, A[i], A[(i + 1) % n]);
+    const c = A.reduce((q, r) => add3(q, mul3(r, 1 / n)), [0, 0, 0]);
+    const hint = norm(sub3(c, p.capBottom));
+    for (let i = 0; i < n; i++) triOut(pos, p.capBottom, A[i], A[(i + 1) % n], hint);
     put(zones.capBottom ?? 'a', pos);
   }
   return geom(Object.entries(out).map(([z, pos]) => part(pos, z)));

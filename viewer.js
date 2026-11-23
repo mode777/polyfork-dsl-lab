@@ -40,7 +40,7 @@ renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 const scene = new THREE.Scene();
 const pmrem = new THREE.PMREMGenerator(renderer);
 scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.02).texture;
-scene.environmentIntensity = 0.4;
+scene.environmentIntensity = 0.3;
 scene.background = new THREE.Color('#0f1319');
 scene.fog = new THREE.Fog('#0f1319', 8, 22);
 
@@ -54,9 +54,9 @@ controls.target.set(0, 0.6, 0);
 controls.minDistance = 0.4;
 controls.maxDistance = 20;
 
-const hemi = new THREE.HemisphereLight('#cfe8ff', '#1a2028', 1.05);
+const hemi = new THREE.HemisphereLight('#cfe8ff', '#1a2028', 0.8);
 scene.add(hemi);
-const key = new THREE.DirectionalLight('#fff4e0', 2.15);
+const key = new THREE.DirectionalLight('#fff4e0', 1.55);
 key.position.set(4, 7, 5);
 key.castShadow = true;
 key.shadow.mapSize.set(2048, 2048);
@@ -66,7 +66,7 @@ key.shadow.camera.top = 4; key.shadow.camera.bottom = -4;
 key.shadow.bias = -0.0008;
 key.shadow.normalBias = 0.004;
 scene.add(key);
-const fill = new THREE.DirectionalLight('#9fc4ff', 0.38);
+const fill = new THREE.DirectionalLight('#9fc4ff', 0.32);
 fill.position.set(-5, 3, -4);
 scene.add(fill);
 
@@ -153,7 +153,9 @@ function frame(o, animate = false) {
   const r = Math.max(s.x, s.y, s.z, 0.08);
   const d = r * 1.65;
   controls.target.copy(c);
-  const dir = new THREE.Vector3(0.85, 0.55, 1).normalize();
+  const [azD, elD] = current?.cam ?? [35, 22];
+  const az = (azD * Math.PI) / 180, el = (elD * Math.PI) / 180;
+  const dir = new THREE.Vector3(Math.sin(az) * Math.cos(el), Math.sin(el), Math.cos(az) * Math.cos(el)).normalize();
   const target = c.clone().addScaledVector(dir, d);
   if (animate) {
     const start = camera.position.clone();
