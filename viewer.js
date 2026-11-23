@@ -151,7 +151,7 @@ function frame(o, animate = false) {
   const c = box.getCenter(new THREE.Vector3());
   const s = box.getSize(new THREE.Vector3());
   const r = Math.max(s.x, s.y, s.z, 0.08);
-  const d = r * 1.65;
+  const d = r * (current?.fit ?? 1.65);
   controls.target.copy(c);
   const [azD, elD] = current?.cam ?? [35, 22];
   const az = (azD * Math.PI) / 180, el = (elD * Math.PI) / 180;
