@@ -316,7 +316,7 @@ function cook(reframe) {
   const mesh = out.outputs.mesh ?? Object.values(out.outputs)[0];
   if (!mesh) { showError('graph produced no output'); return; }
   addObject(mesh);
-  if (reframe) frame(mesh, true);
+  if (reframe) frame(mesh, false);
   const s = statsOf(mesh);
   statsEl.innerHTML = [
     `<span class="stat">tris <b>${fmt(s.tris)}</b></span>`,
