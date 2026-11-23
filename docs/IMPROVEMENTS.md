@@ -1,7 +1,7 @@
 # Mature improvements + research notes
 
 This pass implemented only the changes that are clearly mature, and investigated the
-topics that were still unclear. Runtime is now **48 node types**.
+topics that were still unclear. Runtime is now **55 node types**.
 
 Run: `node t-sample3.mjs`, `node t-cheese2.mjs`, `node t-cookie2.mjs`, `node t-cache.mjs`,
 `node t-bool.mjs`.

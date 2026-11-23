@@ -4,7 +4,7 @@
 three.js-native node graph, the gaps those ports exposed, the nodes added to close them,
 and a compact declarative storage format.
 
-**Code:** `runtime.mjs` (48 node types after the mature-improvement pass), `dsl.mjs`, `format.mjs`, `cache.mjs`,
+**Code:** `runtime.js` (55 node types), `dsl.js`, `format.js`, `cache.js`,
 `ports/` (20 ports), `templates.mjs` (20 more). See `SAMPLE3.md` for the third sample. Run `node t-all.mjs` for the port table.
 
 ---
@@ -35,6 +35,8 @@ and a compact declarative storage format.
 | control | `switch`, `fan`, `cone` |
 | output | `mesh`, `group` |
 | escape hatches | `script`, `module` |
+
+Update: the runtime now also has `curl`, `scatterVolume`, `pathOnSurface`, `bandOnSurface`, `ribbon`, `wrapShell`, `text`, `skeleton`, `skin` and `pose`; the public repo uses `.js` extensions.
 
 Key signatures:
 
