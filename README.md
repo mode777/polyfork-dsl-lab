@@ -5,6 +5,8 @@ viewer that splits DSL source and the cooked mesh.
 
 **Live demo:** https://mode777.github.io/polyfork-dsl-lab/
 
+![viewer](docs/preview.png)
+
 No build step, no textures, no node editor (yet). One vertex-colour material, flat shading,
 geometry only.
 
