@@ -99,8 +99,10 @@ The parser, serializer and evaluator are in `runtime/`. `.pfn` is the authoring 
 | Storage basket | revolved weave bands and handle |
 | Pumpkin | lobed revolve with stem |
 
-## Design notes
+## Project docs
 
+- [AGENTS.md](AGENTS.md) — operating rules, layout, authoring loop, known traps
+- [docs/STATUS.md](docs/STATUS.md) — current example status, verified work, next tasks
 - [docs/DESIGN.md](docs/DESIGN.md) — API, node signatures, format
 - [docs/TECHNIQUES.md](docs/TECHNIQUES.md) — how the studied assets build hair, clothes, text
 - [docs/STUDY.md](docs/STUDY.md) — three random samples, gap analysis, ring-array optimisation
