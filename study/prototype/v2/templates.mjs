@@ -181,7 +181,7 @@ export function roofTile(g, o = {}) {
 
 export function boulder(g, o = {}) {
   const lump = g.sphere({ r: 0.5, seg: 12, rings: 8 });
-  const d = g.deform({ geom: lump, expr: `(x,y,z)=>{const k=1+0.2*Math.sin(3*x+1)*Math.cos(2*z);return [x*k,y*k*0.75,z*k];}` });
+  const d = g.deform({ geom: lump, expr: `let k = 1 + 0.2*sin(3*x+1)*cos(2*z) in [x*k, y*k*0.75, z*k]` });
   const c = g.clip({ geom: d, nx: 0.2, ny: 1, nz: 0.1, d: 0.3, cap: true, zone: 'rock' });
   return g.mesh(g.center({ geom: c, y: false }), { zones: { rock: o.rock ?? '#6a6a66' } });
 }

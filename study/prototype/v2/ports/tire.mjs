@@ -1,7 +1,7 @@
-// Tire — exact geometric port. A code node computes the reference profile,
-// facet modulation, caps, dome and lug seats from the live params; the graph
-// does the revolve/fan/polar assembly.
-import { graph, expr } from '../dsl.mjs';
+// Tire — exact geometric port as a pure node graph: a table of profile rows,
+// a mapped profile/zones list, a per-facet radius expression, and revolve/fan
+// assembly. No script node.
+import { graph, expr, field } from '../dsl.mjs';
 
 const PALETTE = {
   'whitewall-chrome': { rubber: '#2a2d35', sidewall: '#f1f2ef', rim: '#999ca3', chrome: '#c2c7cd' },
@@ -10,43 +10,9 @@ const PALETTE = {
   'worn-spare': { rubber: '#3d3f46', sidewall: '#898c95', rim: '#676b72', chrome: '#999ca3' },
 };
 
-const DATA_SRC = `
-const R_OUT = 0.35, R_SHLD = 0.30, HW = 0.135, GROOVE = 0.030, BLOCK = 0.013;
-const BORE0 = 0.21, HUB0 = 0.135, DISH_Z = 0.042, BACK_R = 0.72, BACK_Z = -0.105, APEX_Z = 0.142;
-const N = Math.round(facets), W = width, RS = rimSize;
-const BORE = BORE0 * RS, HUBR = HUB0 * RS, WWI = BORE + 0.014, BKR = BORE * BACK_R, LUG_R = 0.105 * RS;
-const CY = R_OUT * Math.cos(Math.PI / N), ZOFF = -((APEX_Z - HW) / 2) * W;
-const PROF = [
-  [BKR, BACK_Z, 0, 0, 'rim'], [BKR, -0.135, 0, 0, 'rub'], [R_SHLD, -0.135, 0, 0, 'rub'],
-  [R_OUT, -0.112, BLOCK, 0, 'rub'], [R_OUT, -0.062, BLOCK, 0, 'rub'], [R_OUT - GROOVE, -0.040, 0, 0, 'rub'],
-  [R_OUT, -0.018, BLOCK, 1, 'rub'], [R_OUT, 0.018, BLOCK, 1, 'rub'], [R_OUT - GROOVE, 0.040, 0, 0, 'rub'],
-  [R_OUT, 0.062, BLOCK, 0, 'rub'], [R_OUT, 0.112, BLOCK, 0, 'rub'], [R_SHLD, 0.135, 0, 0, 'ww'],
-  [WWI, 0.135, 0, 0, 'rub'], [BORE, DISH_Z, 0, 0, 'rim'], [HUBR, DISH_Z, 0, 0, null],
-];
-const CAP = [[HUBR, DISH_Z], [0.118 * RS, 0.098], [0.066 * RS, 0.128]];
-const radius = ({ i, k }) => { const row = PROF[k]; return row[2] ? (Math.min(i, N - 1 - i) % 2 === row[3] ? row[0] - row[2] : row[0]) : row[0]; };
-`;
-const DATA_OUTS = [
-  { name: 'N', expr: 'N' },
-  { name: 'CY', expr: 'CY' },
-  { name: 'profile', expr: 'PROF.map((r) => [r[0], r[1] * W + ZOFF])' },
-  { name: 'zones', expr: "PROF.slice(0, -1).map((r) => r[4] ?? 'rim')" },
-  { name: 'radius', expr: 'radius' },
-  { name: 'BKR', expr: 'BKR' },
-  { name: 'backY', expr: 'BACK_Z * W + ZOFF' },
-  { name: 'HUBR', expr: 'HUBR' },
-  { name: 'dishY', expr: 'DISH_Z * W + ZOFF' },
-  { name: 'domeProfile', expr: 'CAP.map(([r, z]) => [r, z * W + ZOFF])' },
-  { name: 'domeR', expr: '0.066 * RS' },
-  { name: 'domeY', expr: '0.128 * W + ZOFF' },
-  { name: 'apexY', expr: 'APEX_Z * W + ZOFF' },
-  { name: 'lugR', expr: '0.023 * RS' },
-  { name: 'lugH', expr: '0.018 * W + 0.002' },
-  { name: 'lugX', expr: 'LUG_R' },
-  { name: 'lugZ', expr: 'DISH_Z * W + ZOFF - 0.002' },
-];
+const P = JSON.stringify(PALETTE);
 
-export default function build(g, P = {}) {
+export default function build(g, P0 = {}) {
   const colorway = g.input('colorway', 'enum', 'whitewall-chrome', { options: Object.keys(PALETTE), label: 'Colorway' });
   const rubber = g.input('rubber', 'color', '', { label: 'Rubber' });
   const sidewall = g.input('sidewall', 'color', '', { label: 'Sidewall' });
@@ -56,33 +22,62 @@ export default function build(g, P = {}) {
   const width = g.input('width', 'float', 1, { min: 0.7, max: 1.35, step: 0.05, label: 'Section width' });
   const rimSize = g.input('rimSize', 'float', 1, { min: 0.85, max: 1.2, step: 0.05, label: 'Rim size' });
 
-  const layoutInputs = [
-    { name: 'facets', type: 'int', default: 14 },
-    { name: 'width', type: 'float', default: 1 },
-    { name: 'rimSize', type: 'float', default: 1 },
-  ];
-  g.defineLayout('tire-data', { inputs: layoutInputs, src: DATA_SRC, outs: DATA_OUTS });
-  const data = g.layoutNode('tire-data', { facets, width, rimSize });
-  const get = (key) => ({ __ref: `${data.__ref}.${key}` });
-  const phase = expr('s => -Math.PI/2 + Math.PI/s.facets');
-  const fanPhase = expr('s => -Math.PI/2 + Math.PI/s.facets');
+  // Profile rows: [radius, z, tread block, parity, zone]. These are the
+  // reference constants with the two live scales applied.
+  const rows = g.value({
+    expr: `[[0.21*s.rimSize*0.72, -0.105, 0, 0, 'rim'], [0.21*s.rimSize*0.72, -0.135, 0, 0, 'rub'], [0.30, -0.135, 0, 0, 'rub'], [0.35, -0.112, 0.013, 0, 'rub'], [0.35, -0.062, 0.013, 0, 'rub'], [0.32, -0.040, 0, 0, 'rub'], [0.35, -0.018, 0.013, 1, 'rub'], [0.35, 0.018, 0.013, 1, 'rub'], [0.32, 0.040, 0, 0, 'rub'], [0.35, 0.062, 0.013, 0, 'rub'], [0.35, 0.112, 0.013, 0, 'rub'], [0.30, 0.135, 0, 0, 'ww'], [0.21*s.rimSize + 0.014, 0.135, 0, 0, 'rub'], [0.21*s.rimSize, 0.042, 0, 0, 'rim'], [0.135*s.rimSize, 0.042, 0, 0, null]]`,
+  });
+
+  g.define('tire-profile', (h) => {
+    h.input('item', 'any', null);
+    const v = h.value({ expr: '[item[0], (item[1] - 0.0035) * s.width]' });
+    h.out('out', v);
+  });
+  g.define('tire-zone', (h) => {
+    h.input('item', 'any', null);
+    const v = h.value({ expr: "item[4] || 'rim'" });
+    h.out('out', v);
+  });
+
+  const profile = g.map({ list: rows, graph: 'tire-profile' });
+  const zonesAll = g.map({ list: rows, graph: 'tire-zone' });
+  const zones = g.value({ args: { z: zonesAll }, expr: 'z.slice(0, -1)' });
+
+  const BKR = g.value({ expr: '0.21*s.rimSize*0.72' });
+  const backY = g.value({ expr: '(-0.105 - 0.0035)*s.width' });
+  const HUBR = g.value({ expr: '0.135*s.rimSize' });
+  const dishY = g.value({ expr: '(0.042 - 0.0035)*s.width' });
+  const domeProfile = g.value({
+    expr: '[[0.135*s.rimSize, (0.042-0.0035)*s.width], [0.118*s.rimSize, (0.098-0.0035)*s.width], [0.066*s.rimSize, (0.128-0.0035)*s.width]]',
+  });
+  const domeR = g.value({ expr: '0.066*s.rimSize' });
+  const domeY = g.value({ expr: '(0.128 - 0.0035)*s.width' });
+  const apexY = g.value({ expr: '(0.142 - 0.0035)*s.width' });
+  const lugR = g.value({ expr: '0.023*s.rimSize' });
+  const lugH = g.value({ expr: '0.018*s.width + 0.002' });
+  const lugX = g.value({ expr: '0.105*s.rimSize' });
+  const lugZ = g.value({ expr: '(0.042 - 0.0035)*s.width - 0.002' });
+  const CY = g.value({ expr: '0.35*cos(PI/s.facets)' });
+  const phase = expr('-PI/2 + PI/s.facets');
 
   const shell = g.revolve({
-    profile: get('profile'), seg: facets, axis: 'z', phase,
-    ringMode: 'xz', zone: get('zones'), mod: get('radius'),
+    profile, seg: facets, axis: 'z', phase,
+    ringMode: 'xz', zone: zones,
+    values: { rows },
+    mod: field("vals.rows[k][2] ? (min(i, s.seg-1-i)%2===vals.rows[k][3] ? vals.rows[k][0]-vals.rows[k][2] : vals.rows[k][0]) : vals.rows[k][0]"),
   });
-  const backCap = g.fanRing({ r: get('BKR'), y: get('backY'), n: facets, phase: fanPhase, apex: [0, 0, get('backY')], axis: 'z', zone: 'rim', flip: true });
-  const dishCap = g.fanRing({ r: get('HUBR'), y: get('dishY'), n: facets, phase: fanPhase, apex: [0, 0, get('dishY')], axis: 'z', zone: 'rim' });
-  const dome = g.revolve({ profile: get('domeProfile'), seg: facets, axis: 'z', phase, zone: 'chrome' });
-  const domeCap = g.fanRing({ r: get('domeR'), y: get('domeY'), n: facets, phase: fanPhase, apex: [0, 0, get('apexY')], axis: 'z', zone: 'chrome' });
-  const lug = g.cone({ n: 6, r: get('lugR'), h: get('lugH'), x: get('lugX'), y: 0, z: get('lugZ'), axis: 'z', zone: 'chrome' });
+  const backCap = g.fanRing({ r: BKR, y: backY, n: facets, phase, apex: [0, 0, backY], axis: 'z', zone: 'rim', flip: true });
+  const dishCap = g.fanRing({ r: HUBR, y: dishY, n: facets, phase, apex: [0, 0, dishY], axis: 'z', zone: 'rim' });
+  const dome = g.revolve({ profile: domeProfile, seg: facets, axis: 'z', phase, zone: 'chrome' });
+  const domeCap = g.fanRing({ r: domeR, y: domeY, n: facets, phase, apex: [0, 0, apexY], axis: 'z', zone: 'chrome' });
+  const lug = g.cone({ n: 6, r: lugR, h: lugH, x: lugX, y: 0, z: lugZ, axis: 'z', zone: 'chrome' });
   const lugs = g.arrayPolar({ geom: lug, count: 5, axis: 'z', start: Math.PI / 2, spin: false });
 
   const geo = g.join([shell, backCap, dishCap, dome, domeCap, lugs]);
   const centered = g.center({ geom: geo, y: false });
-  const body = g.transform({ geom: centered, ty: get('CY') });
+  const body = g.transform({ geom: centered, ty: CY });
 
-  const color = (key) => expr(`s => s.${key} || (${JSON.stringify(PALETTE)})[s.colorway].${key}`);
+  const color = (key) => expr(`s.${key} || (${P}[s.colorway] || ${P}['whitewall-chrome']).${key}`);
   return g.mesh(body, {
     zones: { rub: color('rubber'), ww: color('sidewall'), rim: color('rim'), chrome: color('chrome') },
   });

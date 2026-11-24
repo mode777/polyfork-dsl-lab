@@ -1,107 +1,70 @@
 # polyfork graph v2 — sapphire
 graph sapphire
-layout sapphire-data
-in length float 1
-in barrel float 0
-in ends enum pointed
-in chamfer float 0.3
-in irregularity float 0
-
-const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
-const R = 0.034, Hh = 0.023, PT = 0.033;
-const PL = 0.074 * clamp(length, 0.5, 1.8);
-const irr = clamp(irregularity, 0, 1);
-const bar = clamp(barrel, 0, 1);
-const ch = clamp(chamfer, 0, 1);
-let seed = 20261103;
-const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
-const j = () => rnd() * 2 - 1;
-
-const sec = [[R, Hh], [0.5 * R, 2 * Hh], [-0.5 * R, 2 * Hh], [-R, Hh], [-0.5 * R, 0], [0.5 * R, 0]];
-const jit = [[0.12 * R, 0.18 * Hh], [0.18 * R, 0.12 * Hh], [0.18 * R, 0.12 * Hh], [0.12 * R, 0.18 * Hh], [0.16 * R, 0], [0.16 * R, 0]];
-for (let i = 0; i < 6; i++) { sec[i][0] += j() * jit[i][0] * irr; sec[i][1] += j() * jit[i][1] * irr; }
-
-let ring2d = sec;
-if (ch > 0.001) {
-  const c = ch * 0.2 * R;
-  ring2d = [];
-  for (let i = 0; i < 6; i++) {
-    const a = sec[(i + 5) % 6], b = sec[i], d = sec[(i + 1) % 6];
-    const ta = [a[0] - b[0], a[1] - b[1]], td = [d[0] - b[0], d[1] - b[1]];
-    const la = Math.hypot(...ta), ld = Math.hypot(...td);
-    ring2d.push([b[0] + (ta[0] / la) * c, b[1] + (ta[1] / la) * c]);
-    ring2d.push([b[0] + (td[0] / ld) * c, b[1] + (td[1] / ld) * c]);
-  }
-}
-
-const st = (bar > 0.001 || irr > 0.001)
-  ? [[-PL / 2, 1, 0], [0, 1 + 0.18 * bar, 0], [PL / 2, 1, 0]]
-  : [[-PL / 2, 1, 0], [PL / 2, 1, 0]];
-for (const s of st) { s[1] *= 1 + j() * 0.1 * irr; s[2] += j() * 0.1 * R * irr; }
-
-const centroid = (pts) => pts.reduce((a, p) => [a[0] + p[0] / pts.length, a[1] + p[1] / pts.length, a[2] + p[2] / pts.length], [0, 0, 0]);
-const rings = st.map(([x, s, dz]) => ring2d.map(([z, y]) => [x, y * s, z * s + dz]));
-const ringsBroken = rings.map((r) => r.map((p) => [p[0], p[1], p[2]]));
-
-if (ends === 'broken') {
-  const r0 = rings[0], r1 = rings[1];
-  const yc = centroid(r0)[1];
-  const xc = r0[0][0] + 0.3 * (r1[0][0] - r0[0][0]);
-  const a = 0.45, b = 0.3;
-  ringsBroken[0] = r0.map((p0, i) => {
-    const p1 = r1[i], d = [p1[0] - p0[0], p1[1] - p0[1], p1[2] - p0[2]];
-    const num = xc + a * (p0[1] - yc) + b * p0[2] - p0[0];
-    const den = d[0] - a * d[1] - b * d[2];
-    const t = clamp(num / den, 0.04, 0.9);
-    return [p0[0] + t * d[0], p0[1] + t * d[1], p0[2] + t * d[2]];
-  });
-}
-
-const state = seed;
-const jFrom = (s0) => { let q = s0; return () => { q = (q * 16807) % 2147483647; return (q / 2147483647) * 2 - 1; }; };
-const tip = (ring, dir, jj) => {
-  const c = centroid(ring);
-  return [c[0] + dir * PT * (1 + 0.3 * jj() * irr), c[1] + jj() * 0.25 * Hh * irr, c[2] + jj() * 0.25 * R * irr];
-};
-
-const jp = jFrom(state);
-const pointedTop = tip(rings[rings.length - 1], 1, jp);
-const pointedBottom = tip(rings[0], -1, jp);
-
-const jt = jFrom(state);
-const truncTopApex = tip(rings[rings.length - 1], 1, jt);
-const truncBottomApex = tip(rings[0], -1, jt);
-const capAt = (ring, apex) => ring.map((p) => [p[0] + 0.55 * (apex[0] - p[0]), p[1] + 0.55 * (apex[1] - p[1]), p[2] + 0.55 * (apex[2] - p[2])]);
-const truncTopRing = rings[rings.length - 1], truncBottomRing = rings[0];
-const truncTopCap = capAt(truncTopRing, truncTopApex), truncBottomCap = capAt(truncBottomRing, truncBottomApex);
-const truncTopFan = centroid(truncTopCap), truncBottomFan = centroid(truncBottomCap);
-
-const jb = jFrom(state);
-const brokenTopApex = tip(rings[rings.length - 1], 1, jb);
-// The reference mirrors the whole broken crystal in X after assembling it.
-for (const r of ringsBroken) for (const p of r) p[0] *= -1;
-brokenTopApex[0] *= -1;
-const brokenBottomRing = ringsBroken[0];
-const bc = centroid(brokenBottomRing);
-const brokenDent = [bc[0] - 0.3 * PT, bc[1] + 0.2 * Hh, bc[2] - 0.2 * R];
-
-
-out profile=ring2d
-out stations=st
-out rings=rings
-out ringsBroken=ringsBroken
-out pointedTop=pointedTop
-out pointedBottom=pointedBottom
-out truncTopRing=truncTopRing
-out truncBottomRing=truncBottomRing
-out truncTopCap=truncTopCap
-out truncBottomCap=truncBottomCap
-out truncTopFan=truncTopFan
-out truncBottomFan=truncBottomFan
-out brokenTopRing=ringsBroken[ringsBroken.length - 1]
-out brokenTopApex=brokenTopApex
-out brokenBottomRing=brokenBottomRing
-out brokenDent=brokenDent
+group gem-section
+in item any null
+in v any null
+n n0 value expr=<<<
+let base = [[0.034, 0.023], [0.017, 0.046], [-0.017, 0.046], [-0.034, 0.023], [-0.017, 0], [0.017, 0]],
+        jit = [[0.00408, 0.00414], [0.00612, 0.00276], [0.00612, 0.00276], [0.00408, 0.00414], [0.00544, 0], [0.00544, 0]],
+        irr = clamp(s.irregularity, 0, 1)
+      in [base[item][0] + (v[2*item]*2 - 1) * jit[item][0] * irr,
+          base[item][1] + (v[2*item+1]*2 - 1) * jit[item][1] * irr]
+>>>
+out out=@n0
+end
+group gem-station
+in item any null
+in v any null
+in n any null
+n n0 value expr=<<<
+let irr = clamp(s.irregularity, 0, 1), bar = clamp(s.barrel, 0, 1), pl = 0.074 * clamp(s.length, 0.5, 1.8),
+        x = (n === 3 && item === 1) ? 0 : (item === 0 ? -pl/2 : pl/2),
+        base = (n === 3 && item === 1) ? 1 + 0.18 * bar : 1
+      in { x, s: base * (1 + (v[12+2*item]*2 - 1) * 0.1 * irr), dz: (v[13+2*item]*2 - 1) * 0.1 * 0.034 * irr }
+>>>
+out out=@n0
+end
+group gem-ring-point
+in item any null
+in st any null
+n n0 value expr="[st.x, item[1] * st.s, item[0] * st.s + st.dz]"
+out out=@n0
+end
+group gem-ring
+in item any null
+in profile any null
+n n0 map list=$profile st=$item graph=gem-ring-point
+out out=@n0
+end
+group gem-cap-ring
+in item any null
+in apex any null
+n n0 value expr="[item[0] + 0.55*(apex[0]-item[0]), item[1] + 0.55*(apex[1]-item[1]), item[2] + 0.55*(apex[2]-item[2])]"
+out out=@n0
+end
+group gem-mirror-point
+in item any null
+n n0 value expr="[-item[0], item[1], item[2]]"
+out out=@n0
+end
+group gem-mirror-ring
+in item any null
+n n0 map list=$item graph=gem-mirror-point
+out out=@n0
+end
+group gem-cut-point
+in item any null
+in r0 any null
+in r1 any null
+n n0 value expr=<<<
+let p0 = r0[item], p1 = r1[item], d = [p1[0]-p0[0], p1[1]-p0[1], p1[2]-p0[2]],
+        yc = centroid(r0)[1], xc = r0[0][0] + 0.3*(r1[0][0]-r0[0][0]),
+        num = xc + 0.45*(p0[1]-yc) + 0.3*p0[2] - p0[0],
+        den = d[0] - 0.45*d[1] - 0.3*d[2],
+        tt = clamp(num/den, 0.04, 0.9)
+      in [p0[0] + tt*d[0], p0[1] + tt*d[1], p0[2] + tt*d[2]]
+>>>
+out out=@n0
 end
 in colorway enum royal-blue options=royal-blue|ruby-red|golden-yellow|green|white label=Colorway
 in gem color "" label=Gem
@@ -110,21 +73,65 @@ in barrel float 0 min=0 max=1 step=0.05 label="Barrel bulge"
 in ends enum pointed options=pointed|truncated|broken label=Terminations
 in chamfer float 0.3 min=0 max=1 step=0.05 label="Edge bevel"
 in irregularity float 0 min=0 max=1 step=0.05 label="Natural irregularity"
-n n0 layout length=$length barrel=$barrel ends=$ends chamfer=$chamfer irregularity=$irregularity graph=sapphire-data
-n n1 loftProfile profile=@n0.profile capTop=@n0.pointedTop capBottom=@n0.pointedBottom stations=@n0.stations zones={band:gem,capTop:gem,capBottom:gem} orient=true
-n n2 loft rings=@n0.rings zones={band:gem} orient=true
-n n3 loft rings=[@n0.truncTopRing,@n0.truncTopCap] zones={band:gem} orient=true
-n n4 loft rings=[@n0.truncTopCap] capTop=@n0.truncTopFan zones={capTop:gem} orient=true
-n n5 loft rings=[@n0.truncBottomRing,@n0.truncBottomCap] zones={band:gem} orient=true
-n n6 loft rings=[@n0.truncBottomCap] capBottom=@n0.truncBottomFan zones={capBottom:gem} orient=true
-n n7 join geoms=[@n2,@n3,@n4,@n5,@n6]
-n n8 loft rings=[@n0.brokenBottomRing] capBottom=@n0.brokenDent zones={capBottom:gem} orient=true
-n n9 reverse geom=@n8
-n n10 loft rings=@n0.ringsBroken zones={band:gem} orient=true
-n n11 loft rings=[@n0.brokenTopRing] capTop=@n0.brokenTopApex zones={capTop:gem} orient=true
-n n12 join geoms=[@n10,@n11,@n9]
-n n13 switch cases={pointed:@n1,truncated:@n7,broken:@n12} on=$ends
-n n14 center geom=@n13
-n n15 mesh geom=@n14 zones={gem:~`s => s.gem || ({"royal-blue":"#536aaa","ruby-red":"#a2222d","golden-yellow":"#dbbf57","green":"#50a14f","white":"#dddbdb"})[s.colorway] || '#536aaa'`} materials={gem:{roughness:0.22,metalness:0.2}}
-out mesh=@n15
+n n0 value expr="(clamp(s.barrel,0,1) > 0.001 || clamp(s.irregularity,0,1) > 0.001) ? 3 : 2"
+n n1 value args={nStations:@n0} expr="12 + 2 * nStations"
+n n2 random count=@n1 seed=20261103
+n n3 range from=0 to=6
+n n4 map list=@n3 v=@n2.values graph=gem-section
+n n5 bevelProfile profile=@n4 dist=~`clamp(s.chamfer,0,1) * 0.2 * 0.034`
+n n6 if cond=~`clamp(s.chamfer,0,1) > 0.001` then=@n5 else=@n4
+n n7 range to=@n0 from=0
+n n8 map list=@n7 v=@n2.values n=@n0 graph=gem-station
+n n9 map list=@n8 profile=@n6 graph=gem-ring
+n n10 value args={rings:@n9} expr="rings[0]"
+n n11 value args={rings:@n9} expr="rings[rings.length - 1]"
+n n12 random seed=@n2.state count=6
+n n13 value args={ring:@n11,t:@n12.values} expr=<<<
+let c = centroid(ring), irr = clamp(s.irregularity, 0, 1) in
+      [c[0] + 0.033 * (1 + 0.3 * (t[0]*2 - 1) * irr),
+       c[1] + (t[1]*2 - 1) * 0.25 * 0.023 * irr,
+       c[2] + (t[2]*2 - 1) * 0.25 * 0.034 * irr]
+>>>
+n n14 value args={ring:@n10,t:@n12.values} expr=<<<
+let c = centroid(ring), irr = clamp(s.irregularity, 0, 1) in
+      [c[0] - 0.033 * (1 + 0.3 * (t[3]*2 - 1) * irr),
+       c[1] + (t[4]*2 - 1) * 0.25 * 0.023 * irr,
+       c[2] + (t[5]*2 - 1) * 0.25 * 0.034 * irr]
+>>>
+n n15 loftProfile profile=@n6 capTop=@n13 capBottom=@n14 stations=@n8 zones={band:gem,capTop:gem,capBottom:gem} orient=true
+n n16 map list=@n11 apex=@n13 graph=gem-cap-ring
+n n17 map list=@n10 apex=@n14 graph=gem-cap-ring
+n n18 value args={ring:@n16} expr="centroid(ring)"
+n n19 value args={ring:@n17} expr="centroid(ring)"
+n n20 loft rings=@n9 zones={band:gem} orient=true
+n n21 list items=[@n11,@n16]
+n n22 loft rings=@n21 zones={band:gem} orient=true
+n n23 list items=[@n16]
+n n24 loft rings=@n23 capTop=@n18 zones={capTop:gem} orient=true
+n n25 list items=[@n10,@n17]
+n n26 loft rings=@n25 zones={band:gem} orient=true
+n n27 list items=[@n17]
+n n28 loft rings=@n27 capBottom=@n19 zones={capBottom:gem} orient=true
+n n29 join geoms=[@n20,@n22,@n24,@n26,@n28]
+n n30 value args={ring:@n10} expr=ring.length
+n n31 range to=@n30 from=0
+n n32 value args={rings:@n9} expr="rings[1]"
+n n33 map list=@n31 r0=@n10 r1=@n32 graph=gem-cut-point
+n n34 map list=@n33 graph=gem-mirror-point
+n n35 map list=@n9 graph=gem-mirror-ring
+n n36 value args={cut:@n34,rings:@n35} expr="[cut].concat(rings.slice(1))"
+n n37 value args={rings:@n36} expr="rings[rings.length - 1]"
+n n38 value args={apex:@n13} expr="[-apex[0], apex[1], apex[2]]"
+n n39 value args={ring:@n34} expr="let c = centroid(ring) in [c[0] - 0.3*0.033, c[1] + 0.2*0.023, c[2] - 0.2*0.034]"
+n n40 list items=[@n34]
+n n41 loft rings=@n40 capBottom=@n39 zones={capBottom:gem} orient=true
+n n42 reverse geom=@n41
+n n43 loft rings=@n36 zones={band:gem} orient=true
+n n44 list items=[@n37]
+n n45 loft rings=@n44 capTop=@n38 zones={capTop:gem} orient=true
+n n46 join geoms=[@n43,@n45,@n42]
+n n47 switch cases={pointed:@n15,truncated:@n29,broken:@n46} on=$ends
+n n48 center geom=@n47
+n n49 mesh geom=@n48 zones={gem:~`s.gem || ({"royal-blue":"#536aaa","ruby-red":"#a2222d","golden-yellow":"#dbbf57","green":"#50a14f","white":"#dddbdb"})[s.colorway] || '#536aaa'`} materials={gem:{roughness:0.22,metalness:0.2}}
+out mesh=@n49
 end

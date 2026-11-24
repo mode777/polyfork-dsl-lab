@@ -1,42 +1,14 @@
 # polyfork graph v2 — tire
 graph tire
-layout tire-data
-in facets int 14
-in width float 1
-in rimSize float 1
-
-const R_OUT = 0.35, R_SHLD = 0.30, HW = 0.135, GROOVE = 0.030, BLOCK = 0.013;
-const BORE0 = 0.21, HUB0 = 0.135, DISH_Z = 0.042, BACK_R = 0.72, BACK_Z = -0.105, APEX_Z = 0.142;
-const N = Math.round(facets), W = width, RS = rimSize;
-const BORE = BORE0 * RS, HUBR = HUB0 * RS, WWI = BORE + 0.014, BKR = BORE * BACK_R, LUG_R = 0.105 * RS;
-const CY = R_OUT * Math.cos(Math.PI / N), ZOFF = -((APEX_Z - HW) / 2) * W;
-const PROF = [
-  [BKR, BACK_Z, 0, 0, 'rim'], [BKR, -0.135, 0, 0, 'rub'], [R_SHLD, -0.135, 0, 0, 'rub'],
-  [R_OUT, -0.112, BLOCK, 0, 'rub'], [R_OUT, -0.062, BLOCK, 0, 'rub'], [R_OUT - GROOVE, -0.040, 0, 0, 'rub'],
-  [R_OUT, -0.018, BLOCK, 1, 'rub'], [R_OUT, 0.018, BLOCK, 1, 'rub'], [R_OUT - GROOVE, 0.040, 0, 0, 'rub'],
-  [R_OUT, 0.062, BLOCK, 0, 'rub'], [R_OUT, 0.112, BLOCK, 0, 'rub'], [R_SHLD, 0.135, 0, 0, 'ww'],
-  [WWI, 0.135, 0, 0, 'rub'], [BORE, DISH_Z, 0, 0, 'rim'], [HUBR, DISH_Z, 0, 0, null],
-];
-const CAP = [[HUBR, DISH_Z], [0.118 * RS, 0.098], [0.066 * RS, 0.128]];
-const radius = ({ i, k }) => { const row = PROF[k]; return row[2] ? (Math.min(i, N - 1 - i) % 2 === row[3] ? row[0] - row[2] : row[0]) : row[0]; };
-
-out N=N
-out CY=CY
-out profile=PROF.map((r) => [r[0], r[1] * W + ZOFF])
-out zones=PROF.slice(0, -1).map((r) => r[4] ?? 'rim')
-out radius=radius
-out BKR=BKR
-out backY=BACK_Z * W + ZOFF
-out HUBR=HUBR
-out dishY=DISH_Z * W + ZOFF
-out domeProfile=CAP.map(([r, z]) => [r, z * W + ZOFF])
-out domeR=0.066 * RS
-out domeY=0.128 * W + ZOFF
-out apexY=APEX_Z * W + ZOFF
-out lugR=0.023 * RS
-out lugH=0.018 * W + 0.002
-out lugX=LUG_R
-out lugZ=DISH_Z * W + ZOFF - 0.002
+group tire-profile
+in item any null
+n n0 value expr="[item[0], (item[1] - 0.0035) * s.width]"
+out out=@n0
+end
+group tire-zone
+in item any null
+n n0 value expr="item[4] || 'rim'"
+out out=@n0
 end
 in colorway enum whitewall-chrome options=whitewall-chrome|blackwall-steel|redline|worn-spare label=Colorway
 in rubber color "" label=Rubber
@@ -46,17 +18,33 @@ in chrome color "" label="Hubcap chrome"
 in facets int 14 min=12 max=16 step=1 label=Facets
 in width float 1 min=0.7 max=1.35 step=0.05 label="Section width"
 in rimSize float 1 min=0.85 max=1.2 step=0.05 label="Rim size"
-n n0 layout facets=$facets width=$width rimSize=$rimSize graph=tire-data
-n n1 revolve profile=@n0.profile seg=$facets zone=@n0.zones mod=@n0.radius axis=z phase=~`s => -Math.PI/2 + Math.PI/s.facets` ringMode=xz
-n n2 fanRing r=@n0.BKR y=@n0.backY n=$facets apex=[0,0,@n0.backY] phase=~`s => -Math.PI/2 + Math.PI/s.facets` axis=z zone=rim flip=true
-n n3 fanRing r=@n0.HUBR y=@n0.dishY n=$facets apex=[0,0,@n0.dishY] phase=~`s => -Math.PI/2 + Math.PI/s.facets` axis=z zone=rim
-n n4 revolve profile=@n0.domeProfile seg=$facets axis=z phase=~`s => -Math.PI/2 + Math.PI/s.facets` zone=chrome
-n n5 fanRing r=@n0.domeR y=@n0.domeY n=$facets apex=[0,0,@n0.apexY] phase=~`s => -Math.PI/2 + Math.PI/s.facets` axis=z zone=chrome
-n n6 cone r=@n0.lugR h=@n0.lugH x=@n0.lugX z=@n0.lugZ n=6 y=0 axis=z zone=chrome
-n n7 arrayPolar geom=@n6 count=5 axis=z start=1.5707963267948966 spin=false
-n n8 join geoms=[@n1,@n2,@n3,@n4,@n5,@n7]
-n n9 center geom=@n8 y=false
-n n10 transform geom=@n9 ty=@n0.CY
-n n11 mesh geom=@n10 zones={rub:~`s => s.rubber || ({"whitewall-chrome":{"rubber":"#2a2d35","sidewall":"#f1f2ef","rim":"#999ca3","chrome":"#c2c7cd"},"blackwall-steel":{"rubber":"#2a2d35","sidewall":"#3d3f46","rim":"#676b72","chrome":"#afb5bb"},"redline":{"rubber":"#2a2d35","sidewall":"#d13d34","rim":"#c2c7cd","chrome":"#f1f2ef"},"worn-spare":{"rubber":"#3d3f46","sidewall":"#898c95","rim":"#676b72","chrome":"#999ca3"}})[s.colorway].rubber`,ww:~`s => s.sidewall || ({"whitewall-chrome":{"rubber":"#2a2d35","sidewall":"#f1f2ef","rim":"#999ca3","chrome":"#c2c7cd"},"blackwall-steel":{"rubber":"#2a2d35","sidewall":"#3d3f46","rim":"#676b72","chrome":"#afb5bb"},"redline":{"rubber":"#2a2d35","sidewall":"#d13d34","rim":"#c2c7cd","chrome":"#f1f2ef"},"worn-spare":{"rubber":"#3d3f46","sidewall":"#898c95","rim":"#676b72","chrome":"#999ca3"}})[s.colorway].sidewall`,rim:~`s => s.rim || ({"whitewall-chrome":{"rubber":"#2a2d35","sidewall":"#f1f2ef","rim":"#999ca3","chrome":"#c2c7cd"},"blackwall-steel":{"rubber":"#2a2d35","sidewall":"#3d3f46","rim":"#676b72","chrome":"#afb5bb"},"redline":{"rubber":"#2a2d35","sidewall":"#d13d34","rim":"#c2c7cd","chrome":"#f1f2ef"},"worn-spare":{"rubber":"#3d3f46","sidewall":"#898c95","rim":"#676b72","chrome":"#999ca3"}})[s.colorway].rim`,chrome:~`s => s.chrome || ({"whitewall-chrome":{"rubber":"#2a2d35","sidewall":"#f1f2ef","rim":"#999ca3","chrome":"#c2c7cd"},"blackwall-steel":{"rubber":"#2a2d35","sidewall":"#3d3f46","rim":"#676b72","chrome":"#afb5bb"},"redline":{"rubber":"#2a2d35","sidewall":"#d13d34","rim":"#c2c7cd","chrome":"#f1f2ef"},"worn-spare":{"rubber":"#3d3f46","sidewall":"#898c95","rim":"#676b72","chrome":"#999ca3"}})[s.colorway].chrome`}
-out mesh=@n11
+n n0 value expr="[[0.21*s.rimSize*0.72, -0.105, 0, 0, 'rim'], [0.21*s.rimSize*0.72, -0.135, 0, 0, 'rub'], [0.30, -0.135, 0, 0, 'rub'], [0.35, -0.112, 0.013, 0, 'rub'], [0.35, -0.062, 0.013, 0, 'rub'], [0.32, -0.040, 0, 0, 'rub'], [0.35, -0.018, 0.013, 1, 'rub'], [0.35, 0.018, 0.013, 1, 'rub'], [0.32, 0.040, 0, 0, 'rub'], [0.35, 0.062, 0.013, 0, 'rub'], [0.35, 0.112, 0.013, 0, 'rub'], [0.30, 0.135, 0, 0, 'ww'], [0.21*s.rimSize + 0.014, 0.135, 0, 0, 'rub'], [0.21*s.rimSize, 0.042, 0, 0, 'rim'], [0.135*s.rimSize, 0.042, 0, 0, null]]"
+n n1 map list=@n0 graph=tire-profile
+n n2 map list=@n0 graph=tire-zone
+n n3 value args={z:@n2} expr="z.slice(0, -1)"
+n n4 value expr="0.21*s.rimSize*0.72"
+n n5 value expr="(-0.105 - 0.0035)*s.width"
+n n6 value expr="0.135*s.rimSize"
+n n7 value expr="(0.042 - 0.0035)*s.width"
+n n8 value expr="[[0.135*s.rimSize, (0.042-0.0035)*s.width], [0.118*s.rimSize, (0.098-0.0035)*s.width], [0.066*s.rimSize, (0.128-0.0035)*s.width]]"
+n n9 value expr="0.066*s.rimSize"
+n n10 value expr="(0.128 - 0.0035)*s.width"
+n n11 value expr="(0.142 - 0.0035)*s.width"
+n n12 value expr="0.023*s.rimSize"
+n n13 value expr="0.018*s.width + 0.002"
+n n14 value expr="0.105*s.rimSize"
+n n15 value expr="(0.042 - 0.0035)*s.width - 0.002"
+n n16 value expr="0.35*cos(PI/s.facets)"
+n n17 revolve profile=@n1 seg=$facets zone=@n3 values={rows:@n0} axis=z phase=~`-PI/2 + PI/s.facets` ringMode=xz mod=`vals.rows[k][2] ? (min(i, s.seg-1-i)%2===vals.rows[k][3] ? vals.rows[k][0]-vals.rows[k][2] : vals.rows[k][0]) : vals.rows[k][0]`
+n n18 fanRing r=@n4 y=@n5 n=$facets apex=[0,0,@n5] phase=~`-PI/2 + PI/s.facets` axis=z zone=rim flip=true
+n n19 fanRing r=@n6 y=@n7 n=$facets apex=[0,0,@n7] phase=~`-PI/2 + PI/s.facets` axis=z zone=rim
+n n20 revolve profile=@n8 seg=$facets axis=z phase=~`-PI/2 + PI/s.facets` zone=chrome
+n n21 fanRing r=@n9 y=@n10 n=$facets apex=[0,0,@n11] phase=~`-PI/2 + PI/s.facets` axis=z zone=chrome
+n n22 cone r=@n12 h=@n13 x=@n14 z=@n15 n=6 y=0 axis=z zone=chrome
+n n23 arrayPolar geom=@n22 count=5 axis=z start=1.5707963267948966 spin=false
+n n24 join geoms=[@n17,@n18,@n19,@n20,@n21,@n23]
+n n25 center geom=@n24 y=false
+n n26 transform geom=@n25 ty=@n16
+n n27 mesh geom=@n26 zones={rub:~`s.rubber || ({"whitewall-chrome":{"rubber":"#2a2d35","sidewall":"#f1f2ef","rim":"#999ca3","chrome":"#c2c7cd"},"blackwall-steel":{"rubber":"#2a2d35","sidewall":"#3d3f46","rim":"#676b72","chrome":"#afb5bb"},"redline":{"rubber":"#2a2d35","sidewall":"#d13d34","rim":"#c2c7cd","chrome":"#f1f2ef"},"worn-spare":{"rubber":"#3d3f46","sidewall":"#898c95","rim":"#676b72","chrome":"#999ca3"}}[s.colorway] || {"whitewall-chrome":{"rubber":"#2a2d35","sidewall":"#f1f2ef","rim":"#999ca3","chrome":"#c2c7cd"},"blackwall-steel":{"rubber":"#2a2d35","sidewall":"#3d3f46","rim":"#676b72","chrome":"#afb5bb"},"redline":{"rubber":"#2a2d35","sidewall":"#d13d34","rim":"#c2c7cd","chrome":"#f1f2ef"},"worn-spare":{"rubber":"#3d3f46","sidewall":"#898c95","rim":"#676b72","chrome":"#999ca3"}}['whitewall-chrome']).rubber`,ww:~`s.sidewall || ({"whitewall-chrome":{"rubber":"#2a2d35","sidewall":"#f1f2ef","rim":"#999ca3","chrome":"#c2c7cd"},"blackwall-steel":{"rubber":"#2a2d35","sidewall":"#3d3f46","rim":"#676b72","chrome":"#afb5bb"},"redline":{"rubber":"#2a2d35","sidewall":"#d13d34","rim":"#c2c7cd","chrome":"#f1f2ef"},"worn-spare":{"rubber":"#3d3f46","sidewall":"#898c95","rim":"#676b72","chrome":"#999ca3"}}[s.colorway] || {"whitewall-chrome":{"rubber":"#2a2d35","sidewall":"#f1f2ef","rim":"#999ca3","chrome":"#c2c7cd"},"blackwall-steel":{"rubber":"#2a2d35","sidewall":"#3d3f46","rim":"#676b72","chrome":"#afb5bb"},"redline":{"rubber":"#2a2d35","sidewall":"#d13d34","rim":"#c2c7cd","chrome":"#f1f2ef"},"worn-spare":{"rubber":"#3d3f46","sidewall":"#898c95","rim":"#676b72","chrome":"#999ca3"}}['whitewall-chrome']).sidewall`,rim:~`s.rim || ({"whitewall-chrome":{"rubber":"#2a2d35","sidewall":"#f1f2ef","rim":"#999ca3","chrome":"#c2c7cd"},"blackwall-steel":{"rubber":"#2a2d35","sidewall":"#3d3f46","rim":"#676b72","chrome":"#afb5bb"},"redline":{"rubber":"#2a2d35","sidewall":"#d13d34","rim":"#c2c7cd","chrome":"#f1f2ef"},"worn-spare":{"rubber":"#3d3f46","sidewall":"#898c95","rim":"#676b72","chrome":"#999ca3"}}[s.colorway] || {"whitewall-chrome":{"rubber":"#2a2d35","sidewall":"#f1f2ef","rim":"#999ca3","chrome":"#c2c7cd"},"blackwall-steel":{"rubber":"#2a2d35","sidewall":"#3d3f46","rim":"#676b72","chrome":"#afb5bb"},"redline":{"rubber":"#2a2d35","sidewall":"#d13d34","rim":"#c2c7cd","chrome":"#f1f2ef"},"worn-spare":{"rubber":"#3d3f46","sidewall":"#898c95","rim":"#676b72","chrome":"#999ca3"}}['whitewall-chrome']).rim`,chrome:~`s.chrome || ({"whitewall-chrome":{"rubber":"#2a2d35","sidewall":"#f1f2ef","rim":"#999ca3","chrome":"#c2c7cd"},"blackwall-steel":{"rubber":"#2a2d35","sidewall":"#3d3f46","rim":"#676b72","chrome":"#afb5bb"},"redline":{"rubber":"#2a2d35","sidewall":"#d13d34","rim":"#c2c7cd","chrome":"#f1f2ef"},"worn-spare":{"rubber":"#3d3f46","sidewall":"#898c95","rim":"#676b72","chrome":"#999ca3"}}[s.colorway] || {"whitewall-chrome":{"rubber":"#2a2d35","sidewall":"#f1f2ef","rim":"#999ca3","chrome":"#c2c7cd"},"blackwall-steel":{"rubber":"#2a2d35","sidewall":"#3d3f46","rim":"#676b72","chrome":"#afb5bb"},"redline":{"rubber":"#2a2d35","sidewall":"#d13d34","rim":"#c2c7cd","chrome":"#f1f2ef"},"worn-spare":{"rubber":"#3d3f46","sidewall":"#898c95","rim":"#676b72","chrome":"#999ca3"}}['whitewall-chrome']).chrome`}
+out mesh=@n27
 end

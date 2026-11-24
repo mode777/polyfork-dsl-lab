@@ -25,7 +25,7 @@ export default function build(g, P = {}) {
     capZoneField: field("i%2 ? 'shade' : 'lobe'"),
     orient: true,
   });
-  const scaled = g.transform({ geom: body, s: expr('s => [1, s.squash, 1]') });
+  const scaled = g.transform({ geom: body, s: expr('[1, s.squash, 1]') });
 
   // Reference transform chain: translate up, tilt around Z, then seat on crown.
   const stem = g.transform({
@@ -34,21 +34,13 @@ export default function build(g, P = {}) {
       ty: 0.039,
     }),
     rz: -0.16, tx: 0.006,
-    ty: expr('s => 0.192*s.squash'),
+    ty: expr('0.192*s.squash'),
   });
 
-  const exprColor = (key) => expr(`s => {
-    const cw = (${JSON.stringify(PALETTE)})[s.colorway] || (${JSON.stringify(PALETTE)}).field;
-    return s.${key} || cw.${key === 'lobe' ? 'lobe' : 'stem'};
-  }`);
-  const grooveColor = expr(`s => {
-    const cw = (${JSON.stringify(PALETTE)})[s.colorway] || (${JSON.stringify(PALETTE)}).field;
-    if (!s.lobe) return cw.groove;
-    const n = parseInt(s.lobe.slice(1), 16);
-    const f = 0.78;
-    const r = Math.round(((n >> 16) & 255) * f), g = Math.round(((n >> 8) & 255) * f), b = Math.round((n & 255) * f);
-    return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
-  }`);
+  const PAL = JSON.stringify(PALETTE);
+  const exprColor = (key) => expr(`s.${key} || (${PAL}[s.colorway] || ${PAL}.field).${key === 'lobe' ? 'lobe' : 'stem'}`);
+  // Groove is the lobe darkened 22% when the lobe colour is overridden.
+  const grooveColor = expr(`s.lobe ? darken(s.lobe, 0.78) : (${PAL}[s.colorway] || ${PAL}.field).groove`);
 
   return g.mesh(g.join([scaled, stem]), {
     zones: { lobe: exprColor('lobe'), shade: grooveColor, stem: exprColor('stem') },

@@ -31,15 +31,15 @@ and a compact declarative storage format.
 | `random` | deterministic `{values,next}` stream |
 | `object` | a `THREE.Object3D` output |
 
-### Nodes (60)
+### Nodes (65)
 
 | group | nodes |
 |---|---|
-| sources | `ring`, `profile`, `path`, `grid`, `box`, `cylinder`, `sphere`, `geometry`, `prim`, `random` |
+| sources | `ring`, `profile`, `path`, `grid`, `box`, `cylinder`, `sphere`, `geometry`, `prim`, `random`, `value`, `list`, `range` |
 | surfaces | `loft`, `cap`, `extrude`, `revolve`, `sweep`, `inset`, `pocket`, `solidify` |
 | modifiers | `transform`, `center`, `mirror`, `reverse`, `deform`, `clip`, `join` |
 | distribution | `scatter`, `instance`, `arrayPolar`, `arrayLinear` |
-| control | `switch`, `fan`, `cone`, `layout` |
+| control | `switch`, `fan`, `cone`, `if`, `map`, `fold` |
 | output | `mesh`, `group` |
 | escape hatches | `script`, `module` |
 
@@ -65,7 +65,6 @@ reverse   geom -> geometry with opposite winding
 random    seed count -> stream
 switch    on cases{a:ref,b:ref}
 mesh      geom zones{zone:hex} materials{zone:{slot,roughness,metalness,opacity}} crease
-layout    name + in... let/fn... out name=expr (pure, deterministic rng)
 script    inputs{...} src  (JS: THREE, ADDONS, H; `return` any value)
 module    params  (wraps an existing createAsset)
 ```

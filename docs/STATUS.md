@@ -26,18 +26,21 @@ studies were removed from the published manifest. They are not shown as ports.
 
 - Fixed the sapphire inversion: the runtime's bottom-cap hint pointed inward; `loft` now
   has `orient`/`orientCenter` and the broken dished cap uses `reverse`.
-- Sapphire is fully parametric. A layout block computes the reference layout data using one
-  PRNG stream; multi-output refs feed `loftProfile`/`loft`; `switch` selects the termination; mesh
+- Sapphire is fully parametric. A random value stream plus `map`/`value` nodes compute the
+  reference layout; `loftProfile`/`loft` build it; `switch` selects the termination; mesh
   colours come from `colorway`/`gem`.
-- Added a first-class pure **layout** block (`in`/`let`/`fn`/`out`, deterministic `rng`,
-  multi-output `@node.field` refs) and migrated sapphire/tire/rug off `script` nodes.
+- Added a **parsed expression language** (`runtime/expr.js`, no `new Function`) for
+  fields and `~` params: arithmetic, comparisons, `?:`, arrays/objects, `let … in`, math
+  and vector built-ins.
+- Replaced code-block layouts with generic node graphs: `value`, `list`, `range`,
+  `map`, `fold`, `if`, and `@node.field` refs. Sapphire/tire/rug are pure graphs.
 - Added `prim` (exact Three geometry constructors), `reverse` (face winding),
   `revolve.ringMode`/`zoneField`/caps, `solidify.diagonal`/`wallOrder`/zone fields, and
   input `label`/`step` metadata.
 - Added exact **pumpkin** (alternating lobe/groove revolve, real Three cylinder stem) and
   **area rug** (deformed lattice, folded corner, per-cell zones) ports.
 - Tire is fully parametric now (colorway, rubber/sidewall/rim/chrome, facets, width, rim
-  size) with a layout block for the profile/modulation data.
+  size) with a `value` row table and expression-driven modulation.
 - Parity now checks **winding** as well as vertices/bbox. This is what caught sapphire.
 - Showcase tags and manifest now contain ports only; the old studies are removed.
 
@@ -51,8 +54,7 @@ studies were removed from the published manifest. They are not shown as ports.
 - `t-pumpkin.mjs`: 6/6 variants.
 - `t-rug.mjs`: 9/9 variants (both sizes, pile, lived-in extremes, all patterns).
 - All five showcase graphs parse and cook (`t-examples.mjs`); none contains a `script`
-  node.
-- `t-layout.mjs`: layout inputs, `fn`, `rng`, multi-output and format round-trip.
+  node and the runtime never evaluates JavaScript for fields/params.
 - `t-code.mjs`, `t-bool.mjs`, `t-cache.mjs`, `t-sample3.mjs` pass.
 
 ## How to compare correctly

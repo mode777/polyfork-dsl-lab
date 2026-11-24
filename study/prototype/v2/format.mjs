@@ -22,7 +22,6 @@ export function toJSON(g) {
     nodes: g.nodes.map((n) => ({ id: n.id, type: n.type, in: n.in, p: n.p })),
     outputs: g.outputs,
     groups: Object.fromEntries([...g.groups.entries()].map(([k, v]) => [k, toJSON(v)])),
-    layouts: Object.fromEntries([...g.layouts.entries()].map(([k, v]) => [k, v])),
   };
 }
 
@@ -33,7 +32,6 @@ export function fromJSON(o) {
   g.byId = new Map(g.nodes.map((n) => [n.id, n]));
   g.outputs = o.outputs ?? {};
   for (const [k, v] of Object.entries(o.groups ?? {})) g.groups.set(k, fromJSON(v));
-  for (const [k, v] of Object.entries(o.layouts ?? {})) g.layouts.set(k, v);
   g._seq = g.nodes.length;
   return g;
 }
@@ -137,26 +135,26 @@ export function toText(g) {
         if (v === undefined || seen.has(k) || (script && k === 'src')) continue;
         pairs.push(`${k}=${ser(v)}`);
       }
-      if (script) { L.push(`n ${n.id} ${n.type}${pairs.length ? ' ' + pairs.join(' ') : ''} src=<<<`); L.push(script.trimEnd()); L.push('>>>'); }
-      else L.push(`n ${n.id} ${n.type}${pairs.length ? ' ' + pairs.join(' ') : ''}`);
+      if (script) { L.push(`n ${n.id} ${n.type}${pairs.length ? ' ' + pairs.join(' ') : ''} src=<<<`); L.push(script.trimEnd()); L.push('>>>'); continue; }
+      // Multi-line string params use a heredoc so layout expressions stay readable.
+      let heredoc = null;
+      const inline = [];
+      for (const pair of pairs) {
+        const eq = pair.indexOf('=');
+        const key = pair.slice(0, eq), val = pair.slice(eq + 1);
+        if (!heredoc && val.startsWith('"') && val.includes('\\n')) {
+          try { const text = JSON.parse(val); if (text.includes('\n')) { heredoc = { key, text }; continue; } } catch { /* keep inline */ }
+        }
+        inline.push(pair);
+      }
+      if (heredoc) {
+        L.push(`n ${n.id} ${n.type}${inline.length ? ' ' + inline.join(' ') : ''} ${heredoc.key}=<<<`);
+        L.push(heredoc.text.trimEnd());
+        L.push('>>>');
+      } else L.push(`n ${n.id} ${n.type}${inline.length ? ' ' + inline.join(' ') : ''}`);
     }
     for (const [k, v] of Object.entries(gg.outputs)) L.push(`out ${k}=${ser(v)}`);
   };
-  for (const [name, lay] of g.layouts) {
-    L.push(`layout ${name}`);
-    for (const i of lay.inputs) {
-      let line = `in ${i.name} ${i.type} ${ser(i.default)}`;
-      if (i.min !== undefined) line += ` min=${i.min}`;
-      if (i.max !== undefined) line += ` max=${i.max}`;
-      if (i.step !== undefined) line += ` step=${i.step}`;
-      if (i.options) line += ` options=${i.options.join('|')}`;
-      if (i.label) line += ` label=${ser(i.label)}`;
-      L.push(line);
-    }
-    for (const line of String(lay.src ?? '').split('\n')) L.push(line);
-    for (const o of lay.outs ?? []) L.push(`out ${o.name}=${o.expr}`);
-    L.push('end');
-  }
   for (const [name, sg] of g.groups) { L.push(`group ${name}`); emitInterface(sg); emitNodes(sg); L.push('end'); }
   for (const i of g.inputs) {
     let line = `in ${i.name} ${i.type} ${ser(i.default)}`;
@@ -189,7 +187,6 @@ export function parseText(src) {
     if (v && typeof v === 'object') { const o = {}; for (const [k, x] of Object.entries(v)) o[k] = deref(x); return o; }
     return v;
   };
-  let layout = null;
   const parseInput = (tok) => {
     const i = { name: tok[1], type: tok[2], default: parseVal(tok[3]) };
     for (const t of tok.slice(4)) {
@@ -203,22 +200,10 @@ export function parseText(src) {
   };
   for (const raw of src.split('\n')) {
     const line = raw.trim();
-    if (layout) {
-      if (line === 'end') { layout.src = layout.src.join('\n').trim(); g.layouts.set(layout.name, layout); layout = null; continue; }
-      if (line.startsWith('in ')) { layout.inputs.push(parseInput(splitTop(line))); continue; }
-      if (line.startsWith('out ')) {
-        const body = line.slice(4), eq = body.indexOf('=');
-        if (eq > 0) layout.outs.push({ name: body.slice(0, eq).trim(), expr: body.slice(eq + 1).trim() });
-        continue;
-      }
-      layout.src.push(raw);
-      continue;
-    }
     if (!line || line.startsWith('#')) continue;
     const tok = splitTop(line);
     if (tok[0] === 'graph') { g = new Graph(tok[1]); stack.push(g); continue; }
     if (!g) throw new Error('parse: node before graph header');
-    if (tok[0] === 'layout') { layout = { name: tok[1], inputs: [], src: [], outs: [] }; continue; }
     if (tok[0] === 'group') { const sg = new Graph(tok[1], { group: true }); stack[stack.length - 1].groups.set(tok[1], sg); stack.push(sg); continue; }
     if (tok[0] === 'end') { if (stack.length > 1) stack.pop(); continue; }
     const cur = stack[stack.length - 1];

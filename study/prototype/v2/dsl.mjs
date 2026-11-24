@@ -11,8 +11,6 @@ class Builder {
   constructor(g) { this.g = g; }
   input(name, type, def, extra = {}) { return this.g.input(name, type, def, extra); }
   define(name, fn) { const sg = new Graph(name, { group: true }); fn(new Builder(sg)); this.g.groups.set(name, sg); return name; }
-  defineLayout(name, { inputs = [], src = '', outs = [] } = {}) { this.g.layouts.set(name, { name, inputs, src, outs }); return name; }
-  layoutNode(name, inputs = {}) { return this.add('layout', inputs, { graph: name }); }
   groupNode(name, inputs = {}) { return this.add('group', inputs, { graph: name }); }
   repeatNode(name, count, inputs = {}) { return this.add('repeat', { ...inputs, count }, { graph: name }); }
   add(type, inputs = {}, params = {}) { return this.g.add(type, inputs, params); }
@@ -75,7 +73,7 @@ class Builder {
   center(o) { return this.add('center', { geom: o.geom }, { x: o.x, y: o.y, z: o.z }); }
   mirror(o) { return this.add('mirror', { geom: o.geom }, { axis: o.axis, weld: o.weld }); }
   reverse(o) { return this.add('reverse', { geom: o.geom }, {}); }
-  deform(o) { return this.add('deform', { geom: o.geom }, { expr: F(o.expr) }); }
+  deform(o) { return this.add('deform', { geom: o.geom, values: o.values }, { expr: F(o.expr) }); }
   join(list) { return this.add('join', { geoms: list }, {}); }
   scatter(o) {
     return this.add('scatter', o.rng ? { rng: o.rng } : {}, {
@@ -87,6 +85,12 @@ class Builder {
   }
   instance(o) { return this.add('instance', { points: o.points, proto: o.proto }, { orient: o.orient, scale: o.scale, yawSign: o.yawSign }); }
   geometry(o) { return this.add('geometry', { object: o.object }, { zone: o.zone }); }
+  value(o) { return this.add('value', o.args ? { args: o.args } : {}, { expr: o.expr }); }
+  list(items) { return this.add('list', { items }, {}); }
+  range(o) { return this.add('range', {}, o); }
+  map(o) { return this.add('map', { list: o.list, ...strip(o, ['list', 'graph']) }, { graph: o.graph }); }
+  fold(o) { return this.add('fold', { list: o.list, init: o.init, ...strip(o, ['list', 'init', 'graph']) }, { graph: o.graph }); }
+  cond(o) { return this.add('if', { cond: o.cond, then: o.then, else: o.else }, {}); }
   random(o = {}) { return this.add('random', {}, o); }
   arrayPolar(o) { return this.add('arrayPolar', { geom: o.geom }, strip(o, ['geom'])); }
   arrayLinear(o) { return this.add('arrayLinear', { geom: o.geom }, strip(o, ['geom'])); }

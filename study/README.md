@@ -38,7 +38,8 @@ prototype/
   models/area-rug.mjs v1 port: 260 -> 77 lines, exact topology/bounds
   bench.mjs / bench-rug.mjs / parity.mjs
   v2/
-    runtime.mjs     60-node typed runtime + Three bridge + code/random ops
+    runtime.mjs     65-node typed runtime + Three bridge + code/random ops
+    expr.mjs        parsed expression language (no eval)
     dsl.mjs         builder DSL
     format.mjs      .pfn text + canonical JSON, round-trip tested
     GRAPH_API.md    API, port table, gap analysis, format spec
@@ -55,7 +56,6 @@ prototype/
     t-sapphire.mjs  sapphire 13-variant parity
     t-pumpkin.mjs   pumpkin 6-variant parity
     t-rug.mjs       rug 9-variant parity
-    t-layout.mjs    layout block, fn/rng, multi-output, format round-trip
     t-code.mjs      Three object/BufferGeometry + random stream smoke test
 ```
 

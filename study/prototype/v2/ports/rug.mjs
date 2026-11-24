@@ -1,5 +1,6 @@
-// Area rug — exact geometric port. The code node builds the reference's
-// deformed top/bottom lattice; solidify and mesh do the slab and zone colours.
+// Area rug — exact geometric port as a pure node graph: a random value grid,
+// a position expression, a diagonal straighten, a fold threaded through a
+// repeat group, then solidify with per-cell zones.
 import { graph, expr, field } from '../dsl.mjs';
 
 const PALETTE = {
@@ -9,89 +10,9 @@ const PALETTE = {
   'slate-teal': { field: '#F0F2F1', border: '#3E7C86', motif: '#B4AAA0', backing: '#8C837A' },
 };
 
-const GRID_SRC = `
-const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
-const SIZES = { small: { W: 2.00, D: 1.50, NX: 10, NZ: 8 }, large: { W: 3.00, D: 2.00, NX: 15, NZ: 10 } };
-const RC = 0.30, CH = 0.07, WOB = 0.024, KRUCK = 3;
-const { W, D, NX, NZ } = SIZES[size] || SIZES.small;
-const pileAmt = clamp(pile, 0, 1), lived = clamp(lived_in, 0, 1);
-const px = W / NX, pz = D / NZ;
-const TH = 0.014 + pileAmt * 0.024;
-const AMP = pileAmt * 0.011;
-const wob = rng(7681).grid(NX + 1, NZ + 1);
+const P = JSON.stringify(PALETTE);
 
-const top = [], bot = [];
-for (let i = 0; i <= NX; i++) {
-  top.push([]); bot.push([]);
-  for (let j = 0; j <= NZ; j++) {
-    let x = -W / 2 + i * px, z = -D / 2 + j * pz;
-    const s = (NX - i) + (NZ - j);
-    const ax = clamp((Math.abs(x) - (W / 2 - RC)) / RC, 0, 1);
-    const az = clamp((Math.abs(z) - (D / 2 - RC)) / RC, 0, 1);
-    const cut = CH * Math.max(0, ax + az - 1);
-    x -= Math.sign(x) * cut;
-    z -= Math.sign(z) * cut;
-    if (s !== KRUCK) {
-      const w = wob[i][j] * WOB;
-      if (i === 0) x += w; else if (i === NX) x -= w;
-      if (j === 0) z += w; else if (j === NZ) z -= w;
-    }
-    const cn = Math.exp(-Math.pow(z / 0.32, 2));
-    const rel = AMP * (0.55 * Math.sin(x * 11.3 + z * 4.1) + 0.45 * Math.sin(x * 5.7 - z * 13.9 + 2.1));
-    const y = TH + rel * (1 - 0.7 * cn) - lived * 0.006 * cn;
-    top[i].push([x, y, z]);
-    bot[i].push([x, 0, z]);
-  }
-}
-
-const vsub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
-const vadd = (a, b) => [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
-const vcross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
-const vdot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
-const vnorm = (a) => { const l = Math.hypot(...a) || 1; return [a[0] / l, a[1] / l, a[2] / l]; };
-const vrot = (p, pivot, axis, phi) => {
-  const v = vsub(p, pivot), k = vcross(axis, v), d = vdot(axis, v);
-  const c = Math.cos(phi), s = Math.sin(phi);
-  return vadd(pivot, [v[0] * c + k[0] * s + axis[0] * d * (1 - c),
-                      v[1] * c + k[1] * s + axis[1] * d * (1 - c),
-                      v[2] * c + k[2] * s + axis[2] * d * (1 - c)]);
-};
-
-const foldV = (m) => [NX - KRUCK + m, NZ - m];
-{
-  const [a0, b0] = foldV(0), [a1, b1] = foldV(KRUCK);
-  const y0 = top[a0][b0][1], y1 = top[a1][b1][1];
-  for (let m = 1; m < KRUCK; m++) {
-    const [a, b] = foldV(m);
-    top[a][b][1] = y0 + (y1 - y0) * (m / KRUCK);
-  }
-}
-
-if (lived > 0) {
-  const PHI = lived * (95 * Math.PI / 180);
-  const [a0, b0] = foldV(0), [a1, b1] = foldV(KRUCK);
-  const d = vsub(top[a1][b1], top[a0][b0]); d[1] = 0;
-  const axis = vnorm(d);
-  for (let m = 1; m <= KRUCK; m++) {
-    const phi = -PHI * Math.pow(m / KRUCK, 1.5);
-    const hs = KRUCK - m + 1;
-    const pivot = top[NX - hs][NZ];
-    for (let i = 0; i <= NX; i++) for (let j = 0; j <= NZ; j++) {
-      if ((NX - i) + (NZ - j) > KRUCK - m) continue;
-      top[i][j] = vrot(top[i][j], pivot, axis, phi);
-      bot[i][j] = vrot(bot[i][j], pivot, axis, phi);
-    }
-  }
-}
-`;
-const GRID_OUTS = [
-  { name: 'top', expr: 'top' },
-  { name: 'bot', expr: 'bot' },
-  { name: 'NX', expr: 'NX' },
-  { name: 'NZ', expr: 'NZ' },
-];
-
-export default function build(g, P = {}) {
+export default function build(g) {
   const colorway = g.input('colorway', 'enum', 'linen-sage', { options: Object.keys(PALETTE), label: 'Colorway' });
   const fieldColor = g.input('field', 'color', '', { label: 'Field' });
   const border = g.input('border', 'color', '', { label: 'Border' });
@@ -102,27 +23,77 @@ export default function build(g, P = {}) {
   const pile = g.input('pile', 'float', 0.25, { min: 0, max: 1, step: 0.05, label: 'Pile' });
   const livedIn = g.input('lived_in', 'float', 0.35, { min: 0, max: 1, step: 0.05, label: 'Lived in' });
 
-  const layoutInputs = [
-    { name: 'size', type: 'enum', default: 'small' },
-    { name: 'pile', type: 'float', default: 0.25 },
-    { name: 'lived_in', type: 'float', default: 0.35 },
-  ];
-  g.defineLayout('rug-grid', { inputs: layoutInputs, src: GRID_SRC, outs: GRID_OUTS });
-  const data = g.layoutNode('rug-grid', { size, pile, lived_in: livedIn });
-  const get = (key) => ({ __ref: `${data.__ref}.${key}` });
+  const NX = g.value({ expr: "s.size === 'large' ? 15 : 10" });
+  const NZ = g.value({ expr: "s.size === 'large' ? 10 : 8" });
+  const W = g.value({ expr: "s.size === 'large' ? 3 : 2" });
+  const D = g.value({ expr: "s.size === 'large' ? 2 : 1.5" });
+  const count = g.value({ args: { NX, NZ }, expr: '(NX + 1) * (NZ + 1)' });
+  const rng = g.random({ seed: 7681, count });
+  const wob = { __ref: `${rng.__ref}.values` };
+
+  const grid = g.grid({
+    nx: NX, nz: NZ, w: W, d: D,
+    values: { NX, NZ, W, D, wob },
+    position: field(`let px = vals.W / vals.NX, pz = vals.D / vals.NZ,
+      x0 = -vals.W/2 + i*px, z0 = -vals.D/2 + j*pz,
+      ax = clamp((abs(x0) - (vals.W/2 - 0.30)) / 0.30, 0, 1),
+      az = clamp((abs(z0) - (vals.D/2 - 0.30)) / 0.30, 0, 1),
+      cut = 0.07 * max(0, ax + az - 1),
+      x1 = x0 - sign(x0) * cut, z1 = z0 - sign(z0) * cut,
+      s0 = (vals.NX - i) + (vals.NZ - j),
+      w = vals.wob[i * (vals.NZ + 1) + j] * 0.024,
+      x2 = s0 !== 3 ? (i === 0 ? x1 + w : (i === vals.NX ? x1 - w : x1)) : x1,
+      z2 = s0 !== 3 ? (j === 0 ? z1 + w : (j === vals.NZ ? z1 - w : z1)) : z1,
+      cn = exp(-pow(z2 / 0.32, 2)),
+      amp = s.pile * 0.011, th = 0.014 + s.pile * 0.024,
+      rel = amp * (0.55 * sin(x2*11.3 + z2*4.1) + 0.45 * sin(x2*5.7 - z2*13.9 + 2.1)),
+      y = th + rel * (1 - 0.7*cn) - s.lived_in * 0.006 * cn
+    in [x2, y, z2]`),
+  });
+
+  // Straighten the ruck diagonal before folding it.
+  const straightened = g.deform({
+    geom: grid,
+    values: { grid, NX, NZ },
+    expr: field(`let y0 = vals.grid.top[vals.NX - 3][vals.NZ][1],
+      y1 = vals.grid.top[vals.NX][vals.NZ - 3][1],
+      m = i - (vals.NX - 3)
+    in (side === 'top' && j === vals.NZ - m && m >= 1 && m < 3) ? [x, y0 + (y1 - y0) * (m / 3), z] : [x, y, z]`),
+  });
+
+  g.define('rug-fold', (h) => {
+    const item = h.input('item', 'any', null);
+    const acc = h.input('acc', 'any', null);
+    const NX = h.input('NX', 'any', null);
+    const NZ = h.input('NZ', 'any', null);
+    const pivot = h.value({ expr: 'acc.top[NX - (4 - item)][NZ]' });
+    const axis = h.value({
+      expr: 'vnorm([acc.top[NX][NZ - 3][0] - acc.top[NX - 3][NZ][0], 0, acc.top[NX][NZ - 3][2] - acc.top[NX - 3][NZ][2]])',
+    });
+    const phi = h.value({ expr: '-s.lived_in * (95 * PI / 180) * pow(item / 3, 1.5)' });
+    const folded = h.deform({
+      geom: acc,
+      values: { pivot, axis, phi, NX, NZ, item },
+      expr: field('((vals.NX - i) + (vals.NZ - j) <= 3 - vals.item) ? vrot([x, y, z], vals.pivot, vals.axis, vals.phi) : [x, y, z]'),
+    });
+    h.out('out', folded);
+  });
+
+  const foldSteps = g.range({ from: 1, to: 4 });
+  const folded = g.fold({ list: foldSteps, init: straightened, graph: 'rug-fold', NX, NZ });
+
   const slab = g.solidify({
-    grid: data,
-    NX: get('NX'), NZ: get('NZ'), pattern,
-    topZoneField: field("i===0 || i===s.NX-1 || k===0 || k===s.NZ-1 ? (s.pattern==='plain' ? 'field' : 'border') : (s.pattern==='geometric' && Math.floor(Math.abs(i+0.5-s.NX/2)+Math.abs(k+0.5-s.NZ/2)) % 3 === 1 ? 'motif' : 'field')"),
+    grid: folded,
+    values: { NX, NZ, pattern },
+    topZoneField: field(`(i === 0 || i === vals.NX - 1 || k === 0 || k === vals.NZ - 1)
+      ? (vals.pattern === 'plain' ? 'field' : 'border')
+      : (vals.pattern === 'geometric' && floor(abs(i + 0.5 - vals.NX/2) + abs(k + 0.5 - vals.NZ/2)) % 3 === 1 ? 'motif' : 'field')`),
     botZone: 'backing', wallZone: 'backing',
     diagonal: 'ref', wallOrder: 'ref',
   });
 
-  const color = (key) => expr(`s => s.${key} || (${JSON.stringify(PALETTE)})[s.colorway].${key}`);
+  const color = (key) => expr(`s.${key} || (${P}[s.colorway] || ${P}['linen-sage']).${key}`);
   return g.mesh(slab, {
-    zones: {
-      field: color('field'), border: color('border'),
-      motif: color('motif'), backing: color('backing'),
-    },
+    zones: { field: color('field'), border: color('border'), motif: color('motif'), backing: color('backing') },
   });
 }

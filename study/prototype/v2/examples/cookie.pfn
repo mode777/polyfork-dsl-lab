@@ -3,11 +3,11 @@ graph cookie
 in thickness float 0.024 min=0.014 max=0.034
 in chips int 9 min=3 max=14
 in chipColor color #3d2113
-n n0 ring n=20 radius=`0.05*(0.96+rand(1000+i*7)()*0.07)` y=~`s => s.thickness*0` sx=0.9 sz=0.9
-n n1 ring n=20 radius=`0.05*(0.96+rand(1000+i*7)()*0.07)` y=~`s => s.thickness*0.42` sx=1 sz=1
-n n2 ring n=20 radius=`0.05*(0.96+rand(1000+i*7)()*0.07)` y=~`s => s.thickness*0.8` sx=0.93 sz=0.93
-n n3 loft rings=[@n0,@n1,@n2] capTop=~`s => [0, s.thickness, 0]` capBottom=[0,0,0] zones={band:edge,capTop:dough,capBottom:edge} diagonal=ba
-n n4 scatter count=$chips minDist=~`s => s.chips > 9 ? 0.015 : 0.019` seed=42 tries=800 prng=true lazy=true yawScale=3.141592653589793 sample=`[cos(r0*TAU)*(0.16+r1*0.54)*0.05, sin(r0*TAU)*(0.16+r1*0.54)*0.05]` height=`s.thickness*(0.8+0.2*(1-hypot(x,z)/0.05/0.93))-0.0025` size=`[0.0085+r2*0.0025, 0.0075, 0.0085+r2*0.0025]`
+n n0 ring n=20 radius=`0.05*(0.96+rand(1000+i*7)()*0.07)` y=~`s.thickness*0` sx=0.9 sz=0.9
+n n1 ring n=20 radius=`0.05*(0.96+rand(1000+i*7)()*0.07)` y=~`s.thickness*0.42` sx=1 sz=1
+n n2 ring n=20 radius=`0.05*(0.96+rand(1000+i*7)()*0.07)` y=~`s.thickness*0.8` sx=0.93 sz=0.93
+n n3 loft rings=[@n0,@n1,@n2] capTop=~`[0, s.thickness, 0]` capBottom=[0,0,0] zones={band:edge,capTop:dough,capBottom:edge} diagonal=ba
+n n4 scatter count=$chips minDist=~`s.chips > 9 ? 0.015 : 0.019` seed=42 tries=800 prng=true lazy=true yawScale=3.141592653589793 sample=`[cos(r0*TAU)*(0.16+r1*0.54)*0.05, sin(r0*TAU)*(0.16+r1*0.54)*0.05]` height=`s.thickness*(0.8+0.2*(1-hypot(x,z)/0.05/0.93))-0.0025` size=`[0.0085+r2*0.0025, 0.0075, 0.0085+r2*0.0025]`
 n n5 cone n=6 r=1 h=1 zone=chip flip=true
 n n6 instance points=@n4 proto=@n5 yawSign=-1
 n n7 join geoms=[@n3,@n6]

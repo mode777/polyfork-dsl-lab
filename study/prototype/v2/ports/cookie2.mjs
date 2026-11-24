@@ -11,19 +11,19 @@ export default function build(g, P = {}) {
   const rings = [0.9, 1.0, 0.93].map((s, i) => g.ring({
     n: 20,
     radius: field('0.05*(0.96+rand(1000+i*7)()*0.07)'),
-    y: expr(`s => s.thickness*${[0, 0.42, 0.8][i]}`),
+    y: expr(`s.thickness*${[0, 0.42, 0.8][i]}`),
     sx: s, sz: s,
   }));
   const body = g.loft({
     rings,
-    capTop: expr('s => [0, s.thickness, 0]'),
+    capTop: expr('[0, s.thickness, 0]'),
     capBottom: [0, 0, 0],
     zones: { band: 'edge', capTop: 'dough', capBottom: 'edge' },
     diagonal: 'ba',
   });
   const pts = g.scatter({
     count: chips,
-    minDist: expr('s => s.chips > 9 ? 0.015 : 0.019'),
+    minDist: expr('s.chips > 9 ? 0.015 : 0.019'),
     seed: 42, tries: 800, prng: true, lazy: true, yawScale: Math.PI,
     sample: field('[cos(r0*TAU)*(0.16+r1*0.54)*0.05, sin(r0*TAU)*(0.16+r1*0.54)*0.05]'),
     height: field('s.thickness*(0.8+0.2*(1-hypot(x,z)/0.05/0.93))-0.0025'),

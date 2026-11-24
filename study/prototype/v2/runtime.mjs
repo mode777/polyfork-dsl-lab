@@ -3,6 +3,7 @@
 import * as THREE from 'three';
 import { mergeGeometries, toCreasedNormals } from 'three/addons/utils/BufferGeometryUtils.js';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+import { compileExpr, evalExpr, parseExpr } from './expr.mjs';
 
 export const TAU = Math.PI * 2;
 export const ADDONS = { mergeGeometries, toCreasedNormals, RoundedBoxGeometry };
@@ -34,7 +35,6 @@ export class Graph {
     this.byId = new Map();
     this.outputs = {};         // {name: ref}
     this.groups = new Map();   // name -> Graph
-    this.layouts = new Map();  // name -> {name, inputs, src, outs}
     this._seq = 0;
   }
   input(name, type, def, extra = {}) {
@@ -67,30 +67,19 @@ export const isRef = (v) => v && typeof v === 'object' && '__ref' in v;
 const jsonSafe = (v) => (typeof v === 'function' ? String(v) : v);
 
 // ---------------------------------------------------------------- fields
+// Fields are parsed expressions, not JavaScript. See expr.mjs for the grammar.
+const fieldCache = new Map();
 function compileField(src) {
   if (typeof src !== 'string') return () => src;
-  const fn = new Function('x', 'y', 'z', 'i', 'k', 'u', 'v', 'p', 'n', 's', 'q', 'r0', 'r1', 'r2', 'r3', `
-    const {sin,cos,tan,asin,acos,atan,atan2,sqrt,abs,min,max,floor,ceil,round,pow,exp,log,hypot,sign,PI}=Math;
-    const TAU=Math.PI*2;
-    const lerp=(a,b,t)=>a+(b-a)*t;
-    const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
-    const smoothstep=(a,b,v)=>{const t=clamp((v-a)/(b-a),0,1);return t*t*(3-2*t);};
-    const fract=(v)=>v-Math.floor(v);
-    const hash=(a,b=0,c=0)=>{let h=Math.sin(a*127.1+b*311.7+c*74.7)*43758.5453;return h-Math.floor(h);};
-    const rand=(seed=1)=>{let s=seed;return ()=>(s=(s*16807)%2147483647)/2147483647;};
-    const noise=(a,b=0,c=0)=>{const xi=Math.floor(a),yi=Math.floor(b),zi=Math.floor(c);
-      const xf=a-xi,yf=b-yi,zf=c-zi;const u=xf*xf*(3-2*xf),vv=yf*yf*(3-2*yf),w=zf*zf*(3-2*zf);
-      const g=(i,j,k)=>hash(i,j,k);const x00=lerp(g(xi,yi,zi),g(xi+1,yi,zi),u);
-      const x10=lerp(g(xi,yi+1,zi),g(xi+1,yi+1,zi),u);const x01=lerp(g(xi,yi,zi+1),g(xi+1,yi,zi+1),u);
-      const x11=lerp(g(xi,yi+1,zi+1),g(xi+1,yi+1,zi+1),u);return lerp(lerp(x00,x10,vv),lerp(x01,x11,vv),w);};
-    return (${src});
-  `);
-  return (ctx = {}) => {
-    const r = fn(ctx.x ?? 0, ctx.y ?? 0, ctx.z ?? 0, ctx.i ?? 0, ctx.k ?? 0, ctx.u ?? 0, ctx.v ?? 0, ctx.p ?? [0, 0, 0], ctx.n ?? [0, 1, 0], ctx.s ?? {}, ctx, ctx.r0 ?? 0, ctx.r1 ?? 0, ctx.r2 ?? 0, ctx.r3 ?? 0);
-    return typeof r === 'function'
-      ? r(ctx.x ?? 0, ctx.y ?? 0, ctx.z ?? 0, ctx.i ?? 0, ctx.k ?? 0, ctx.u ?? 0, ctx.v ?? 0, ctx.p ?? [0, 0, 0], ctx.n ?? [0, 1, 0], ctx.s ?? {}, ctx, ctx.r0 ?? 0, ctx.r1 ?? 0, ctx.r2 ?? 0, ctx.r3 ?? 0)
-      : r;
-  };
+  if (!fieldCache.has(src)) fieldCache.set(src, compileExpr(src));
+  const fn = fieldCache.get(src);
+  return (ctx = {}) => fn({
+    ...ctx,
+    x: ctx.x ?? 0, y: ctx.y ?? 0, z: ctx.z ?? 0,
+    i: ctx.i ?? 0, k: ctx.k ?? 0, u: ctx.u ?? 0, v: ctx.v ?? 0,
+    p: ctx.p ?? [0, 0, 0], n: ctx.n ?? [0, 1, 0], s: ctx.s ?? {}, vals: ctx.vals ?? {},
+    r0: ctx.r0 ?? 0, r1: ctx.r1 ?? 0, r2: ctx.r2 ?? 0, r3: ctx.r3 ?? 0,
+  });
 }
 export const field = (src) => ({ __field: typeof src === 'function' ? String(src) : src });
 export const isField = (v) => v && typeof v === 'object' && '__field' in v;
@@ -143,7 +132,7 @@ export function evaluate(graph, values = {}, opts = {}) {
   const paramValue = (v) => {
     if (v && typeof v === 'object') {
       if ('__expr' in v) {
-        const r = new Function('s', `const {sin,cos,sqrt,abs,min,max,floor,round,pow,PI}=Math; const TAU=Math.PI*2; const clamp=(v,a,b)=>Math.min(b,Math.max(a,v)); const lerp=(a,b,t)=>a+(b-a)*t; return (${v.__expr});`)(params);
+        const r = evalExpr(v.__ast ?? (v.__ast = parseExpr(v.__expr)), { s: params, ...params });
         return typeof r === 'function' ? r(params) : r;
       }
       if ('__field' in v || v.__kind || v.isObject3D || v.isBufferGeometry || v.isMaterial || v.isBufferAttribute) return v;
@@ -310,7 +299,7 @@ node('path', { in: { pts: V.any, closed: V.bool }, out: V.path }, ({ p }) => {
   return path(q, !!p.closed);
 });
 
-node('grid', { in: { nx: V.int, nz: V.int, w: V.number, d: V.number, position: V.field }, out: V.any }, ({ p, ctx }) => {
+node('grid', { in: { nx: V.int, nz: V.int, w: V.number, d: V.number, position: V.field, values: V.any }, out: V.any }, ({ p, ctx }) => {
   const nx = Math.max(1, Math.round(p.nx)), nz = Math.max(1, Math.round(p.nz));
   const top = [], bot = [];
   for (let i = 0; i <= nx; i++) {
@@ -318,7 +307,7 @@ node('grid', { in: { nx: V.int, nz: V.int, w: V.number, d: V.number, position: V
     for (let j = 0; j <= nz; j++) {
       const x = -(p.w ?? 1) / 2 + (i * (p.w ?? 1)) / nx;
       const z = -(p.d ?? 1) / 2 + (j * (p.d ?? 1)) / nz;
-      const q = p.position ? fieldValue(p.position, { x, z, i, j, u: i / nx, v: j / nz, s: ctx.params }) : [x, 0, z];
+      const q = p.position ? fieldValue(p.position, { x, z, i, j, u: i / nx, v: j / nz, s: ctx.params, vals: p.values }) : [x, 0, z];
       const a = Array.isArray(q) ? q : [x, q, z];
       top[i].push(a); bot[i].push([a[0], 0, a[2]]);
     }
@@ -397,7 +386,10 @@ node('bevelProfile', { in: { profile: V.profile, dist: V.number }, out: V.profil
 
 node('loftProfile', { in: { profile: V.profile, capTop: V.any, capBottom: V.any, zones: V.any, diagonal: V.string, bandZones: V.any, flip: V.bool, orient: V.bool, orientCenter: V.vec3 }, out: V.geom }, ({ p }) => {
   const P = asArray(p.profile), stations = p.stations ?? [[0, 1, 0]];
-  const rings = stations.map(([x, s = 1, dz = 0]) => P.map(([z, y]) => [x, y * s, z * s + dz]));
+  const rings = stations.map((st) => {
+    const [x, sc = 1, dz = 0] = Array.isArray(st) ? st : [st.x, st.s ?? 1, st.dz ?? 0];
+    return P.map(([z, y]) => [x, y * sc, z * sc + dz]);
+  });
   return NODES.get('loft').fn({ p: { rings, capTop: p.capTop, capBottom: p.capBottom, zones: p.zones ?? {}, diagonal: p.diagonal, bandZones: p.bandZones, flip: p.flip, orient: p.orient, orientCenter: p.orientCenter } });
 });
 
@@ -508,7 +500,7 @@ node('extrude', { in: { profile: V.profile, depth: V.number, z0: V.number, cap: 
   return geom(part(out, 'a'));
 });
 
-node('revolve', { in: { profile: V.any, seg: V.int, phase: V.number, inRadius: V.bool, zone: V.any, zoneField: V.field, mod: V.field, axis: V.string, ringMode: V.string, orient: V.bool, orientCenter: V.vec3, capTop: V.any, capBottom: V.any, capZone: V.any, capZoneField: V.field, flip: V.bool }, out: V.geom }, ({ p }) => {
+node('revolve', { in: { profile: V.any, seg: V.int, phase: V.number, inRadius: V.bool, zone: V.any, zoneField: V.field, mod: V.field, values: V.any, axis: V.string, ringMode: V.string, orient: V.bool, orientCenter: V.vec3, capTop: V.any, capBottom: V.any, capZone: V.any, capZoneField: V.field, flip: V.bool }, out: V.geom }, ({ p }) => {
   const P = asArray(p.profile), n = Math.max(3, Math.round(p.seg ?? 12)), buckets = new Map();
   const step = TAU / n, cosH = Math.cos(step / 2);
   const axis = p.axis ?? 'y';
@@ -518,7 +510,7 @@ node('revolve', { in: { profile: V.any, seg: V.int, phase: V.number, inRadius: V
     const R = p.inRadius ? r / cosH : r, q = [];
     for (let i = 0; i < n; i++) {
       const a = (p.phase ?? 0) + ((i + (p.inRadius ? 0.5 : 0)) / n) * TAU;
-      const rr = modField ? fieldValue(modField, { i, k, x: r, y, s: p }) : R;
+      const rr = modField ? fieldValue(modField, { i, k, x: r, y, s: p, profile: P, vals: p.values }) : R;
       const xz = p.ringMode === 'xz';
       q.push(axis === 'z' ? [rr * Math.cos(a), rr * Math.sin(a), y]
         : (xz ? [rr * Math.cos(a), y, rr * Math.sin(a)] : [rr * Math.sin(a), y, rr * Math.cos(a)]));
@@ -622,9 +614,9 @@ node('pocket', { in: { profile: V.profile, depth: V.number, bevel: V.number, zon
   return geom(part(out, p.zone ?? 'a'));
 });
 
-node('solidify', { in: { grid: V.any, topZone: V.any, botZone: V.any, wallZone: V.any, topZoneField: V.field, botZoneField: V.field, diagonal: V.string, wallOrder: V.string }, out: V.geom }, ({ p }) => {
+node('solidify', { in: { grid: V.any, topZone: V.any, botZone: V.any, wallZone: V.any, topZoneField: V.field, botZoneField: V.field, values: V.any, diagonal: V.string, wallOrder: V.string }, out: V.geom }, ({ p }) => {
   const { top, bot } = p.grid, nx = top.length - 1, nz = top[0].length - 1;
-  const zo = (z, field, i, j) => field ? fieldValue(field, { i, k: j, j, s: p })
+  const zo = (z, field, i, j) => field ? fieldValue(field, { i, k: j, j, s: p, vals: p.values })
     : (typeof z === 'function' ? z(i, j) : (z ?? 'a'));
   const buckets = new Map();
   const put = (z, pos) => { if (!buckets.has(z)) buckets.set(z, []); buckets.get(z).push(...pos); };
@@ -789,20 +781,20 @@ node('mirror', { in: { geom: V.geom, axis: V.string, weld: V.bool }, out: V.geom
   return geom(out);
 });
 
-node('deform', { in: { geom: V.any, expr: V.field }, out: V.any }, ({ p }) => {
+node('deform', { in: { geom: V.any, expr: V.field, values: V.any }, out: V.any }, ({ p }) => {
   const g = p.geom;
   if (g?.__kind === 'grid') {
-    const map = (lattice) => lattice.map((row, i) => row.map((q, k) => {
-      const r = fieldValue(p.expr, { x: q[0], y: q[1], z: q[2], i, k, j: k, p: q }) ?? q;
+    const map = (lattice, side) => lattice.map((row, i) => row.map((q, k) => {
+      const r = fieldValue(p.expr, { x: q[0], y: q[1], z: q[2], i, k, j: k, p: q, side, vals: p.values }) ?? q;
       return Array.isArray(r) ? r : [q[0], r, q[2]];
     }));
-    return { ...g, top: map(g.top), bot: map(g.bot) };
+    return { ...g, top: map(g.top, 'top'), bot: map(g.bot, 'bot') };
   }
   return geom(toGeometry(g).parts.map(({ pos, zone }) => {
     const out = new Array(pos.length);
     for (let i = 0; i < pos.length; i += 3) {
       const x = pos[i], y = pos[i + 1], z = pos[i + 2];
-      const q = fieldValue(p.expr, { x, y, z, p: [x, y, z] }) ?? [x, y, z];
+      const q = fieldValue(p.expr, { x, y, z, p: [x, y, z], vals: p.values }) ?? [x, y, z];
       out[i] = q[0]; out[i + 1] = q[1]; out[i + 2] = q[2];
     }
     return part(out, zone);
@@ -818,13 +810,14 @@ node('geometry', { in: { object: V.any, zone: V.string }, out: V.geom }, ({ p })
 
 node('random', { in: { seed: V.int, count: V.int }, out: V.random }, ({ p }) => {
   const n = Math.max(0, Math.round(p.count ?? 4096));
-  const rnd = makePrng(p.seed ?? 1);
+  let s = (p.seed ?? 1) >>> 0;
+  const rnd = () => (s = (s * 16807) % 2147483647) / 2147483647;
   const values = [];
   for (let i = 0; i < n; i++) values.push(rnd());
-  return { __kind: 'random', seed: p.seed ?? 1, values, next: 0 };
+  return { __kind: 'random', seed: p.seed ?? 1, values, state: s, next: 0 };
 });
 
-node('scatter', { in: { count: V.int, minDist: V.number, seed: V.int, tries: V.int, sample: V.field, height: V.field, size: V.field, yawScale: V.number, prng: V.bool, lazy: V.bool, rng: V.any }, out: V.points }, ({ p, ctx }) => {
+node('scatter', { in: { count: V.int, minDist: V.number, seed: V.int, tries: V.int, sample: V.field, height: V.field, size: V.field, values: V.any, yawScale: V.number, prng: V.bool, lazy: V.bool, rng: V.any }, out: V.points }, ({ p, ctx }) => {
   let s = (p.seed ?? 1) >>> 0;
   const fallback = () => (s = (s * 16807) % 2147483647) / 2147483647;
   const rnd = p.rng ? () => {
@@ -842,17 +835,17 @@ node('scatter', { in: { count: V.int, minDist: V.number, seed: V.int, tries: V.i
     let r0, r1;
     if (p.prng || p.rng) { r0 = rnd(); r1 = rnd(); }
     const q = (p.prng || p.rng)
-      ? (fieldValue(p.sample, { i: t, s: ctx.params, r0, r1 }) ?? [0, 0])
-      : (fieldValue(p.sample, { i: t, s: ctx.params }) ?? [0, 0]);
+      ? (fieldValue(p.sample, { i: t, s: ctx.params, r0, r1, vals: p.values }) ?? [0, 0])
+      : (fieldValue(p.sample, { i: t, s: ctx.params, vals: p.values }) ?? [0, 0]);
     const [x, z] = q;
     if (out.some((r) => Math.hypot(r[0] - x, r[2] - z) < (p.minDist ?? 0))) continue;
     // lazy=true matches the reference modules: draw size/yaw only after the
     // candidate has passed the separation test.
     let r2 = 0, r3;
     if ((p.prng || p.rng) && p.lazy) { r2 = rnd(); r3 = rnd(); }
-    const y = p.height ? fieldValue(p.height, { x, z, s: ctx.params, r2 }) : 0;
+    const y = p.height ? fieldValue(p.height, { x, z, s: ctx.params, r2, vals: p.values }) : 0;
     if ((p.prng || p.rng) && !p.lazy) r2 = rnd();
-    const sz = p.size ? fieldValue(p.size, { x, z, i: out.length, s: ctx.params, r2 }) : 1;
+    const sz = p.size ? fieldValue(p.size, { x, z, i: out.length, s: ctx.params, r2, vals: p.values }) : 1;
     if ((p.prng || p.rng) && !p.lazy) r3 = rnd();
     const yawStep = p.yawScale ?? TAU;
     out.push([x, y, z, sz, (p.prng || p.rng) ? r3 * yawStep : hash01(t, 4, p.seed ?? 1) * yawStep]);
@@ -1451,42 +1444,51 @@ node('pointsGrid', { in: { nx: V.int, nz: V.int, w: V.number, d: V.number, y: V.
   return pts(out);
 });
 
-// ---------------------------------------------------------------- pure layout blocks
-// A layout block is a restricted, pure value/layout function. It has typed
-// inputs and named outputs, no THREE/imports/DOM, and is the supported home
-// for profile/table/grid layout math. script remains the geometry escape hatch.
-function layoutRng(seed = 1) {
-  const next = makePrng(seed);
-  return {
-    next,
-    take: (n) => Array.from({ length: Math.max(0, Math.round(n)) }, next),
-    grid: (nx, nz) => Array.from({ length: Math.round(nx) }, () =>
-      Array.from({ length: Math.round(nz) }, next)),
-  };
-}
-const LAYOUT_FORBIDDEN = /\b(THREE|ADDONS|import\s*\(|require\s*\(|globalThis|window|document|process|fetch|XMLHttpRequest|eval\s*\(|Function\s*\()/;
-function compileLayout(def) {
-  // Small sugar: `fn name(args) { ... }` and `fn name(args) = expr` are
-  // layout-only spellings of a function declaration/arrow.
-  const layoutSrc = String(def.src ?? '')
-    .replace(/^[ \t]*fn[ \t]+([A-Za-z_$][\w$]*)[ \t]*\(([^)]*)\)[ \t]*=/gm, 'const $1 = ($2) =>')
-    .replace(/^[ \t]*fn[ \t]+([A-Za-z_$][\w$]*)[ \t]*\(([^)]*)\)[ \t]*\{/gm, 'function $1($2) {');
-  const src = `${layoutSrc}\n${(def.outs ?? []).map((o) => o.expr).join('\n')}`;
-  if (LAYOUT_FORBIDDEN.test(src)) throw new Error(`layout ${def.name}: impure source`);
-  const names = (def.inputs ?? []).map((i) => i.name);
-  const body = `"use strict";
-const {${names.join(',')}} = inputs;
-${layoutSrc}
-return {
-${(def.outs ?? []).map((o) => `${JSON.stringify(o.name)}: (${o.expr})`).join(',\n')}
-};`;
-  return new Function('inputs', 'rng', body);
-}
-node('layout', { in: {}, out: V.any }, ({ p, inputs, graph }) => {
-  const def = graph.layouts.get(p.graph);
-  if (!def) throw new Error(`layout: ${p.graph} not found`);
-  const values = { ...Object.fromEntries(def.inputs.map((i) => [i.name, i.default])), ...inputs };
-  return compileLayout(def)(values, layoutRng);
+// ---------------------------------------------------------------- generic data nodes
+// Generic data nodes: values, lists, ranges, mapping a group over a list,
+// folding a value through a list, and a boolean select. Layout math is expressed
+// with these plus the parsed expression language, not with code blocks.
+node('value', { in: { args: V.any }, out: V.any }, ({ p, params }) => {
+  const env = { ...(p.args ?? {}), s: params, ...params };
+  return evalExpr(parseExpr(String(p.expr ?? 'null')), env);
+});
+
+node('list', { in: { items: V.any }, out: V.any }, ({ p }) => p.items ?? []);
+
+node('range', { in: { from: V.int, to: V.int, step: V.number }, out: V.any }, ({ p }) => {
+  const step = p.step ?? 1, out = [];
+  for (let v = p.from ?? 0; step > 0 ? v < (p.to ?? 0) : v > (p.to ?? 0); v += step) out.push(v);
+  return out;
+});
+
+node('if', { in: { cond: V.bool, then: V.any, else: V.any }, out: V.any }, ({ p }) => (p.cond ? p.then : p.else));
+
+node('map', { in: { list: V.any, graph: V.string }, out: V.any }, ({ p, inputs, graph, params }) => {
+  const sg = graph.groups.get(p.graph);
+  if (!sg) throw new Error(`map: ${p.graph} not found`);
+  const bound = { ...p, ...inputs };
+  delete bound.graph; delete bound.list;
+  const list = asArray(p.list) ?? [];
+  const out = [];
+  for (let i = 0; i < list.length; i++) {
+    const r = evaluate(sg, { ...params, ...bound, item: list[i], index: i }, { root: graph });
+    out.push('out' in r.outputs ? r.outputs.out : r.outputs);
+  }
+  return out;
+});
+
+node('fold', { in: { list: V.any, init: V.any, graph: V.string }, out: V.any }, ({ p, inputs, graph, params }) => {
+  const sg = graph.groups.get(p.graph);
+  if (!sg) throw new Error(`fold: ${p.graph} not found`);
+  const bound = { ...p, ...inputs };
+  delete bound.graph; delete bound.list; delete bound.init;
+  const list = asArray(p.list) ?? [];
+  let acc = p.init;
+  for (let i = 0; i < list.length; i++) {
+    const r = evaluate(sg, { ...params, ...bound, item: list[i], index: i, acc }, { root: graph });
+    acc = 'out' in r.outputs ? r.outputs.out : r.outputs;
+  }
+  return acc;
 });
 
 // script escape hatch: receives resolved inputs, returns any value. The scope

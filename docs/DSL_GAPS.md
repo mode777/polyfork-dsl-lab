@@ -1,188 +1,121 @@
-# Script-node gaps and the pure layout layer
+# Script-node audit and the node-graph replacement
 
-**Status:** implemented. The three showcase ports no longer use `script` nodes; the audit below is kept as the design record.
-
-The showcase ports previously used three `script` nodes. They were escape hatches and
-should not be part of a finished port. This document records exactly what they did, what
-the DSL gap was, and the general language change that closed them without adding
-asset-specific nodes.
+**Status:** implemented. The showcase ports contain no `script` nodes and the core never
+evaluates JavaScript. This document keeps the audit as the design record.
 
 ## 1. Inventory
 
-| port | script | lines | what it computes |
-|---|---|---:|---|
-| rough sapphire | `DATA_SRC` | 87 | jittered section, bevel profile, stations, rings, tips, truncated caps, broken dent/mirror |
-| tire | `DATA_SRC` | 24 | derived dimensions, row table, profile/zones, per-facet radius function, caps |
-| area rug | `GRID_SRC` | 66 | size lookup, random wobble lattice, grid construction, corner fold |
+The three ports previously used `script` nodes:
 
-All three scripts return **data**, not geometry: no `BufferGeometry`, no mesh, no
-`mergeGeometries`. The geometry is already built by `loftProfile`, `revolve`, `solidify`,
-`fanRing`, `cone`, `join`, `center`, `transform` and `mesh`. So the missing capability is
-not another geometry primitive; it is a compact **value/layout layer**.
+| port | lines | what it computed |
+|---|---:|---|
+| rough sapphire | 87 | jittered section, bevel profile, stations, rings, tips, truncated caps, broken dent/mirror |
+| tire | 24 | derived dimensions, row table, profile/zones, per-facet radius function, caps |
+| area rug | 66 | size lookup, random wobble lattice, grid construction, corner fold |
 
-## 2. What the scripts actually need
+All three returned **data**, not geometry. The geometry was already built by `loftProfile`,
+`revolve`, `solidify`, `fanRing`, `cone`, `join`, `center`, `transform` and `mesh`.
 
-| need | sapphire | tire | rug | current workaround |
-|---|:---:|:---:|:---:|---|
-| local constants / derived scalars | ✓ | ✓ | ✓ | JS `const` |
-| pure helper functions | ✓ | ✓ | ✓ | JS `function` |
-| stateful seeded RNG | ✓ | — | ✓ | closed-over `seed` |
-| array/table construction and mapping | ✓ | ✓ | ✓ | JS loops / `.map` / `.slice` |
-| row/record field access | ✓ | ✓ | ✓ | JS objects |
-| data-level conditional | ✓ | — | ✓ | JS `if` / ternary |
-| mutate/fold a grid over indices | — | — | ✓ | `THREE.Vector3` + nested loops |
-| return several named values | ✓ | ✓ | ✓ | one object + a get helper (now replaced by `@node.field`) |
-| build a field/function from data | — | ✓ | — | string-concatenate a JS field |
+## 2. What the scripts actually needed
 
-The last row is the strongest signal: the tire script literally builds another field
-source string with `JSON.stringify(PROF)` and `N`. That is code generation inside an
-escape hatch. The DSL should provide a first-class function/table value instead.
+| need | sapphire | tire | rug |
+|---|:---:|:---:|:---:|
+| constants / derived scalars | ✓ | ✓ | ✓ |
+| reusable functions | ✓ | ✓ | ✓ |
+| seeded random values | ✓ | — | ✓ |
+| arrays, tables, row access | ✓ | ✓ | ✓ |
+| value-level conditional | ✓ | — | ✓ |
+| mutate/fold a lattice | — | — | ✓ |
+| return several named values | ✓ | ✓ | ✓ |
 
-## 3. Implemented additions
+## 3. Why not a code block
 
-The change is a **pure `layout` block** plus first-class values. It is a language
-feature, not a pile of nodes. It has no access to `THREE`, imports, DOM or runtime state;
-`script` remains the unrestricted escape hatch for Three/addons geometry.
+An earlier pass added a `layout … end` block. It removed the `script` node but still
+compiled JavaScript, so a backend would still need a JS engine. That is not acceptable:
+the graph itself must carry the meaning, and the text form must be a compact serialization
+of the graph.
 
-### 3.1 `layout … end`
+The block was removed. Its jobs are now done by two things:
 
-A pure block with explicit inputs and named outputs:
+1. a **parsed expression language** for scalar/vector math;
+2. **generic data nodes** for structure and iteration.
 
-```pfn
-layout sapphire-data
-in length float 1
-in barrel float 0
-in ends enum pointed
-in chamfer float 0.3
-in irregularity float 0
+## 4. The expression language (`runtime/expr.js`)
 
-let R = 0.034
-let Hh = 0.023
-let rng = prng(20261103)
+Fields and `~` params are tokenised and evaluated by our own parser. No `eval`,
+no `new Function`, no host language required.
 
-fn jitter(sec, amount) = sec.map(([x, y], i) => ...)
-fn centroid(points) = points.sum() / points.count
-fn tip(ring, dir, r) = ...
+Supported:
 
-let sec = jitter(BASE_SECTION, $irregularity)
-let profile = if $chamfer > 0.001 { bevel(sec, $chamfer * 0.2 * R) } else sec
-let stations = if $barrel > 0.001 || $irregularity > 0.001 { ... } else { ... }
-let rings = stations.map(s => profile.map(([z, y]) => [s.x, y * s.s, z * s.s + s.dz]))
-...
-out profile, stations, rings, pointedTop, pointedBottom, ...
-end
-```
+- literals: numbers, strings, booleans, `null`
+- arrays `[a, b]`, objects `{x: 1, y: 2}` (and `{x, y}` shorthand)
+- `+ - * / % **`, comparisons, `&& || !`, ternary `? :`
+- `let a = e, b = e in body`
+- member/index access, `.length`, `.slice`, `.concat`, `.join`
+- built-ins: `sin cos tan asin acos atan atan2 sqrt abs min max floor ceil round pow
+  exp log hypot sign clamp lerp smoothstep fract hash noise rand`
+- vector helpers: `centroid sum vnorm vrot darken`
 
-Then the existing geometry nodes consume the outputs directly:
+## 5. Generic data nodes
 
-```pfn
-n d sapphire-data length=$length ...
-n body loftProfile profile=@d.profile stations=@d.stations capTop=@d.pointedTop ...
-```
+Six nodes cover the structure the code blocks provided:
 
-The syntax is deliberately small: `in`, `let`, `fn`, `if`, `for`/`map`, literals, records,
-`out`. No new geometry semantics.
+| node | purpose |
+|---|---|
+| `value` | evaluate an expression to a value; `args` binds refs into it |
+| `list` | list literal of refs/values |
+| `range` | integer range for iteration |
+| `map` | apply a `group` to each list item; group sees `item`/`index` |
+| `fold` | thread an accumulator through a list; group sees `item`/`index`/`acc` |
+| `if` | select one of two values |
 
-### 3.2 First-class values
+`@node.field` reads a named output from a multi-output node or group, so `map`/`fold`
+groups can return records without a special accessor node.
 
-- **`rng`**: `prng(seed)` with `next()`, `take(n)`, `grid(nx, nz)`; deterministic and
-  forkable. Replaces every hand-rolled LCG in the scripts.
-- **arrays / records / tables**: `[a, b]`, `{x, y}`, `.map`, `.filter`, `.slice`,
-  `.flatMap`, `.sum`, `.count`, `.at`. Enough for profile rows, zones and ring maps.
-- **multi-output**: `out name=value` in groups/layouts, referenced as `@node.name`.
-  This removes the object-access workaround from showcase ports.
-- **`if` as a value expression**: selects profiles/stations/tips without a geometry
-  `switch` (the geometry `switch` stays for geometry branches).
-
-### 3.3 Two generic hooks, no asset-specific nodes
-
-| hook | why | proposed surface |
-|---|---|---|
-| grid deformation/fold | rug needs cumulative rotations of a subset of top/bot vertices | let existing `deform` accept a `grid` and apply a callback to both lattices; callback gets `(p, i, j, top, bot, ctx)` |
-| table/function modulation | tire builds a `mod` string by hand | let `revolve.mod` accept a function value (`fn radius(i, k) = ...`) or a table, not only a field string |
-
-That is the whole geometry-side change: two general capabilities, no `rugFold`,
-`sapphireProfile`, `tireTread` or similar nodes.
-
-## 4. How the three ports look after the change
+## 6. How the ports are expressed now
 
 ### Sapphire
 
-The layout block holds the jitter, bevel, station and tip math. The graph keeps
-`loftProfile`/`loft`, `switch` for pointed/truncated/broken, `reverse` for the dished
-fracture cap, `center` and `mesh`. No `script` node. The generated pfn uses a `layout`
-block and `@data.field` refs.
+- `random(20261103, 12 + 2*nStations)` provides the reference draw stream.
+- `map(range 6)` builds the jittered section; `bevelProfile` + `if` chooses bevel vs raw.
+- `map(range nStations)` builds jittered stations; nested `map` builds rings.
+- a second `random` seeded from `@rng.state` gives the tip jitter; `value` computes tips.
+- `switch` selects pointed/truncated/broken; `reverse` handles the dished fracture cap.
+- No code block, 50 nodes.
 
 ### Tire
 
-```pfn
-layout tire-data
-in facets int 14
-in width float 1
-in rimSize float 1
-let rows = [
-  {r: BKR, z: BACK_Z, block: 0, zone: rim}, ...
-]
-fn radius(i, k) = ...
-out profile=rows.map(...), zones=rows.map(...), mod=radius, ...
-end
-```
+- `value` holds the profile row table.
+- `map` builds the scaled profile and zone list.
+- `revolve.mod` is an expression reading `vals.rows[k]`; no generated field string.
+- No code block, 28 nodes.
 
-`revolve profile=@t.profile zone=@t.zones mod=@t.mod`. The dynamic field string disappears.
+### Area rug
 
-### Rug
+- `random(7681, (NX+1)*(NZ+1))` provides the wobble values.
+- `grid.position` is one `let … in` expression using `vals.wob`.
+- `deform` straightens the ruck diagonal (top only).
+- `fold(range 1..3)` threads the grid through a group that computes pivot/axis/phi and
+  rotates the subset with `vrot`.
+- `solidify` uses a per-cell zone expression.
+- No code block, 12 nodes.
 
-```pfn
-layout rug-grid
-in size enum small
-in pile float 0.25
-in lived_in float 0.35
-let {W, D, NX, NZ} = SIZES[$size]
-let rng = prng(7681)
-let wob = rng.grid(NX + 1, NZ + 1)
-let top = grid(NX, NZ, (i, k) => ...wob[i][k]...)
-let bot = grid(NX, NZ, (i, k) => [top[i][k].x, 0, top[i][k].z])
-let foldedTop = deform(grid: top, fn: ...KRUCK rotations...)
-let foldedBot = deform(grid: bot, fn: ...same rotations...)
-out top=foldedTop, bot=foldedBot, NX, NZ
-end
-```
+## 7. `script` today
 
-`solidify` then does the slab and `topZoneField` does the weave colours. The rug fold is
-still an algorithm, but it is a pure, reusable layout expression instead of opaque JS.
+`script` still exists as an optional host escape hatch for Three/addons geometry. It is
+not used by any published example, and a strict backend can reject it. The core graph
+evaluation path has no dependency on it.
 
-## 5. What not to do
+## 8. Acceptance (met)
 
-- Do not add `sapphire`, `tire` or `rug` nodes.
-- Do not add one node per loop/table operation.
-- Do not let the layout block call `THREE` or import modules; that is what `script` is for.
-- Do not claim a port is script-free until `rg "script" examples/*.pfn` is empty.
+1. `sapphire`, `tire`, `rug` contain no `script` nodes. ✓
+2. The core never evaluates JavaScript for fields or params. ✓
+3. Same parity at `1e-4`, including winding. ✓
+4. No generated field strings; tire uses a row table + expression. ✓
+5. `script` remains documented as a host-only escape hatch. ✓
 
-## 6. Acceptance criteria (met)
-
-1. `sapphire`, `tire` and `rug` contain no `script` nodes. ✓
-2. Their layout blocks are pure; geometry still comes from the existing nodes. ✓
-3. The same parity tests pass at `1e-4`, including winding. ✓
-4. The tire no longer embeds a JSON-string-generated field source; it returns a
-   `radius({i,k})` function. ✓
-5. `script` remains documented as the escape hatch for Three/addons geometry only. ✓
-
-## 7. Remaining gaps this does not close
+## 9. Remaining gaps
 
 Polygon faces with holes/craters (cheese wedge), fused clipped lumps / CSG (small rock),
-and cloth/rigged families are separate geometry gaps. They are not caused by the layout
-scripts and should not be hidden inside a layout block.
-
-
-## 8. Implementation notes
-
-- `layout … end` is a first-class block in the `.pfn` format (and JSON). It has typed
-  inputs, `let`/`fn` sugar, pure JS expressions, and `out name=expr` outputs.
-- `@node.field` refs resolve multi-output layouts.
-- `rng(seed)` is available inside layouts; `next()`, `take(n)` and `grid(nx,nz)` are
-  deterministic.
-- The layout source is checked for `THREE`, imports, DOM/global access and eval-like
-  constructs; it is intentionally not a general script.
-- `deform` accepts a grid value and deforms top/bot together.
-- `revolve.mod` accepts a function value; tire returns `radius({i,k})`.
-- `t-layout.mjs` covers layout inputs, `fn`, `rng`, multi-output and format round-trip.
+and cloth/rigged families are separate geometry gaps. They are not layout gaps and are
+not hidden in a code block.

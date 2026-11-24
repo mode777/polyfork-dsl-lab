@@ -14,7 +14,7 @@ export default function build(g, P = {}) {
   const tie = g.cylinder({ r1: 0.035, r2: 0.032, h: 0.035, seg: 8, x: 0, y: 0.01, z: -0.12, rx: 0.55, zone: 'ribbon' });
   const tail = g.cylinder({ r1: 0.034, r2: 0.012, h: 0.2, seg: 7, x: 0, y: -0.045, z: -0.165, rx: 0.55, zone: 'hair' });
   const pts = g.scatterVolume({
-    count, minDist: expr('s => s.curlSize * 0.95'), seed: 7, center: [0, 0.06, 0], radius: [0.108, 0.126, 0.108],
+    count, minDist: expr('s.curlSize * 0.95'), seed: 7, center: [0, 0.06, 0], radius: [0.108, 0.126, 0.108],
     keep: field('(z < 0.015 || y > 0.12) && y > 0.015'),
     size: field('s.curlSize'),
   });

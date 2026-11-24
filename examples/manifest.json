@@ -6,7 +6,7 @@
     "category": "props",
     "status": "port",
     "file": "cookie.pfn",
-    "bytes": 1101,
+    "bytes": 1076,
     "nodes": 9,
     "cam": [
       25,
@@ -21,8 +21,8 @@
     "category": "props",
     "status": "port",
     "file": "sapphire.pfn",
-    "bytes": 6074,
-    "nodes": 16,
+    "bytes": 5721,
+    "nodes": 50,
     "cam": [
       20,
       12
@@ -36,8 +36,8 @@
     "category": "props",
     "status": "port",
     "file": "tire.pfn",
-    "bytes": 4821,
-    "nodes": 12,
+    "bytes": 6103,
+    "nodes": 28,
     "cam": [
       58,
       14
@@ -51,7 +51,7 @@
     "category": "nature",
     "status": "port",
     "file": "pumpkin.pfn",
-    "bytes": 3033,
+    "bytes": 2635,
     "nodes": 7,
     "cam": [
       30,
@@ -66,8 +66,8 @@
     "category": "props",
     "status": "port",
     "file": "rug.pfn",
-    "bytes": 5721,
-    "nodes": 3,
+    "bytes": 6261,
+    "nodes": 12,
     "cam": [
       35,
       42

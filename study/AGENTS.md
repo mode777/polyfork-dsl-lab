@@ -42,7 +42,8 @@ prototype/
   models/*.mjs          v1 exact ports (cookie, rug)
   bench*.mjs            v1 parity benches
   v2/
-    runtime.mjs         60-node typed runtime + Three bridge (source of public runtime.js)
+    runtime.mjs         65-node typed runtime + Three bridge (source of public runtime.js)
+    expr.mjs            parsed expression language (source of public runtime/expr.js)
     dsl.mjs             authoring DSL
     format.mjs          .pfn text + JSON (source of public format.js)
     cache.mjs           content-addressed array cache
@@ -88,7 +89,6 @@ node t-tire.mjs             # 8 tire variants
 node t-sapphire.mjs                 # 13 sapphire variants
 node t-pumpkin.mjs                  # 6 pumpkin variants
 node t-rug.mjs                      # 9 rug variants
-node t-layout.mjs                   # layout block, fn/rng, multi-output, round-trip
 node t-code.mjs                     # Three object/BufferGeometry + random stream
 node t-sample3.mjs                  # sample-3 templates
 node t-bool.mjs && node t-cache.mjs
@@ -107,15 +107,15 @@ Commit/push the public repo, check
 
 ## Current state (24 Nov 2026)
 
-- Runtime: 60 nodes; **5 published examples, all geometric ports**.
+- Runtime: 65 nodes; **5 published examples, all geometric ports, zero script nodes**.
 - **Geometric parity** (vertices, bbox and winding at 1e-4): `cookie` (174),
   `sapphire` (48), `tire` (520), `pumpkin` (120), `area rug` (392/700), plus the six
   `module` wrappers.
 - Sapphire is fully parametric (colorway, gem, length, barrel, ends, chamfer, irregularity)
   and its bottom-cap inversion is fixed with `loft.orient` + `reverse`.
-- New: pure `layout` blocks (`in`/`let`/`fn`/`out`, `rng`, multi-output refs), `prim`,
-  `reverse`, `revolve.ringMode`/`zoneField`/caps, `solidify.diagonal`/`wallOrder`/zone
-  fields, input `label`/`step`.
+- Core expressions are parsed by `expr.mjs` (no `new Function`). Layout math uses
+  `value`/`list`/`range`/`map`/`fold`/`if` and `@node.field` refs. `prim`, `reverse`,
+  `revolve` modes/caps, `solidify` reference diagonals and input `label`/`step` remain.
 - Sapphire/tire/rug are script-free; the showcase has no script or get nodes.
 - Approximations/studies were removed from the published manifest; do not re-add them
   until they are real ports.
