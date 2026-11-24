@@ -33,7 +33,7 @@ browser viewer. Public repo, published with GitHub Pages.
 index.html            split code/result viewer
 viewer.js             viewer: scene, examples, params, live cook
 style.css
-runtime/runtime.js    92-node typed graph runtime + evaluator, Three bridge
+runtime/runtime.js    93-node typed graph runtime + evaluator, Three bridge
 runtime/expr.js       parsed expression language (no eval)
 runtime/format.js     .pfn parser/serializer
 runtime/dsl.js        JS authoring DSL (for building ports)
@@ -94,10 +94,12 @@ The viewer `frame()` uses `current.cam` = `[azimuthDeg, elevationDeg]` and
 
 ## Current status (24 Nov 2026)
 
-- 92 node types; **9 published examples, all geometric ports, zero script nodes**.
+- 93 node types; **19 published examples, all geometric ports, zero script nodes**.
 - **Geometric parity (vertices, bbox and winding at 1e-4):** `cookie` (174),
   `sapphire` (48), `tire` (520), `pumpkin` (120), `area rug` (392/700),
-  `chalkboard` (194), `theatre` (667), `wayfinding` (482) and `desk` (280).
+  `chalkboard` (194), `theatre` (667), `wayfinding` (482), `desk` (280),
+  `plaza` (292), `clam` (792), `tram` (170), `armchair` (460), `wattle` (802),
+  `quiver` (658), `door` (402), `taxiway` (408), `roof` (712), `carousel` (276).
 - Sapphire had an inverted bottom cap; `loft.orient`/`orientCenter` and `reverse` fixed it.
   Sapphire is now fully parametric (all reference params live, including pointed/
   truncated/broken terminations).
@@ -113,18 +115,22 @@ The viewer `frame()` uses `current.cam` = `[azimuthDeg, elevationDeg]` and
 - The overhead wayfinding sign adds `pack`, `outlineRect` and `band`; `plate` gained
   cap/wall selection, `chamferBox` face skipping, `prism` cap orientation and `mixColor`
   expression support. The office desk reuses the new outline/band primitives.
+- The ten new ports use a batched `faces` source (`faces: [{pts,zone,hint}]`) so a
+  reference face soup stays one node instead of hundreds of `poly` nodes. `door` also
+  keeps its glass in a separate material slot, and its hinge knuckles use `prim` plus a
+  `deform` shear so the reference's lived-in matrix applies to them too.
 - The previous approximations/studies were removed from the published manifest while
   they are replaced with real ports. The gallery is stale.
 - `t-all.mjs` is count-independent and winding-aware; counts alone are not parity.
 
 ## Next tasks (priority)
 
-1. Port more reference props and add them to the showcase. The new signage primitives
-   (`prism`, `frame`, `plate`, `block`, `gem`, `poly`) make the remaining sign/cabinet
-   assets tractable; the current gaps are polygon faces with craters (cheese wedge),
-   fused clipped lumps (small rock), and cloth/rigged families.
+1. Port more reference props and add them to the showcase. The `faces` source plus the
+   signage/furniture primitives cover the remaining face-soup assets; the current gaps
+   are polygon faces with craters (cheese wedge), fused clipped lumps (small rock), and
+   cloth/rigged families.
 2. Keep every published example a verified port; do not re-add labelled approximations.
-3. Regenerate the gallery for the nine ports.
+3. Regenerate the gallery for the nineteen ports.
 4. If adding booleans to examples, verify `manifold-3d` WASM loads from the import map and
    gate it behind `await initManifold()`.
 
@@ -135,6 +141,7 @@ From `study/prototype/v2`:
 ```bash
 node t-examples.mjs        # parses/cooks every published pfn
 node t-all.mjs             # order-independent vertex/bbox/winding parity
+node t-ports10.mjs         # ten new ports: parity + colourway invariance
 node t-cookie.mjs          # cookie default / 3-chip / 14-chip
 node t-tire.mjs             # 8 tire variants
 node t-sapphire.mjs        # 13 sapphire param variants
@@ -189,5 +196,5 @@ deployment fails, fix it and push again rather than leaving the public site stal
 - `mesh` zones must match part zone names; a mismatch silently uses fallback colours.
 - GitHub Pages caches assets; bump `?v=` after viewer/style/runtime changes. The public
   runtime files must import each other with `.js`, unlike the study `.mjs` sources.
-  `sync-public.mjs` uses `PUBLIC_ASSET_VERSION` (default `10`); keep it in step with
+  `sync-public.mjs` uses `PUBLIC_ASSET_VERSION` (default `12`); keep it in step with
   `index.html` and `viewer.js`.

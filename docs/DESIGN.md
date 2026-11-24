@@ -4,7 +4,7 @@
 three.js-native node graph, the gaps those ports exposed, the nodes added to close them,
 and a compact declarative storage format.
 
-**Code:** `runtime.js` (92 node types), `expr.js`, `dsl.js`, `format.js`, `cache.js`,
+**Code:** `runtime.js` (93 node types), `expr.js`, `dsl.js`, `format.js`, `cache.js`,
 `ports/` (20 ports), `templates.mjs` (20 more). See `SAMPLE3.md` for the third sample. Run `node t-all.mjs` for the order-independent geometric parity table.
 
 ---
@@ -25,11 +25,11 @@ and a compact declarative storage format.
 | `random` | `{ values, next }` deterministic LCG stream |
 | `object` | a `THREE.Object3D` output |
 
-### Nodes (92)
+### Nodes (93)
 
 | group | nodes |
 |---|---|
-| sources | `ring`, `profile`, `path`, `grid`, `box`, `outlineRect`, `cylinder`, `sphere`, `geometry`, `prim`, `random`, `value`, `let`, `list`, `range`, `table`, `preset`, `coalesce`, `draws`, `jitter` |
+| sources | `ring`, `profile`, `path`, `grid`, `box`, `outlineRect`, `cylinder`, `sphere`, `geometry`, `prim`, `faces`, `random`, `value`, `let`, `list`, `range`, `table`, `preset`, `coalesce`, `draws`, `jitter` |
 | surfaces | `loft`, `cap`, `extrude`, `revolve`, `sweep`, `band`, `inset`, `pocket`, `solidify` |
 | signage | `prism`, `frame`, `plate`, `block`, `gem`, `poly` |
 | modifiers | `transform`, `center`, `mirror`, `reverse`, `deform`, `clip`, `join`, `centroid`, `lerpPoint`, `mirrorPoint`, `rotateAbout`, `planeCut`, `gridPoint`, `direction`, `lookup`, `first`, `last`, `slice`, `concat` |
@@ -38,7 +38,7 @@ and a compact declarative storage format.
 | output | `mesh`, `group` |
 | escape hatches | `script`, `module` |
 
-Update: the runtime now also has `curl`, `scatterVolume`, `pathOnSurface`, `bandOnSurface`, `ribbon`, `wrapShell`, `text`, `skeleton`, `skin`, `pose`, `prism`, `frame`, `plate`, `block`, `gem` and `poly`; the public repo uses `.js` extensions.
+Update: the runtime now also has `faces`, `curl`, `scatterVolume`, `pathOnSurface`, `bandOnSurface`, `ribbon`, `wrapShell`, `text`, `skeleton`, `skin`, `pose`, `prism`, `frame`, `plate`, `block`, `gem` and `poly`; the public repo uses `.js` extensions.
 
 Key signatures:
 
@@ -70,6 +70,7 @@ chamferBox w h d c x y z ry skip(px nx py ny pz nz) zone -> chamfered block
 prism     ... cap(true|front|back|both|top|bottom) capOrient? zone -> prism
 gem       x y z nx ny nz r ry h n zone -> faceted lamp
 poly      pts zone hint? inside? flip? -> oriented polygon
+faces     faces[{pts,zone?,hint?,inside?,flip?}] -> batched oriented polygons
 random    seed count -> consumable stream
 switch    on cases{a:ref,b:ref}
 mesh      geom zones{zone:hex} materials{zone:{slot,roughness,metalness,opacity}}
@@ -114,18 +115,21 @@ tolerance; "sketch" means detail is deliberately reduced.
 |---|---|---:|---:|---:|---:|---|
 | rough-sapphire | prop | 48 | 48 | 1.00 | 6 | **parity** |
 | tire | prop | 520 | 520 | 1.00 | 13 | **parity** |
-| lounge-armchair | prop | 460 | 468 | 1.02 | 9 | near |
-| tram-track-tile | prop | 170 | 156 | 0.92 | 15 | near |
+| lounge-armchair | prop | 460 | 460 | 1.00 | 3 | **parity** |
+| tram-track-tile | prop | 170 | 170 | 1.00 | 3 | **parity** |
 | small-rock | prop | 188 | 198 | 1.05 | 6 | near |
-| baggage-carousel | prop | 276 | 316 | 1.14 | 16 | near |
-| wattle-fence | prop | 802 | 472 | 0.59 | 27 | sketch |
+| baggage-carousel | prop | 276 | 276 | 1.00 | 3 | **parity** |
+| wattle-fence | prop | 802 | 802 | 1.00 | 3 | **parity** |
 | cobbled-street | prop | 890 | 492 | 0.55 | 43 | sketch |
-| quiver | prop | 658 | 312 | 0.47 | 13 | sketch |
-| composite-plaza-tile | prop | 292 | 108 | 0.37 | 12 | sketch |
-| clam | prop | 792 | 192 | 0.24 | 2 | sketch |
+| quiver | prop | 658 | 658 | 1.00 | 3 | **parity** |
+| composite-plaza-tile | prop | 292 | 292 | 1.00 | 3 | **parity** |
+| clam | prop | 792 | 792 | 1.00 | 3 | **parity** |
 | flowering-shrub | prop | 831 | 174 | 0.21 | 19 | sketch |
 | adjustable-bay-stilt | building | 1,284 | 136 | 0.11 | 9 | sketch |
 | cheese-wedge | prop | 608 | 12 | 0.02 | 3 | sketch |
+| interior-door-leaf | prop | 402 | 402 | 1.00 | 10 | **parity** |
+| lit-taxiway-sign | signage | 408 | 408 | 1.00 | 3 | **parity** |
+| tiled-roof-section | building | 712 | 712 | 1.00 | 3 | **parity** |
 | valet-attendant | character | 3,193 | 3,193 | 1.00 | 1 | module |
 | snail | animal | 2,532 | 2,532 | 1.00 | 1 | module |
 | stag-beetle | animal | 2,706 | 2,706 | 1.00 | 1 | module |

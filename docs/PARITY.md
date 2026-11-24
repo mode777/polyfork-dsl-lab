@@ -32,6 +32,16 @@ Current hand-port results:
 | theatre | 667 | PASS, 8 variants |
 | wayfinding | 482 | PASS, 15 variants |
 | desk | 280 | PASS, 10 variants |
+| plaza | 292 | PASS at 0 error |
+| clam | 792 | PASS at ~4e-9 |
+| tram | 170 | PASS at 0 error |
+| armchair | 460 | PASS at 0 error |
+| wattle | 802 | PASS at 0 error |
+| quiver | 658 | PASS at 0 error |
+| door | 402 | PASS at ~1e-7 |
+| taxiway | 408 | PASS at 0 error |
+| roof | 712 | PASS at 0 error |
+| carousel | 276 | PASS at ~4e-8 |
 
 The six `module` wrappers also pass because they call the reference `createAsset()`
 directly.

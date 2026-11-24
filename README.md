@@ -18,12 +18,12 @@ geometry only.
 ```
 index.html            the split code / result viewer
 app.js                viewer (three.js scene, params, live cook)
-runtime/runtime.js    92-node typed graph runtime + evaluator, Three bridge
+runtime/runtime.js    93-node typed graph runtime + evaluator, Three bridge
 runtime/expr.js       parsed expression language (no eval)
 runtime/format.js     .pfn text parser and serializer
 runtime/dsl.js        JavaScript authoring DSL
 runtime/cache.js      content-addressed array pool + Float32 cache
-examples/*.pfn        9 ported example graphs (showcase is ports only)
+examples/*.pfn        19 ported example graphs (showcase is ports only)
 docs/                 design notes, parity status, techniques
 study/                authoring/porting workspace (reference assets gitignored)
 ```
@@ -85,11 +85,11 @@ The parser, serializer and evaluator are in `runtime/`. `.pfn` is the authoring 
 `cache.js` shows a compact content-addressed JSON cache (arrays pooled and base64-encoded,
 ≈84% smaller on graphs with repeated rings).
 
-## Node set (92)
+## Node set (93)
 
 | group | nodes |
 |---|---|
-| sources | `ring profile path grid box chamferBox outlineRect cylinder sphere plane card cone curl pointsGrid geometry prim random value let list range table preset coalesce draws jitter` |
+| sources | `ring profile path grid box chamferBox outlineRect cylinder sphere plane card cone curl pointsGrid geometry prim faces random value let list range table preset coalesce draws jitter` |
 | surfaces | `loft loftProfile cap extrude revolve sweep band inset pocket solidify bevelProfile fan fanRing wrapShell` |
 | signage | `prism frame plate block gem poly` |
 | modifiers | `transform center mirror reverse deform clip join cavity centroid lerpPoint mirrorPoint rotateAbout planeCut gridPoint direction lookup first last slice concat` |
@@ -106,8 +106,10 @@ Low-level controls are first-class: `loft` has `diagonal`, `bandZones`, `flip`,
 `yawScale`, `rng`; `instance` has per-point `[sx,sy,sz]` scale and `yawSign`; `arrayPolar`
 has `spin`; `reverse` flips winding; `prim` calls a real Three geometry constructor;
 `prism`/`frame`/`plate`/`block`/`gem`/`poly` cover swept frames, holed plates, skipped-face
-blocks, faceted lamps and hand-authored sign polygons. `plate` can emit either cap and
-selected walls, `chamferBox` can skip faces, `prism` can orient its caps, `outlineRect`
+blocks, faceted lamps and hand-authored sign polygons. `faces` batches hand-authored
+polygons with per-face zones and orientation hints, which keeps face-soup ports (weave,
+shells, tile rows) to one source node. `plate` can emit either cap and selected walls,
+`chamferBox` can skip faces, `prism` can orient its caps, `outlineRect`
 and `band` build chamfered furniture outlines, and `pack` lays out flat legend items.
 A `script` node sees `THREE`, `ADDONS`
 (`mergeGeometries`, `toCreasedNormals`, `RoundedBoxGeometry`) and `H` (`tri`, `quad`,
@@ -132,6 +134,16 @@ removed from the published manifest while they are replaced with real ports.
 | Theatre vertical sign | banded readerboard, enamel glyph plates, marquee lamps and three crowns |
 | Overhead wayfinding sign | chamfered lit cabinet, packed legend glyphs, hanger rods and knee braces |
 | Office desk | chamfered slab, folded steel sleds, drawer/plain/pedestal undercarriage |
+| Composite plaza tile | twin recessed seams, lit bars, raised field and service socket |
+| Maxima clam | ribbed valves, pearly dish, mantle rays and inhalant spots |
+| Tram track tile | grooved steel rails in a swept asphalt slab with a base course |
+| Lounge armchair | tub shell, splayed legs and two loose cushions |
+| Wattle fence run | lashed stakes, mirrored sails and eleven woven withy rows |
+| Arrow quiver | stitched leather tube, shoulder strap, buckle and seven arrows |
+| Interior door leaf | glazed leaf, moulded panels, brass lever and three hinges |
+| Lit taxiway sign | two-panel arrow face, octagonal casing, legs and concrete pad |
+| Tiled roof section | gable kawara roof with four stepped courses and closed verges |
+| Baggage carousel | sloped plate bed, bumper skirt and three riding bags |
 
 Parity means the order-independent `t-all.mjs` check passes at `1e-4`: same vertex count,
 vertex set and bbox, and no winding mismatches. It is not a byte/vertex-order claim.

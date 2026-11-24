@@ -133,5 +133,155 @@
       22
     ],
     "fit": 1.7
+  },
+  {
+    "id": "plaza",
+    "title": "Composite plaza tile",
+    "description": "Exact geometric port: twin recessed seams, lit bars, raised field and service socket.",
+    "category": "architecture",
+    "status": "port",
+    "file": "plaza.pfn",
+    "bytes": 17966,
+    "nodes": 3,
+    "cam": [
+      35,
+      35
+    ],
+    "fit": 1.25
+  },
+  {
+    "id": "clam",
+    "title": "Maxima clam",
+    "description": "Exact geometric port: ribbed valves, pearly dish, mantle rays and inhalant spots.",
+    "category": "nature",
+    "status": "port",
+    "file": "clam.pfn",
+    "bytes": 112703,
+    "nodes": 3,
+    "cam": [
+      25,
+      20
+    ],
+    "fit": 1.8
+  },
+  {
+    "id": "tram",
+    "title": "Tram track tile",
+    "description": "Exact geometric port: grooved steel rails in a swept asphalt slab with a base course.",
+    "category": "architecture",
+    "status": "port",
+    "file": "tram.pfn",
+    "bytes": 9433,
+    "nodes": 3,
+    "cam": [
+      35,
+      35
+    ],
+    "fit": 1.5
+  },
+  {
+    "id": "armchair",
+    "title": "Lounge armchair",
+    "description": "Exact geometric port: tub shell, splayed legs and two loose cushions.",
+    "category": "props",
+    "status": "port",
+    "file": "armchair.pfn",
+    "bytes": 78531,
+    "nodes": 3,
+    "cam": [
+      30,
+      18
+    ],
+    "fit": 1.5
+  },
+  {
+    "id": "wattle",
+    "title": "Wattle fence run",
+    "description": "Exact geometric port: lashed stakes, mirrored sails and eleven woven withy rows.",
+    "category": "nature",
+    "status": "port",
+    "file": "wattle.pfn",
+    "bytes": 115698,
+    "nodes": 3,
+    "cam": [
+      30,
+      15
+    ],
+    "fit": 1.4
+  },
+  {
+    "id": "quiver",
+    "title": "Arrow quiver",
+    "description": "Exact geometric port: stitched leather tube, shoulder strap, buckle and seven arrows.",
+    "category": "props",
+    "status": "port",
+    "file": "quiver.pfn",
+    "bytes": 115201,
+    "nodes": 3,
+    "cam": [
+      25,
+      15
+    ],
+    "fit": 1.5
+  },
+  {
+    "id": "door",
+    "title": "Interior door leaf",
+    "description": "Exact geometric port: glazed leaf, moulded panels, brass lever and three hinges.",
+    "category": "architecture",
+    "status": "port",
+    "file": "door.pfn",
+    "bytes": 31510,
+    "nodes": 10,
+    "cam": [
+      18,
+      8
+    ],
+    "fit": 1.2
+  },
+  {
+    "id": "taxiway",
+    "title": "Lit taxiway sign",
+    "description": "Exact geometric port: two-panel arrow face, octagonal casing, legs and concrete pad.",
+    "category": "signage",
+    "status": "port",
+    "file": "taxiway.pfn",
+    "bytes": 40676,
+    "nodes": 3,
+    "cam": [
+      25,
+      12
+    ],
+    "fit": 1.4
+  },
+  {
+    "id": "roof",
+    "title": "Tiled roof section",
+    "description": "Exact geometric port: gable kawara roof with four stepped courses and closed verges.",
+    "category": "architecture",
+    "status": "port",
+    "file": "roof.pfn",
+    "bytes": 83326,
+    "nodes": 3,
+    "cam": [
+      35,
+      20
+    ],
+    "fit": 1.4
+  },
+  {
+    "id": "carousel",
+    "title": "Baggage carousel",
+    "description": "Exact geometric port: sloped plate bed, bumper skirt and three riding bags.",
+    "category": "props",
+    "status": "port",
+    "file": "carousel.pfn",
+    "bytes": 25329,
+    "nodes": 3,
+    "cam": [
+      35,
+      20
+    ],
+    "fit": 1.6
   }
 ]

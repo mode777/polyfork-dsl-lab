@@ -6,9 +6,8 @@ example policy changes.
 ## Headline
 
 The showcase is **ports only** while the remaining approximations and studies are
-replaced with real ports. Nine reference assets pass the order-independent geometric
-parity check at `1e-4`: cookie, rough sapphire, tire, pumpkin, area rug, chalkboard,
-the theatre vertical sign, the overhead wayfinding sign and the office desk.
+replaced with real ports. Nineteen reference assets pass the order-independent geometric
+parity check at `1e-4`, including the ten new ports added in this pass.
 
 ## Example status
 
@@ -23,12 +22,30 @@ the theatre vertical sign, the overhead wayfinding sign and the office desk.
 | **theatre** | 667 | **geometric port** | 374 nodes; three prebuilt word layouts, banded readerboard, enamel glyph plates, marquee lamps, three crowns, steel bracket. |
 | **wayfinding** | 482 | **geometric port** | 157 nodes; chamfered lit cabinet, recessed face rings, packed arrow/letter/icon legends, hanger rods, ceiling channel, tie bar and knee braces. |
 | **desk** | 280 | **geometric port** | 209 nodes; chamfered slab with cable slot, folded steel sleds, drawer/plain/pedestal undercarriage, live width and lived-in wear. |
+| **plaza** | 292 | **geometric port** | 3 nodes; twin recessed seams, lit bars, raised field and service socket, all faces batched through `faces`. |
+| **clam** | 792 | **geometric port** | 3 nodes; ribbed valves, pearly dish, mantle rays and inhalant spots. |
+| **tram** | 170 | **geometric port** | 3 nodes; grooved steel rails in a swept asphalt slab with a base course. |
+| **armchair** | 460 | **geometric port** | 3 nodes; tub shell, splayed legs and two loose cushions. |
+| **wattle** | 802 | **geometric port** | 3 nodes; lashed stakes, mirrored sails and eleven woven withy rows. |
+| **quiver** | 658 | **geometric port** | 3 nodes; stitched leather tube, shoulder strap, buckle and seven arrows. |
+| **door** | 402 | **geometric port** | 10 nodes; glazed leaf, moulded panels, brass lever and three hinges; glass on its own material slot. |
+| **taxiway** | 408 | **geometric port** | 3 nodes; two-panel arrow face, octagonal casing, legs and concrete pad. |
+| **roof** | 712 | **geometric port** | 3 nodes; gable kawara roof with four stepped courses and closed verges. |
+| **carousel** | 276 | **geometric port** | 3 nodes; sloped plate bed, bumper skirt and three riding bags. |
 
 The previous rock/armchair/clam/basket approximations and the hair/jacket/sign/creature
-studies were removed from the published manifest. They are not shown as ports.
+studies were removed from the published manifest. Armchair and clam are now real ports;
+rock/cheese remain open.
 
 ## What changed in this pass
 
+- Added ten exact ports: **composite plaza tile**, **maxima clam**, **tram track tile**,
+  **lounge armchair**, **wattle fence run**, **arrow quiver**, **interior door leaf**,
+  **lit taxiway sign**, **tiled roof section** and **baggage carousel**.
+- Added the generic `faces` source: a batch of `{pts, zone, hint}` polygons in one node,
+  so reference face-soup builders stay compact instead of emitting hundreds of `poly`
+  nodes. `door` also uses `prim` + `deform` to apply the reference's lived-in shear to
+  its hinge knuckles, and keeps glass on a separate material slot.
 - Added two more exact ports: the **overhead wayfinding sign** (fourth reference sample)
   and the **office desk** (third sample). Both keep their reference options live.
 - Added three generic nodes: `pack` (flat legend layout), `outlineRect` (chamfered
@@ -47,7 +64,7 @@ studies were removed from the published manifest. They are not shown as ports.
 - `let` bindings now expose graph inputs under `s` as well as bare names, matching field
   and `~` param evaluation. Expression built-ins gained `mix`, `deg`/`rad` and
   `vadd`/`vsub`/`vmul`/`vdot`/`vcross`/`vlen`.
-- Bumped the public runtime asset version to `10`.
+- Bumped the public runtime asset version to `12`.
 
 - Fixed the sapphire inversion: the runtime's bottom-cap hint pointed inward; `loft` now
   has `orient`/`orientCenter` and the broken dished cap uses `reverse`.
@@ -74,8 +91,10 @@ studies were removed from the published manifest. They are not shown as ports.
 
 ## What was verified
 
-- `t-all.mjs`: cookie, sapphire, tire, pumpkin, rug, chalkboard, theatre, wayfinding,
-  desk + six `module` wrappers pass at default; the per-port tests cover parameter variants.
+- `t-all.mjs`: all nineteen published ports plus six `module` wrappers pass at default;
+  the per-port tests cover parameter variants for the original nine.
+- `t-ports10.mjs`: 10/10 new ports pass reference parity and every colourway leaves the
+  vertex set unchanged.
 - `t-cookie.mjs`: 3/3 variants.
 - `t-tire.mjs`: 8/8 variants.
 - `t-sapphire.mjs`: 13/13 variants (all params, including broken/truncated/irregular).
@@ -86,7 +105,7 @@ studies were removed from the published manifest. They are not shown as ports.
 - `t-wayfinding.mjs`: 15/15 variants (width/drop extremes, unlit ends, every arrow/letter/icon family, colourway).
 - `t-desk.mjs`: 10/10 variants (width extremes, all three undercarriages, lived-in extremes, colourway).
 - `t-expr.mjs`: 10/10 angle/vector expression helpers.
-- All nine showcase graphs parse and cook (`t-examples.mjs`); none contains a `script`
+- All nineteen showcase graphs parse and cook (`t-examples.mjs`); none contains a `script`
   node and the runtime never evaluates JavaScript for fields/params.
 - `t-code.mjs`, `t-bool.mjs`, `t-cache.mjs`, `t-sample3.mjs` pass.
 
@@ -100,12 +119,11 @@ studies were removed from the published manifest. They are not shown as ports.
 ## Next
 
 1. Port more reference props with the new ops and add them to the showcase; the
-   remaining fourth-sample signs (lit taxiway, core rulebook, marquee letter) are the
-   next candidates. The taxiway needs a stroke/SDF glyph node; the rulebook is mostly
-   plates and bands; the marquee needs stroke union/offset.
+   remaining fourth-sample signs are the core rulebook (mostly plates and bands) and
+   the marquee letter (stroke union/offset).
 2. Exposed but not yet filled: polygon faces with craters (cheese wedge), fused clipped
    lumps (small rock), and more cloth/rigged families.
-3. Regenerate the gallery for the nine ports; the old images are stale.
+3. Regenerate the gallery for the nineteen ports; the old images are stale.
 
 ## Workspace
 

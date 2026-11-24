@@ -45,7 +45,7 @@ prototype/
   models/*.mjs          v1 exact ports (cookie, rug)
   bench*.mjs            v1 parity benches
   v2/
-    runtime.mjs         92-node typed runtime + Three bridge (source of public runtime.js)
+    runtime.mjs         93-node typed runtime + Three bridge (source of public runtime.js)
     expr.mjs            parsed expression language (source of public runtime/expr.js)
     dsl.mjs             authoring DSL
     format.mjs          .pfn text + JSON (source of public format.js)
@@ -87,6 +87,7 @@ From `prototype/v2`:
 node make-examples.mjs              # writes examples/*.pfn + manifest
 node t-examples.mjs                 # parse + cook all published examples
 node t-all.mjs                      # order-independent geometric parity
+node t-ports10.mjs                  # ten new ports: parity + colourway invariance
 node t-cookie.mjs                   # cookie default / 3-chip / 14-chip
 node t-tire.mjs             # 8 tire variants
 node t-sapphire.mjs                 # 13 sapphire variants
@@ -114,10 +115,12 @@ Commit/push the public repo, check
 
 ## Current state (24 Nov 2026)
 
-- Runtime: 92 nodes; **9 published examples, all geometric ports, zero script nodes**.
+- Runtime: 93 nodes; **19 published examples, all geometric ports, zero script nodes**.
 - **Geometric parity** (vertices, bbox and winding at 1e-4): `cookie` (174),
   `sapphire` (48), `tire` (520), `pumpkin` (120), `area rug` (392/700), `chalkboard`
-  (194), `theatre` (667), `wayfinding` (482), `desk` (280), plus the six `module` wrappers.
+  (194), `theatre` (667), `wayfinding` (482), `desk` (280), `plaza` (292), `clam` (792),
+  `tram` (170), `armchair` (460), `wattle` (802), `quiver` (658), `door` (402),
+  `taxiway` (408), `roof` (712), `carousel` (276), plus the six `module` wrappers.
 - Sapphire is fully parametric (colorway, gem, length, barrel, ends, chamfer, irregularity)
   and its bottom-cap inversion is fixed with `loft.orient` + `reverse`.
 - Core expressions are parsed by `expr.mjs` (no `new Function`). Layout math uses
@@ -130,14 +133,14 @@ Commit/push the public repo, check
 
 ## Known issues / next
 
-1. Port more reference props. The new signage primitives (`prism`, `frame`, `plate`,
-   `block`, `gem`, `poly`) cover the fourth-sample signs; exposed gaps remain polygon
-   faces with craters (cheese wedge), fused clipped lumps (small rock), and cloth/rigged
-   families.
+1. Port more reference props. The batched `faces` source plus the signage/furniture
+   primitives (`prism`, `frame`, `plate`, `block`, `gem`, `poly`) cover the remaining
+   face-soup assets; exposed gaps remain polygon faces with craters (cheese wedge),
+   fused clipped lumps (small rock), and cloth/rigged families.
 2. Exact parity workflow: compare order-independently (vertices, bbox, winding) against
    the reference module; do not compare hero images to the viewer.
 3. The public repo must stay source-free; keep the reference modules here.
-4. Regenerate the gallery for the nine ports.
+4. Regenerate the gallery for the nineteen ports.
 
 ## Why this matters
 

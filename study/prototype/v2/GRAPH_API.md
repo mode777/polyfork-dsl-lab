@@ -5,10 +5,10 @@ three.js-native node graph, the gaps those ports exposed, the nodes added to clo
 and a compact declarative storage format.
 
 > **Update (24 Nov 2026):** the tables below are historical. The current parity contract is
-> order-independent triangle/vertex/bbox comparison in `t-all.mjs` at `1e-4`. Only
-> `cookie`, `sapphire`, `tire` and the six `module` wrappers pass; see
-> `docs/PARITY.md`. The runtime now has a first-class Three bridge and the low-level
-> controls listed there.
+> order-independent triangle/vertex/bbox comparison in `t-all.mjs` at `1e-4`. Nineteen
+> hand ports plus the six `module` wrappers pass; see `docs/PARITY.md`. The runtime now
+> has a first-class Three bridge, the low-level controls listed there, and a batched
+> `faces` source for reference face-soup builders.
 
 **Code:** `runtime.mjs` (57 node types after the Three-bridge/parity pass), `dsl.mjs`, `format.mjs`, `cache.mjs`,
 `ports/` (20 ports), `templates.mjs` (20 more). See `SAMPLE3.md` for the third sample. Run `node t-all.mjs` for the order-independent geometric parity table.

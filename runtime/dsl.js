@@ -1,6 +1,6 @@
 // Compact authoring DSL over the v2 IR. Every call records a node; scalars,
 // refs, arrays and field expressions all serialise (fields as source strings).
-import { Graph, field, isField, expr } from './runtime.js?v=11';
+import { Graph, field, isField, expr } from './runtime.js?v=12';
 
 const F = (v) => (isField(v) || typeof v !== 'string' && typeof v !== 'function' ? v : field(v));
 const strip = (o, ks) => { const q = { ...o }; for (const k of ks) delete q[k]; return q; };
@@ -57,6 +57,7 @@ class Builder {
   band(o = {}) { return this.add('band', { lower: o.lower, upper: o.upper }, strip(o, ['lower', 'upper'])); }
   gem(o = {}) { return this.add('gem', {}, o); }
   poly(o = {}) { return this.add('poly', { pts: o.pts }, strip(o, ['pts'])); }
+  faces(o = {}) { return this.add('faces', { faces: o.faces }, strip(o, ['faces'])); }
   pack(o = {}) { return this.add('pack', { items: o.items }, strip(o, ['items'])); }
   bevelProfile(o) { return this.add('bevelProfile', { profile: o.profile }, { dist: o.dist }); }
   loftProfile(o) { return this.add('loftProfile', { profile: o.profile, capTop: o.capTop, capBottom: o.capBottom }, strip(o, ['profile', 'capTop', 'capBottom'])); }

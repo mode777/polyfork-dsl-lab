@@ -159,7 +159,22 @@ The overhead wayfinding sign and office desk added the next set of reusable oper
 | `prism.capOrient` | reference prisms whose caps must face out from a profile |
 | `mixColor` | wear/fade colour interpolation in `value` expressions |
 
-The remaining fourth-sample signs are still open: the lit taxiway needs a generic
-stroke/SDF glyph node, the core rulebook is mostly plates/bands but has two states, and
-the marquee letter needs stroke union/offset. Those are separate geometry features, not
-layout escapes.
+The remaining fourth-sample signs are still open: the core rulebook is mostly
+plates/bands but has two states, and the marquee letter needs stroke union/offset. Those
+are separate geometry features, not layout escapes.
+
+## 12. Face-soup follow-up
+
+Ten more ports (plaza, clam, tram, armchair, wattle, quiver, door, taxiway, roof and
+carousel) are reference face builders rather than primitive assemblies. They use one
+generic source:
+
+| node / option | replaces |
+|---|---|
+| `faces` | batches of hand-authored polygons with per-face `zone`, `hint`, `inside` and `flip`; fan-triangulates each face like `poly` |
+| `faces` + `prim`/`deform` | mixed face/Three-primitive assets (door hinge knuckles under the lived-in shear) |
+
+The `faces` source is data-only, like `profile` and `path`; it does not execute code.
+It keeps the graph readable while preserving the reference vertex set and winding at
+`1e-4`. The expression language did not need another built-in for this set; the repeated
+value work was already covered by `let`/`value`/`preset` and the existing math helpers.

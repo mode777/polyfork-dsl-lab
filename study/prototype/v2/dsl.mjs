@@ -57,6 +57,7 @@ class Builder {
   band(o = {}) { return this.add('band', { lower: o.lower, upper: o.upper }, strip(o, ['lower', 'upper'])); }
   gem(o = {}) { return this.add('gem', {}, o); }
   poly(o = {}) { return this.add('poly', { pts: o.pts }, strip(o, ['pts'])); }
+  faces(o = {}) { return this.add('faces', { faces: o.faces }, strip(o, ['faces'])); }
   pack(o = {}) { return this.add('pack', { items: o.items }, strip(o, ['items'])); }
   bevelProfile(o) { return this.add('bevelProfile', { profile: o.profile }, { dist: o.dist }); }
   loftProfile(o) { return this.add('loftProfile', { profile: o.profile, capTop: o.capTop, capBottom: o.capBottom }, strip(o, ['profile', 'capTop', 'capBottom'])); }

@@ -694,6 +694,57 @@ node('poly', { in: { pts: V.any, zone: V.string, hint: V.vec3, inside: V.vec3, f
   return geom(part(out, p.zone ?? 'a'));
 });
 
+// Batched hand-authored polygon source. Each face is {pts, zone?, hint?, inside?,
+// flip?} or a bare point array. This is `poly` without one node per face, for
+// ports whose reference builder emits a face soup (weave, shell, tile rows).
+node('faces', { in: { faces: V.any, zone: V.string }, out: V.geom }, ({ p }) => {
+  const list = asArray(p.faces) ?? [];
+  const buckets = new Map();
+  for (const f of list) {
+    if (!f) continue;
+    const meta = Array.isArray(f) ? null : f;
+    const raw = meta ? (meta.pts ?? meta.points ?? []) : f;
+    let P = asArray(raw).map((q) => [q[0], q[1], q[2]]);
+    if (meta?.flip) P = P.slice().reverse();
+    // Drop consecutive and closing duplicates, matching the reference face helpers.
+    const Q = [];
+    for (const q of P) {
+      const r = Q[Q.length - 1];
+      if (r && Math.abs(q[0] - r[0]) < 1e-9 && Math.abs(q[1] - r[1]) < 1e-9 && Math.abs(q[2] - r[2]) < 1e-9) continue;
+      Q.push(q);
+    }
+    while (Q.length > 1) {
+      const a = Q[0], b = Q[Q.length - 1];
+      if (Math.abs(a[0] - b[0]) < 1e-9 && Math.abs(a[1] - b[1]) < 1e-9 && Math.abs(a[2] - b[2]) < 1e-9) Q.pop();
+      else break;
+    }
+    P = Q;
+    if (P.length < 3) continue;
+    let hint = meta?.hint;
+    const inside = meta?.inside;
+    if (!hint && inside) {
+      const mid = P.reduce((a, q) => [a[0] + q[0] / P.length, a[1] + q[1] / P.length, a[2] + q[2] / P.length], [0, 0, 0]);
+      hint = sub3(mid, inside);
+    }
+    if (hint && P.length >= 3) {
+      const n = [0, 0, 0];
+      for (let i = 0; i < P.length; i++) {
+        const a = P[i], b = P[(i + 1) % P.length];
+        n[0] += (a[1] - b[1]) * (a[2] + b[2]);
+        n[1] += (a[2] - b[2]) * (a[0] + b[0]);
+        n[2] += (a[0] - b[0]) * (a[1] + b[1]);
+      }
+      if (dot3(n, hint) < 0) P = P.slice().reverse();
+    }
+    const zone = meta?.zone ?? p.zone ?? 'a';
+    if (!buckets.has(zone)) buckets.set(zone, []);
+    const out = buckets.get(zone);
+    if (inside) for (let i = 1; i + 1 < P.length; i++) triOut(out, P[0], P[i], P[i + 1], inside);
+    else for (let i = 1; i + 1 < P.length; i++) tri(out, P[0], P[i], P[i + 1]);
+  }
+  return geom([...buckets.entries()].map(([z, pos]) => part(pos, z)));
+});
+
 node('revolve', { in: { profile: V.any, seg: V.int, phase: V.number, inRadius: V.bool, zone: V.any, zoneField: V.field, mod: V.field, values: V.any, axis: V.string, ringMode: V.string, orient: V.bool, orientCenter: V.vec3, capTop: V.any, capBottom: V.any, capZone: V.any, capZoneField: V.field, flip: V.bool }, out: V.geom }, ({ p }) => {
   const P = asArray(p.profile), n = Math.max(3, Math.round(p.seg ?? 12)), buckets = new Map();
   const step = TAU / n, cosH = Math.cos(step / 2);
