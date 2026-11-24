@@ -7,13 +7,16 @@ const list = [
   ['tire','tire','Tire','Exact geometric port: revolved tread, caps, hub and lug ring.','props'],
   ['pumpkin','pumpkin','Pumpkin','Exact geometric port: alternating lobe/groove revolve and a real THREE stem.','nature'],
   ['rug','rug','Area rug','Exact geometric port: deformed lattice, folded corner, per-cell weave zones.','props'],
+  ['chalkboard','chalkboard','Chalkboard menu board','Exact geometric port: mitred frame, recessed slate, live menu rows and two chalk sticks.','signage'],
+  ['theatre','theatre','Theatre vertical sign','Exact geometric port: banded readerboard, enamel glyphs, marquee lamps and three crowns.','signage'],
 ];
 fs.mkdirSync('examples', { recursive: true });
 const CAM = {
   cookie: [25, 35], sapphire: [20, 12], tire: [58, 14], pumpkin: [30, 14], rug: [35, 42],
+  chalkboard: [22, 18], theatre: [18, 8],
 };
-const FIT = { cookie: 1.25, sapphire: 1.5, tire: 2.4, pumpkin: 1.65, rug: 1.5 };
-const STATUS = { cookie: 'port', sapphire: 'port', tire: 'port', pumpkin: 'port', rug: 'port' };
+const FIT = { cookie: 1.25, sapphire: 1.5, tire: 2.4, pumpkin: 1.65, rug: 1.5, chalkboard: 1.35, theatre: 1.15 };
+const STATUS = { cookie: 'port', sapphire: 'port', tire: 'port', pumpkin: 'port', rug: 'port', chalkboard: 'port', theatre: 'port' };
 const manifest = [];
 for (const [id, port, title, desc, cat] of list) {
   const mod = await import(`./ports/${port}.mjs`);

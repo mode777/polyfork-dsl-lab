@@ -121,3 +121,26 @@ No published example uses it, so the default runtime cannot execute JavaScript a
 Polygon faces with holes/craters (cheese wedge), fused clipped lumps / CSG (small rock),
 and cloth/rigged families are separate geometry gaps. They are not layout gaps and are
 not hidden in a code block.
+
+## 10. Signage follow-up
+
+The fourth reference sample is signage-heavy: menu boards, readerboards, marquee letters
+and wayfinding signs. Those assets repeatedly hand-build mitred frames, holed plates,
+skipped-face boxes, faceted lamps and flat letter polygons. Rather than bake each one into
+a `script` node, the runtime gained six generic primitives:
+
+| node | replaces |
+|---|---|
+| `prism` | `prismX` / `prismY` / Z extrusion helpers |
+| `frame` | rectangular mitred frame sweeps |
+| `plate` | triangulated outer profile + holes, with side walls |
+| `block` | axis-aligned box with selected faces skipped |
+| `gem` | n-sided faceted lamp/socket cap |
+| `poly` | arbitrary oriented 3D polygon (hint or interior point) |
+
+`join` now flattens nested geometry lists, so `map` results and conditional branches can
+be joined directly. `let` bindings also expose graph inputs under `s`, matching fields and
+`~` params; the chalkboard and theatre ports use this for per-panel/per-row layout maths.
+Expression built-ins gained `mix`, `deg`/`rad` and the missing vector operations
+(`vadd`, `vsub`, `vmul`, `vdot`, `vcross`, `vlen`). Both new ports are exact at `1e-4`
+across their parameter variants.

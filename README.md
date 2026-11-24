@@ -18,12 +18,12 @@ geometry only.
 ```
 index.html            the split code / result viewer
 app.js                viewer (three.js scene, params, live cook)
-runtime/runtime.js    83-node typed graph runtime + evaluator, Three bridge
+runtime/runtime.js    89-node typed graph runtime + evaluator, Three bridge
 runtime/expr.js       parsed expression language (no eval)
 runtime/format.js     .pfn text parser and serializer
 runtime/dsl.js        JavaScript authoring DSL
 runtime/cache.js      content-addressed array pool + Float32 cache
-examples/*.pfn        5 ported example graphs (showcase is ports only)
+examples/*.pfn        7 ported example graphs (showcase is ports only)
 docs/                 design notes, parity status, techniques
 study/                authoring/porting workspace (reference assets gitignored)
 ```
@@ -85,12 +85,13 @@ The parser, serializer and evaluator are in `runtime/`. `.pfn` is the authoring 
 `cache.js` shows a compact content-addressed JSON cache (arrays pooled and base64-encoded,
 ≈84% smaller on graphs with repeated rings).
 
-## Node set (83)
+## Node set (89)
 
 | group | nodes |
 |---|---|
 | sources | `ring profile path grid box chamferBox cylinder sphere plane card cone curl pointsGrid geometry prim random value let list range table preset coalesce draws jitter` |
 | surfaces | `loft loftProfile cap extrude revolve sweep inset pocket solidify bevelProfile fan fanRing wrapShell` |
+| signage | `prism frame plate block gem poly` |
 | modifiers | `transform center mirror reverse deform clip join cavity centroid lerpPoint mirrorPoint rotateAbout planeCut gridPoint direction lookup first last slice concat` |
 | distribution | `scatter scatterSurface scatterVolume instance instancedMesh arrayPolar arrayLinear` |
 | character | `skeleton skin pose` |
@@ -104,11 +105,14 @@ Low-level controls are first-class: `loft` has `diagonal`, `bandZones`, `flip`,
 `solidify` has reference diagonals, wall order and zone fields; `scatter` has `lazy`,
 `yawScale`, `rng`; `instance` has per-point `[sx,sy,sz]` scale and `yawSign`; `arrayPolar`
 has `spin`; `reverse` flips winding; `prim` calls a real Three geometry constructor;
+`prism`/`frame`/`plate`/`block`/`gem`/`poly` cover swept frames, holed plates, skipped-face
+blocks, faceted lamps and hand-authored sign polygons.
 A `script` node sees `THREE`, `ADDONS`
 (`mergeGeometries`, `toCreasedNormals`, `RoundedBoxGeometry`) and `H` (`tri`, `quad`,
 `part`, `geom`, `ring`, `prng`, `clamp`, `lerp`). Fields and `~` params are parsed
   expressions (`+ - * / % **`, comparisons, `?:`, arrays, objects, `let … in`, built-in
-  math/vector functions); the core never evaluates JavaScript.
+  math/vector functions, including `mix`, `deg`/`rad` and `vadd`/`vsub`/`vmul`/`vdot`/`vcross`/`vlen`);
+  the core never evaluates JavaScript.
 
 ## Examples
 
@@ -122,6 +126,8 @@ removed from the published manifest while they are replaced with real ports.
 | Tire | revolved tread with per-facet modulation, caps, hub, lug ring |
 | Pumpkin | alternating lobe/groove revolve, real `THREE.CylinderGeometry` stem |
 | Area rug | deformed lattice, folded corner, per-cell weave zones |
+| Chalkboard menu board | mitred frame sweep, recessed slate, mapped menu cells, ledge and chalk sticks |
+| Theatre vertical sign | banded readerboard, enamel glyph plates, marquee lamps and three crowns |
 
 Parity means the order-independent `t-all.mjs` check passes at `1e-4`: same vertex count,
 vertex set and bbox, and no winding mismatches. It is not a byte/vertex-order claim.

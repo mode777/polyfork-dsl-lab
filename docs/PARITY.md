@@ -28,6 +28,8 @@ Current hand-port results:
 | tire | 520 | PASS at ~1e-18 |
 | pumpkin | 120 | PASS, 6 variants |
 | area rug | 392/700 | PASS, 9 variants |
+| chalkboard | 194 | PASS, 10 variants |
+| theatre | 667 | PASS, 8 variants |
 
 The six `module` wrappers also pass because they call the reference `createAsset()`
 directly.
@@ -68,7 +70,13 @@ node option per asset:
 | `solidify` | `topZoneField` / `botZoneField` | per-cell colour zones |
 | `reverse` | — | flip every triangle winding (dished caps) |
 | `prim` | `type`, `args` | call a real `THREE.*Geometry` constructor |
-| `let` | `in`, `binds`, `outs` | named derived values, one node |
+| `prism` | `axis: x|y|z` | extrude a polygon along an axis (ledges, mullions, sticks) |
+| `frame` | `hx`, `hy`, `profile` | mitred rectangular frame sweep |
+| `plate` | `profile`, `holes`, `z0`, `z1` | triangulated face plus outer/hole walls |
+| `block` | `skip` | box with selected faces omitted |
+| `gem` | `r`, `ry`, `h`, `n` | faceted marquee lamp / socket cap |
+| `poly` | `hint` / `inside` | orient hand-authored sign triangles and quads |
+| `let` | `in`, `binds`, `outs` | named derived values, one node; bindings can read inputs via `s` |
 | `table` | `cols`, `rows` | rows with named columns |
 | `preset` | `choice`, `presets`, `overrides` | colourway plus explicit overrides |
 | `jitter` / `draws` | stream slicing | point jitter and named consecutive draws |

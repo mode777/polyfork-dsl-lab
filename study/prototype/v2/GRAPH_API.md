@@ -31,12 +31,13 @@ and a compact declarative storage format.
 | `random` | deterministic `{values,next}` stream |
 | `object` | a `THREE.Object3D` output |
 
-### Nodes (83)
+### Nodes (89)
 
 | group | nodes |
 |---|---|
 | sources | `ring`, `profile`, `path`, `grid`, `box`, `cylinder`, `sphere`, `geometry`, `prim`, `random`, `value`, `let`, `list`, `range`, `table`, `preset`, `coalesce`, `draws`, `jitter` |
 | surfaces | `loft`, `cap`, `extrude`, `revolve`, `sweep`, `inset`, `pocket`, `solidify` |
+| signage | `prism`, `frame`, `plate`, `block`, `gem`, `poly` |
 | modifiers | `transform`, `center`, `mirror`, `reverse`, `deform`, `clip`, `join`, `centroid`, `lerpPoint`, `mirrorPoint`, `rotateAbout`, `planeCut`, `gridPoint`, `direction`, `lookup`, `first`, `last`, `slice`, `concat` |
 | distribution | `scatter`, `instance`, `arrayPolar`, `arrayLinear` |
 | control | `switch`, `fan`, `cone`, `if`, `map`, `fold` |
@@ -61,6 +62,12 @@ instance  points proto [sx,sy,sz] scale yawSign -> geometry
 arrayPolar geom count radius start arc spin
 geometry  object(THREE.BufferGeometry|Mesh|Group) zone -> geometry
 prim      type(THREE geometry) args[] transform -> geometry
+prism     profile axis(x|y|z) from to cap? zone -> geometry
+frame     hx hy profile zone -> mitred rectangular sweep
+plate     profile holes z0 z1 zone -> front face + side walls
+block     x0 x1 y0 y1 z0 z1 skip(px nx py ny pz nz) zone -> geometry
+gem       x y z nx ny nz r ry h n zone -> faceted lamp
+poly      pts zone hint? inside? flip? -> oriented polygon
 reverse   geom -> geometry with opposite winding
 random    seed count -> stream
 switch    on cases{a:ref,b:ref}
@@ -69,8 +76,9 @@ script    inputs{...} src  (JS: THREE, ADDONS, H; `return` any value)
 module    params  (wraps an existing createAsset)
 ```
 
-**Fields** are strings evaluated as JS with `x,y,z,i,k,u,v,p,n,s` in scope, plus
-`sin/cos/clamp/lerp/noise/hash/rand`. Example: `` `0.05*(0.96+rand(1000+i*7)()*0.07)` ``.
+**Fields** are parsed expressions with `x,y,z,i,k,u,v,p,n,s` in scope, plus math,
+angle and vector built-ins (`mix`, `deg`/`rad`, `vadd`/`vsub`/`vmul`/`vdot`/`vcross`/
+`vlen`, `noise`, `hash`, `rand`). Example: `` `0.05*(0.96+rand(1000+i*7)()*0.07)` ``.
 The convention for arrow fields is positional `(x,y,z,i,k,u,v,p,n,s)`.
 
 **Params vs inputs:** `in` values that contain a ref are wired sockets; everything else is a

@@ -88,6 +88,14 @@ export const expr = (src) => ({ __expr: typeof src === 'function' ? String(src) 
 // ---------------------------------------------------------------- helpers
 const tri = (o, a, b, c) => o.push(a[0], a[1], a[2], b[0], b[1], b[2], c[0], c[1], c[2]);
 const quad = (o, a, b, c, d) => { tri(o, a, b, c); tri(o, a, c, d); };
+// Emit a triangle with its winding facing away from `inside`. This is the same
+// rule the reference signage builders use for hand-authored quads and caps.
+const triOut = (o, a, b, c, inside = [0, 0, 0]) => {
+  const u = sub3(b, a), v = sub3(c, a), n = cross3(u, v);
+  const mid = [(a[0] + b[0] + c[0]) / 3, (a[1] + b[1] + c[1]) / 3, (a[2] + b[2] + c[2]) / 3];
+  if (dot3(n, sub3(mid, inside)) >= 0) tri(o, a, b, c); else tri(o, a, c, b);
+};
+const quadOut = (o, a, b, c, d, inside) => { triOut(o, a, b, c, inside); triOut(o, a, c, d, inside); };
 const part = (pos, zone = 'a') => ({ pos, zone });
 const geom = (parts) => ({ __kind: 'geom', parts: Array.isArray(parts) ? parts : [parts] });
 const pts = (p, attrs = {}) => ({ __kind: 'points', pts: p, attrs });
@@ -501,6 +509,162 @@ node('extrude', { in: { profile: V.profile, depth: V.number, z0: V.number, cap: 
   return geom(part(out, 'a'));
 });
 
+// Generic polygon extrusion along X, Y or Z. The reference sign/prop builders
+// use the same three helpers (prismY, prismX and the ordinary Z extrusion) for
+// frames, ledges, chalk sticks and mullions.
+node('prism', { in: { profile: V.profile, axis: V.string, from: V.number, to: V.number, cap: V.bool, zone: V.string }, out: V.geom }, ({ p }) => {
+  const P = asArray(p.profile), a0 = p.from ?? 0, a1 = p.to ?? 1, axis = p.axis ?? 'z', out = [];
+  if (axis === 'y') {
+    for (let i = 0; i < P.length; i++) {
+      const [x0, z0] = P[i], [x1, z1] = P[(i + 1) % P.length];
+      quad(out, [x0, a0, z0], [x1, a0, z1], [x1, a1, z1], [x0, a1, z0]);
+    }
+    if (p.cap) {
+      const outer = P.map(([x, z]) => new THREE.Vector2(x, z));
+      for (const [i, j, k] of THREE.ShapeUtils.triangulateShape(outer, [])) {
+        tri(out, [P[i][0], a1, P[i][1]], [P[j][0], a1, P[j][1]], [P[k][0], a1, P[k][1]]);
+        tri(out, [P[i][0], a0, P[i][1]], [P[k][0], a0, P[k][1]], [P[j][0], a0, P[j][1]]);
+      }
+    }
+  } else if (axis === 'x') {
+    for (let i = 0; i < P.length; i++) {
+      const [z0, y0] = P[i], [z1, y1] = P[(i + 1) % P.length];
+      quad(out, [a0, y0, z0], [a0, y1, z1], [a1, y1, z1], [a1, y0, z0]);
+    }
+    if (p.cap) {
+      for (let i = 1; i + 1 < P.length; i++) {
+        tri(out, [a1, P[0][1], P[0][0]], [a1, P[i][1], P[i][0]], [a1, P[i + 1][1], P[i + 1][0]]);
+        tri(out, [a0, P[0][1], P[0][0]], [a0, P[i + 1][1], P[i + 1][0]], [a0, P[i][1], P[i][0]]);
+      }
+    }
+  } else {
+    for (let i = 0; i < P.length; i++) {
+      const [x0, y0] = P[i], [x1, y1] = P[(i + 1) % P.length];
+      quad(out, [x0, y0, a0], [x1, y1, a0], [x1, y1, a1], [x0, y0, a1]);
+    }
+    if (p.cap) {
+      const outer = P.map(([x, y]) => new THREE.Vector2(x, y));
+      for (const [i, j, k] of THREE.ShapeUtils.triangulateShape(outer, [])) {
+        tri(out, [P[i][0], P[i][1], a1], [P[j][0], P[j][1], a1], [P[k][0], P[k][1], a1]);
+        tri(out, [P[i][0], P[i][1], a0], [P[k][0], P[k][1], a0], [P[j][0], P[j][1], a0]);
+      }
+    }
+  }
+  return geom(part(out, p.zone ?? 'a'));
+});
+
+// Swept rectangular frame: one four-corner ring per profile point, closed back
+// to the first profile point. This is the mitred frame used by the menu board.
+node('frame', { in: { hx: V.number, hy: V.number, profile: V.profile, zone: V.string }, out: V.geom }, ({ p }) => {
+  const P = asArray(p.profile), hx = p.hx ?? 0.5, hy = p.hy ?? 0.5, out = [];
+  const rings = P.map(([u, z]) => [
+    [-(hx + u), -(hy + u), z], [(hx + u), -(hy + u), z],
+    [(hx + u), (hy + u), z], [-(hx + u), (hy + u), z],
+  ]);
+  for (let i = 0; i < rings.length; i++) {
+    const A = rings[i], B = rings[(i + 1) % rings.length];
+    for (let k = 0; k < 4; k++) {
+      const j = (k + 1) % 4;
+      quad(out, A[k], A[j], B[j], B[k]);
+    }
+  }
+  return geom(part(out, p.zone ?? 'a'));
+});
+
+// Flat plate with holes, extruded from z0 to z1: triangulated front face plus
+// side walls for the outer loop and every hole. Used for sign plates, glyphs
+// and bezel frames.
+node('plate', { in: { profile: V.profile, holes: V.any, z0: V.number, z1: V.number, zone: V.string }, out: V.geom }, ({ p }) => {
+  const area2 = (L) => { let a = 0; for (let i = 0; i < L.length; i++) { const q = L[i], r = L[(i + 1) % L.length]; a += q[0] * r[1] - r[0] * q[1]; } return a / 2; };
+  let outer = asArray(p.profile).map((q) => [q[0], q[1]]);
+  if (area2(outer) < 0) outer = outer.slice().reverse();
+  const holes = (p.holes ?? []).map((h) => {
+    const q = asArray(h).map((r) => [r[0], r[1]]);
+    return area2(q) > 0 ? q.slice().reverse() : q;
+  });
+  const all = [...outer, ...holes.flat()];
+  const V2 = (L) => L.map((q) => new THREE.Vector2(q[0], q[1]));
+  const out = [], z0 = p.z0 ?? 0, z1 = p.z1 ?? z0 + 0.01;
+  for (const [i, j, k] of THREE.ShapeUtils.triangulateShape(V2(outer), holes.map(V2))) {
+    const a = all[i], b = all[j], c = all[k];
+    const s = (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0]);
+    const A = [a[0], a[1], z1], B = [b[0], b[1], z1], C = [c[0], c[1], z1];
+    if (s >= 0) tri(out, A, B, C); else tri(out, A, C, B);
+  }
+  for (const L of [outer, ...holes]) {
+    for (let i = 0; i < L.length; i++) {
+      const a = L[i], b = L[(i + 1) % L.length];
+      tri(out, [a[0], a[1], z0], [b[0], b[1], z0], [b[0], b[1], z1]);
+      tri(out, [a[0], a[1], z0], [b[0], b[1], z1], [a[0], a[1], z1]);
+    }
+  }
+  return geom(part(out, p.zone ?? 'a'));
+});
+
+// Axis-aligned block with optional skipped faces. The reference builders use
+// this for readerboards and sign cabinets where a hidden face must not exist.
+node('block', { in: { x0: V.number, x1: V.number, y0: V.number, y1: V.number, z0: V.number, z1: V.number, skip: V.string, zone: V.string }, out: V.geom }, ({ p }) => {
+  let x0 = p.x0 ?? 0, x1 = p.x1 ?? 1;
+  const y0 = p.y0 ?? 0, y1 = p.y1 ?? 1, z0 = p.z0 ?? 0, z1 = p.z1 ?? 1;
+  if (x0 > x1) [x0, x1] = [x1, x0];
+  const sk = new Set(String(p.skip ?? '').split(/\s+/).filter(Boolean));
+  const F = {
+    px: [[x1, y0, z0], [x1, y1, z0], [x1, y1, z1], [x1, y0, z1]],
+    nx: [[x0, y0, z0], [x0, y1, z0], [x0, y1, z1], [x0, y0, z1]],
+    py: [[x0, y1, z0], [x1, y1, z0], [x1, y1, z1], [x0, y1, z1]],
+    ny: [[x0, y0, z0], [x1, y0, z0], [x1, y0, z1], [x0, y0, z1]],
+    pz: [[x0, y0, z1], [x1, y0, z1], [x1, y1, z1], [x0, y1, z1]],
+    nz: [[x0, y0, z0], [x1, y0, z0], [x1, y1, z0], [x0, y1, z0]],
+  };
+  const out = [], m = [(x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2];
+  for (const k of Object.keys(F)) if (!sk.has(k)) quadOut(out, ...F[k], m);
+  return geom(part(out, p.zone ?? 'a'));
+});
+
+// Faceted lamp/gem: an n-sided ellipse ring around c in the plane normal to
+// nrm, with an apex pushed along nrm. Sign assets use it for marquee bulbs and
+// unlit socket caps.
+node('gem', { in: { x: V.number, y: V.number, z: V.number, nx: V.number, ny: V.number, nz: V.number, r: V.number, ry: V.number, h: V.number, n: V.int, zone: V.string }, out: V.geom }, ({ p }) => {
+  const c = [p.x ?? 0, p.y ?? 0, p.z ?? 0], nr = [p.nx ?? 0, p.ny ?? 0, p.nz ?? 1];
+  const n = Math.max(3, Math.round(p.n ?? 6)), r = p.r ?? 0.1, ry = p.ry ?? r, h = p.h ?? 0.1;
+  const t = Math.abs(nr[2]) > 0.5 ? [1, 0, 0] : [0, 0, 1], ring = [];
+  for (let i = 0; i < n; i++) {
+    const a = Math.PI / 2 + (i / n) * TAU, cs = Math.cos(a) * r, sn = Math.sin(a) * ry;
+    ring.push([c[0] + t[0] * cs, c[1] + sn, c[2] + t[2] * cs]);
+  }
+  const apex = [c[0] + nr[0] * h, c[1] + nr[1] * h, c[2] + nr[2] * h];
+  const inside = [c[0] + nr[0] * h * 0.25, c[1], c[2] + nr[2] * h * 0.25];
+  const out = [];
+  for (let i = 0; i < n; i++) triOut(out, apex, ring[i], ring[(i + 1) % n], inside);
+  return geom(part(out, p.zone ?? 'a'));
+});
+
+// Arbitrary 3D polygon with an optional orientation hint or interior point.
+// Hand-authored sign decals use this for arrows, icons and cut faces.
+node('poly', { in: { pts: V.any, zone: V.string, hint: V.vec3, inside: V.vec3, flip: V.bool }, out: V.geom }, ({ p }) => {
+  let P = asArray(p.pts).map((q) => [q[0], q[1], q[2]]);
+  if (p.flip) P = P.slice().reverse();
+  let hint = p.hint;
+  if (!hint && p.inside) {
+    const mid = P.reduce((a, q) => [a[0] + q[0] / P.length, a[1] + q[1] / P.length, a[2] + q[2] / P.length], [0, 0, 0]);
+    hint = sub3(mid, p.inside);
+  }
+  if (hint && P.length >= 3) {
+    const n = [0, 0, 0];
+    for (let i = 0; i < P.length; i++) {
+      const a = P[i], b = P[(i + 1) % P.length];
+      n[0] += (a[1] - b[1]) * (a[2] + b[2]);
+      n[1] += (a[2] - b[2]) * (a[0] + b[0]);
+      n[2] += (a[0] - b[0]) * (a[1] + b[1]);
+    }
+    if (dot3(n, hint) < 0) P = P.slice().reverse();
+  }
+  const out = [];
+  if (p.inside) for (let i = 1; i + 1 < P.length; i++) triOut(out, P[0], P[i], P[i + 1], p.inside);
+  else for (let i = 1; i + 1 < P.length; i++) tri(out, P[0], P[i], P[i + 1]);
+  return geom(part(out, p.zone ?? 'a'));
+});
+
 node('revolve', { in: { profile: V.any, seg: V.int, phase: V.number, inRadius: V.bool, zone: V.any, zoneField: V.field, mod: V.field, values: V.any, axis: V.string, ringMode: V.string, orient: V.bool, orientCenter: V.vec3, capTop: V.any, capBottom: V.any, capZone: V.any, capZoneField: V.field, flip: V.bool }, out: V.geom }, ({ p }) => {
   const P = asArray(p.profile), n = Math.max(3, Math.round(p.seg ?? 12)), buckets = new Map();
   const step = TAU / n, cosH = Math.cos(step / 2);
@@ -802,7 +966,10 @@ node('deform', { in: { geom: V.any, expr: V.field, values: V.any }, out: V.any }
   }));
 });
 
-node('join', { in: { geoms: V.any }, out: V.geom }, ({ p }) => geom(p.geoms.flatMap((g) => toGeometry(g).parts)));
+node('join', { in: { geoms: V.any }, out: V.geom }, ({ p }) => {
+  const flat = (v) => (Array.isArray(v) ? v.flatMap(flat) : [v]);
+  return geom(flat(p.geoms).filter(Boolean).flatMap((g) => toGeometry(g).parts));
+});
 
 // Expose a THREE.BufferGeometry/Mesh/Group coming out of a code node as a
 // normal graph geometry value. The mesh node also accepts objects directly,
@@ -1495,7 +1662,9 @@ node('fold', { in: { list: V.any, init: V.any, graph: V.string }, out: V.any }, 
 // Named derived values: one node, many outputs. Each binding is a field
 // expression evaluated in order, so later bindings can use earlier ones.
 node('let', { in: {}, out: V.any }, ({ p, inputs, params }) => {
-  const env = { ...params, ...inputs };
+  // Bindings are ordinary field expressions, so expose the graph inputs under
+  // `s` as well as as bare names (matching `value` and field evaluation).
+  const env = { ...params, ...inputs, s: params };
   const out = {};
   for (const [k, v] of Object.entries(p.binds ?? {})) {
     const val = isField(v) ? fieldValue(v, env) : typeof v === 'string' ? fieldValue(field(v), env) : v;

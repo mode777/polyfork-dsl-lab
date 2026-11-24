@@ -6,8 +6,9 @@ example policy changes.
 ## Headline
 
 The showcase is **ports only** while the remaining approximations and studies are
-replaced with real ports. Five reference assets pass the order-independent geometric
-parity check at `1e-4`: cookie, rough sapphire, tire, pumpkin and area rug.
+replaced with real ports. Seven reference assets pass the order-independent geometric
+parity check at `1e-4`: cookie, rough sapphire, tire, pumpkin, area rug, chalkboard and
+the theatre vertical sign.
 
 ## Example status
 
@@ -18,11 +19,25 @@ parity check at `1e-4`: cookie, rough sapphire, tire, pumpkin and area rug.
 | **tire** | 520 | **geometric port** | 17 nodes; `let` dimensions, a 5-column row table, one preset, expression tread modulation. |
 | **pumpkin** | 120 | **geometric port** | alternating lobe/groove revolve; real `THREE.CylinderGeometry` stem; squash/ribs live. |
 | **area rug** | 392 / 700 | **geometric port** | 9 nodes; named dimensions, random grid, straighten + fold group, per-cell zones. |
+| **chalkboard** | 194 | **geometric port** | 34 nodes; mitred frame sweep, recessed backing, mapped menu cells, ledge and two chalk sticks. Panels/rows/density stay live. |
+| **theatre** | 667 | **geometric port** | 374 nodes; three prebuilt word layouts, banded readerboard, enamel glyph plates, marquee lamps, three crowns, steel bracket. |
 
 The previous rock/armchair/clam/basket approximations and the hair/jacket/sign/creature
 studies were removed from the published manifest. They are not shown as ports.
 
 ## What changed in this pass
+
+- Added two exact signage ports from the fourth reference sample: **chalkboard menu
+  board** and **theatre vertical sign**. Both use the new generic sign primitives and
+  keep their reference options live.
+- Added `prism` (polygon extrusion on X/Y/Z), `frame` (mitred rectangular sweep),
+  `plate` (triangulated plate with holes and walls), `block` (box with optional skipped
+  faces), `gem` (faceted marquee lamp) and `poly` (arbitrary 3D polygon with orientation
+  hint/inside point). `join` now flattens nested geometry lists.
+- `let` bindings now expose graph inputs under `s` as well as bare names, matching field
+  and `~` param evaluation. Expression built-ins gained `mix`, `deg`/`rad` and
+  `vadd`/`vsub`/`vmul`/`vdot`/`vcross`/`vlen`.
+- Bumped the public runtime asset version to `10`.
 
 - Fixed the sapphire inversion: the runtime's bottom-cap hint pointed inward; `loft` now
   has `orient`/`orientCenter` and the broken dished cap uses `reverse`.
@@ -49,14 +64,17 @@ studies were removed from the published manifest. They are not shown as ports.
 
 ## What was verified
 
-- `t-all.mjs`: cookie, sapphire, tire, pumpkin, rug + six `module` wrappers pass at
-  default; the per-port tests cover parameter variants.
+- `t-all.mjs`: cookie, sapphire, tire, pumpkin, rug, chalkboard, theatre + six `module`
+  wrappers pass at default; the per-port tests cover parameter variants.
 - `t-cookie.mjs`: 3/3 variants.
 - `t-tire.mjs`: 8/8 variants.
 - `t-sapphire.mjs`: 13/13 variants (all params, including broken/truncated/irregular).
 - `t-pumpkin.mjs`: 6/6 variants.
 - `t-rug.mjs`: 9/9 variants (both sizes, pile, lived-in extremes, all patterns).
-- All five showcase graphs parse and cook (`t-examples.mjs`); none contains a `script`
+- `t-chalkboard.mjs`: 10/10 variants (panels, rows, density extremes, colourway).
+- `t-theatre.mjs`: 8/8 variants (all words, all crowns, lit/unlit, colourway).
+- `t-expr.mjs`: 10/10 angle/vector expression helpers.
+- All seven showcase graphs parse and cook (`t-examples.mjs`); none contains a `script`
   node and the runtime never evaluates JavaScript for fields/params.
 - `t-code.mjs`, `t-bool.mjs`, `t-cache.mjs`, `t-sample3.mjs` pass.
 
@@ -69,10 +87,12 @@ studies were removed from the published manifest. They are not shown as ports.
 
 ## Next
 
-1. Port more reference props with the new ops and add them to the showcase.
-2. Exposed but not yet filled: polygon faces with holes / craters (cheese wedge), fused
-   clipped lumps (small rock), and more cloth/rigged families.
-3. Regenerate the gallery for the five ports; the old images are stale.
+1. Port more reference props with the new ops and add them to the showcase; the
+   remaining fourth-sample signs (lit taxiway, overhead wayfinding, core rulebook,
+   marquee letter) are the next candidates.
+2. Exposed but not yet filled: polygon faces with craters (cheese wedge), fused clipped
+   lumps (small rock), and more cloth/rigged families.
+3. Regenerate the gallery for the seven ports; the old images are stale.
 
 ## Workspace
 

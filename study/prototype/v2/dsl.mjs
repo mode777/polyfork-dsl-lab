@@ -49,6 +49,12 @@ class Builder {
   // surfaces
   loft(o) { return this.add('loft', { rings: o.rings, capTop: o.capTop, capBottom: o.capBottom }, strip(o, ['rings', 'capTop', 'capBottom'])); }
   extrude(o) { return this.add('extrude', { profile: o.profile }, { depth: o.depth, z0: o.z0, cap: o.cap }); }
+  prism(o) { return this.add('prism', { profile: o.profile }, strip(o, ['profile'])); }
+  frame(o) { return this.add('frame', { profile: o.profile }, strip(o, ['profile'])); }
+  plate(o) { return this.add('plate', { profile: o.profile, holes: o.holes }, strip(o, ['profile', 'holes'])); }
+  block(o = {}) { return this.add('block', {}, o); }
+  gem(o = {}) { return this.add('gem', {}, o); }
+  poly(o = {}) { return this.add('poly', { pts: o.pts }, strip(o, ['pts'])); }
   bevelProfile(o) { return this.add('bevelProfile', { profile: o.profile }, { dist: o.dist }); }
   loftProfile(o) { return this.add('loftProfile', { profile: o.profile, capTop: o.capTop, capBottom: o.capBottom }, strip(o, ['profile', 'capTop', 'capBottom'])); }
   fanRing(o) { return this.add('fanRing', {}, o); }

@@ -1,0 +1,81 @@
+# polyfork graph v2 — chalkboard
+graph chalkboard
+group chalk-panel
+in item any null
+in hy any null
+in yMid any null
+in blockRight any null
+in priceCols any null
+in xL any null
+in TW any null
+in lenScale any null
+in d any null
+in written any null
+in N any null
+n n0 let item=$item binds={cx:"-s.hx + (item + 0.5)*0.844 + item*0.088",x0:"cx - 0.422 - 0.018",x1:"cx + 0.422 + 0.018",y0:"s.yMid - s.hy - 0.018",y1:"s.yMid + s.hy + 0.018"}
+n n1 poly pts=[[@n0.x0,@n0.y0,0.031],[@n0.x1,@n0.y0,0.031],[@n0.x1,@n0.y1,0.031],[@n0.x0,@n0.y1,0.031]] zone=board
+n n2 map list=[{type:headline,zone:chalkAccent,x0:-0.17714000000000002,x1:-0.08008000000000001},{type:headline,zone:chalkAccent,x0:-0.06608000000000001,x1:0.0056599999999999845},{type:headline,zone:chalkAccent,x0:0.019659999999999983,x1:0.10405999999999999},{type:headline,zone:chalkAccent,x0:0.11805999999999998,x1:0.17714},{type:rule,zone:chalkAccent},{type:header,zone:chalk,k:0},{type:header,zone:chalk,k:1},{type:word,zone:chalk,row:0,seg:0,count:2,pre:0,w:0.36},{type:word,zone:chalk,row:0,seg:1,count:2,pre:0.36,w:0.22},{type:word,zone:chalk,row:0,seg:2,count:2,pre:0.58,w:0},{type:price,zone:chalk,row:0,k:0,skip:false,frac:0.66},{type:price,zone:chalk,row:0,k:1,skip:false,frac:0.72},{type:word,zone:chalk,row:1,seg:0,count:3,pre:0,w:0.28},{type:word,zone:chalk,row:1,seg:1,count:3,pre:0.28,w:0.19},{type:word,zone:chalk,row:1,seg:2,count:3,pre:0.47000000000000003,w:0.3},{type:price,zone:chalk,row:1,k:0,skip:false,frac:0.5},{type:price,zone:chalk,row:1,k:1,skip:false,frac:0.54},{type:word,zone:chalk,row:2,seg:0,count:2,pre:0,w:0.44},{type:word,zone:chalk,row:2,seg:1,count:2,pre:0.44,w:0.24},{type:word,zone:chalk,row:2,seg:2,count:2,pre:0.6799999999999999,w:0},{type:price,zone:chalk,row:2,k:0,skip:false,frac:0.6},{type:price,zone:chalk,row:2,k:1,skip:true,frac:0.64},{type:word,zone:chalk,row:3,seg:0,count:2,pre:0,w:0.31},{type:word,zone:chalk,row:3,seg:1,count:2,pre:0.31,w:0.26},{type:word,zone:chalk,row:3,seg:2,count:2,pre:0.5700000000000001,w:0},{type:price,zone:chalk,row:3,k:0,skip:false,frac:0.48},{type:price,zone:chalk,row:3,k:1,skip:false,frac:0.58},{type:word,zone:chalk,row:4,seg:0,count:2,pre:0,w:0.22},{type:word,zone:chalk,row:4,seg:1,count:2,pre:0.22,w:0.38},{type:word,zone:chalk,row:4,seg:2,count:2,pre:0.6,w:0},{type:price,zone:chalk,row:4,k:0,skip:false,frac:0.72},{type:price,zone:chalk,row:4,k:1,skip:false,frac:0.46},{type:word,zone:chalk,row:5,seg:0,count:2,pre:0,w:0.48},{type:word,zone:chalk,row:5,seg:1,count:2,pre:0.48,w:0.2},{type:word,zone:chalk,row:5,seg:2,count:2,pre:0.6799999999999999,w:0},{type:price,zone:chalk,row:5,k:0,skip:false,frac:0.54},{type:price,zone:chalk,row:5,k:1,skip:false,frac:0.66},{type:word,zone:chalk,row:6,seg:0,count:3,pre:0,w:0.26},{type:word,zone:chalk,row:6,seg:1,count:3,pre:0.26,w:0.33},{type:word,zone:chalk,row:6,seg:2,count:3,pre:0.5900000000000001,w:0.18},{type:price,zone:chalk,row:6,k:0,skip:false,frac:0.64},{type:price,zone:chalk,row:6,k:1,skip:true,frac:0.5},{type:word,zone:chalk,row:7,seg:0,count:2,pre:0,w:0.4},{type:word,zone:chalk,row:7,seg:1,count:2,pre:0.4,w:0.27},{type:word,zone:chalk,row:7,seg:2,count:2,pre:0.67,w:0},{type:price,zone:chalk,row:7,k:0,skip:false,frac:0.58},{type:price,zone:chalk,row:7,k:1,skip:false,frac:0.6},{type:word,zone:chalk,row:8,seg:0,count:2,pre:0,w:0.24},{type:word,zone:chalk,row:8,seg:1,count:2,pre:0.24,w:0.3},{type:word,zone:chalk,row:8,seg:2,count:2,pre:0.54,w:0},{type:price,zone:chalk,row:8,k:0,skip:false,frac:0.46},{type:price,zone:chalk,row:8,k:1,skip:false,frac:0.48}] cx=@n0.cx hy=$hy yMid=$yMid blockRight=$blockRight priceCols=$priceCols xL=$xL TW=$TW lenScale=$lenScale d=$d written=$written N=$N graph=chalk-cell
+n n3 concat lists=[[@n1],@n2]
+n n4 join geoms=@n3
+out out=@n4
+end
+group chalk-cell
+in item any null
+n n0 let item=$item binds={yTop:"s.yMid + s.hy - 0.035",yHead:"yTop - 0.068",yRule:"yTop - 0.068 - 0.026",yHdr:"yRule - 0.012 - 0.03",yRows:"yHdr - 0.022 - 0.024",colLeft:"s.cx + s.blockRight - (s.priceCols - 1 - item.k)*(0.115+0.03) - 0.115",x0:"item.type === 'headline' ? s.cx + item.x0 : item.type === 'rule' ? s.cx - 0.3376/2 : item.type === 'header' ? colLeft + (0.115 - 0.115*0.58)/2 : item.type === 'word' ? s.cx + s.xL + s.TW*s.lenScale*item.pre + item.seg*0.026 : colLeft + 0.115 - 0.115*item.frac",x1:"item.type === 'headline' ? s.cx + item.x1 : item.type === 'rule' ? s.cx + 0.3376/2 : item.type === 'header' ? colLeft + (0.115 + 0.115*0.58)/2 : item.type === 'word' ? s.cx + s.xL + s.TW*s.lenScale*(item.pre + item.w) + item.seg*0.026 : colLeft + 0.115",y0:"item.type === 'headline' ? yHead : item.type === 'rule' ? yRule - 0.012 : item.type === 'header' ? yHdr - 0.022 : yRows - item.row*0.096 - 0.042",y1:"item.type === 'headline' ? yTop : item.type === 'rule' ? yRule : item.type === 'header' ? yHdr : yRows - item.row*0.096"}
+n n1 value args={item:$item} expr=<<<
+item.type === 'headline' || item.type === 'rule' ? s.d > 0
+        : item.type === 'header' ? s.d > 0 && s.priceCols === 2
+        : item.type === 'word' ? item.row < s.written && item.row < s.N && item.seg < item.count
+        : item.row < s.written && item.row < s.N && item.k < s.priceCols && !item.skip
+>>>
+n n2 value args={item:$item} expr=item.zone
+n n3 poly pts=[[@n0.x0,@n0.y0,0.0322],[@n0.x1,@n0.y0,0.0322],[@n0.x1,@n0.y1,0.0322],[@n0.x0,@n0.y1,0.0322]] zone=@n2
+n n4 join geoms=[]
+n n5 if cond=@n1 then=@n3 else=@n4
+out out=@n5
+end
+in colorway enum oak-slate options=oak-slate|walnut-slate|black-steel|sage-painted label=Colorway
+in frame color "" label="Frame timber"
+in board color "" label=Slate
+in chalk color "" label=Chalk
+in chalkAccent color "" label="Accent chalk"
+in chalkStickB color "" label="Second chalk stick"
+in panels int 1 min=1 max=3 step=1 label=Panels
+in rows int 7 min=5 max=9 step=1 label="Menu lines"
+in menuDensity float 0.6 min=0 max=1 step=0.05 label="Chalk density"
+n n0 let panels=$panels rows=$rows menuDensity=$menuDensity binds={P:"round(panels)",N:"round(rows)",d:"clamp(menuDensity, 0, 1)",openH:"0.247 + N*0.096",hy:openH/2,hx:"(P*0.844 + (P-1)*0.088)/2",WF:"2*(hx + 0.078)",HF:"2*(hy + 0.078)",yMid:"0.043 + HF/2",priceCols:"d < 0.4 ? 1 : 2",lenScale:"0.78 + 0.22*d",W60:"round(N*0.8)",written:"d <= 0 ? 0 : (d <= 0.6 ? round(W60*d/0.6) : round(W60 + (N-W60)*(d-0.6)/0.4))",hxp:0.422,blockRight:"hxp - 0.045",colLeft0:"blockRight - (priceCols-1)*(0.115+0.03) - 0.115",xL:"-hxp + 0.045",TW:"colLeft0 - 0.04 - xL",bx:"hx + 0.018",by:"hy + 0.018"}
+n n1 frame profile=[[0,0],[0.057999999999999996,0],[0.078,0.02],[0.078,0.05499999999999999],[0.057999999999999996,0.075],[0.03276,0.075],[0.022759999999999996,0.061],[0.02,0.061],[0,0.040999999999999995]] hx=@n0.hx hy=@n0.hy zone=frame
+n n2 transform geom=@n1 ty=@n0.yMid
+n n3 value args={bx:@n0.bx,by:@n0.by,yMid:@n0.yMid,ZB:0.016} expr="[[-bx, yMid-by, ZB], [-bx, yMid+by, ZB], [bx, yMid+by, ZB], [bx, yMid-by, ZB]]"
+n n4 poly pts=@n3 zone=frame
+n n5 value expr="s.panels >= 2"
+n n6 value args={hx:@n0.hx} expr="let c = -hx + 1*0.844 + (1-0.5)*0.088 in [[c+0.044,0.024],[c-0.044,0.024],[c-0.044,0.033],[c-0.044+0.02,0.053],[c+0.044-0.02,0.053],[c+0.044,0.033]]"
+n n7 value args={hy:@n0.hy,yMid:@n0.yMid} expr="yMid - hy - 0.018"
+n n8 value args={hy:@n0.hy,yMid:@n0.yMid} expr="yMid + hy + 0.018"
+n n9 prism profile=@n6 from=@n7 to=@n8 axis=y cap=false zone=frame
+n n10 join geoms=[]
+n n11 if cond=@n5 then=@n9 else=@n10
+n n12 value expr="s.panels >= 3"
+n n13 value args={hx:@n0.hx} expr="let c = -hx + 2*0.844 + (2-0.5)*0.088 in [[c+0.044,0.024],[c-0.044,0.024],[c-0.044,0.033],[c-0.044+0.02,0.053],[c+0.044-0.02,0.053],[c+0.044,0.033]]"
+n n14 value args={hy:@n0.hy,yMid:@n0.yMid} expr="yMid - hy - 0.018"
+n n15 value args={hy:@n0.hy,yMid:@n0.yMid} expr="yMid + hy + 0.018"
+n n16 prism profile=@n13 from=@n14 to=@n15 axis=y cap=false zone=frame
+n n17 join geoms=[]
+n n18 if cond=@n12 then=@n16 else=@n17
+n n19 range to=$panels from=0
+n n20 map list=@n19 hx=@n0.hx hy=@n0.hy yMid=@n0.yMid blockRight=@n0.blockRight priceCols=@n0.priceCols xL=@n0.xL TW=@n0.TW lenScale=@n0.lenScale d=@n0.d written=@n0.written N=@n0.N graph=chalk-panel
+n n21 value args={WF:@n0.WF} expr="-WF/2 - 0.012"
+n n22 value args={WF:@n0.WF} expr="WF/2 + 0.012"
+n n23 prism profile=[[0.155,0],[0.006,0],[0.006,0.075],[0.133,0.075],[0.155,0.053]] from=@n21 to=@n22 axis=x cap=true zone=frame
+n n24 value args={WF:@n0.WF} expr="-WF/2 + 0.12"
+n n25 value args={WF:@n0.WF} expr="-WF/2 + 0.12 + 0.14"
+n n26 prism profile=[[0.1293205080756888,0.09932050807568876],[0.1293205080756888,0.07932050807568877],[0.112,0.06932050807568876],[0.09467949192431123,0.07932050807568877],[0.09467949192431123,0.09932050807568876],[0.112,0.10932050807568877]] from=@n24 to=@n25 axis=x cap=true zone=chalkAccent
+n n27 value args={WF:@n0.WF} expr="-WF/2 + 0.3"
+n n28 value args={WF:@n0.WF} expr="-WF/2 + 0.3 + 0.14"
+n n29 prism profile=[[0.12132050807568877,0.09932050807568876],[0.12132050807568877,0.07932050807568877],[0.104,0.06932050807568876],[0.08667949192431122,0.07932050807568877],[0.08667949192431122,0.09932050807568876],[0.104,0.10932050807568877]] from=@n27 to=@n28 axis=x cap=true zone=chalkStickB
+n n30 join geoms=[@n2,@n4,[@n11,@n18],@n20,@n23,@n26,@n29]
+n n31 transform geom=@n30 ty=1.4
+n n32 preset choice=$colorway overrides={frame:$frame,board:$board,chalk:$chalk,chalkAccent:$chalkAccent,chalkStickB:$chalkStickB} presets={oak-slate:{frame:#A98F6F,board:#2E3330,chalk:#F8F5EF,chalkAccent:#E4C98A,chalkStickB:#9BD5E0},walnut-slate:{frame:#4A3825,board:#2E3330,chalk:#F8F5EF,chalkAccent:#E0A96D,chalkStickB:#9BD5E0},black-steel:{frame:#4A4F52,board:#1C1F1E,chalk:#ECEFF0,chalkAccent:#C9A227,chalkStickB:#9BD5E0},sage-painted:{frame:#5C6E52,board:#2E3330,chalk:#F8F1E7,chalkAccent:#E4C98A,chalkStickB:#9FB89A}} fallback=oak-slate
+n n33 mesh geom=@n31 zones={frame:@n32.frame,board:@n32.board,chalk:@n32.chalk,chalkAccent:@n32.chalkAccent,chalkStickB:@n32.chalkStickB}
+out mesh=@n33
+end

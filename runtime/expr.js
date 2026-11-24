@@ -171,6 +171,9 @@ const B = {
   log: Math.log, hypot: Math.hypot, sign: Math.sign,
   clamp: (v, a, b) => Math.min(b, Math.max(a, v)),
   lerp: (a, b, t) => a + (b - a) * t,
+  mix: (a, b, t) => a + (b - a) * t,
+  deg: (v) => v * 180 / Math.PI,
+  rad: (v) => v * Math.PI / 180,
   smoothstep: (a, b, v) => { const t = Math.min(1, Math.max(0, (v - a) / (b - a))); return t * t * (3 - 2 * t); },
   fract: (v) => v - Math.floor(v),
   len: (v) => (v == null ? 0 : (Array.isArray(v) || typeof v === 'string') ? v.length : Object.keys(v).length),
@@ -180,6 +183,12 @@ const B = {
     for (const p of pts ?? []) { a[0] += p[0] / pts.length; a[1] += p[1] / pts.length; a[2] += p[2] / pts.length; }
     return a;
   },
+  vadd: (a, b) => [a[0] + b[0], a[1] + b[1], a[2] + b[2]],
+  vsub: (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]],
+  vmul: (a, s) => [a[0] * s, a[1] * s, a[2] * s],
+  vdot: (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2],
+  vcross: (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]],
+  vlen: (a) => Math.hypot(a[0], a[1], a[2]),
   vnorm: (a) => { const l = Math.hypot(a[0], a[1], a[2]) || 1; return [a[0]/l, a[1]/l, a[2]/l]; },
   vrot: (p, pivot, axis, phi) => {
     const v = [p[0]-pivot[0], p[1]-pivot[1], p[2]-pivot[2]];

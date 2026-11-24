@@ -73,5 +73,35 @@
       42
     ],
     "fit": 1.5
+  },
+  {
+    "id": "chalkboard",
+    "title": "Chalkboard menu board",
+    "description": "Exact geometric port: mitred frame, recessed slate, live menu rows and two chalk sticks.",
+    "category": "signage",
+    "status": "port",
+    "file": "chalkboard.pfn",
+    "bytes": 9934,
+    "nodes": 34,
+    "cam": [
+      22,
+      18
+    ],
+    "fit": 1.35
+  },
+  {
+    "id": "theatre",
+    "title": "Theatre vertical sign",
+    "description": "Exact geometric port: banded readerboard, enamel glyphs, marquee lamps and three crowns.",
+    "category": "signage",
+    "status": "port",
+    "file": "theatre.pfn",
+    "bytes": 46122,
+    "nodes": 374,
+    "cam": [
+      18,
+      8
+    ],
+    "fit": 1.15
   }
 ]

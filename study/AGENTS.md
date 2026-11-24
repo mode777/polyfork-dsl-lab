@@ -42,7 +42,7 @@ prototype/
   models/*.mjs          v1 exact ports (cookie, rug)
   bench*.mjs            v1 parity benches
   v2/
-    runtime.mjs         83-node typed runtime + Three bridge (source of public runtime.js)
+    runtime.mjs         89-node typed runtime + Three bridge (source of public runtime.js)
     expr.mjs            parsed expression language (source of public runtime/expr.js)
     dsl.mjs             authoring DSL
     format.mjs          .pfn text + JSON (source of public format.js)
@@ -107,10 +107,10 @@ Commit/push the public repo, check
 
 ## Current state (24 Nov 2026)
 
-- Runtime: 83 nodes; **5 published examples, all geometric ports, zero script nodes**.
+- Runtime: 89 nodes; **7 published examples, all geometric ports, zero script nodes**.
 - **Geometric parity** (vertices, bbox and winding at 1e-4): `cookie` (174),
-  `sapphire` (48), `tire` (520), `pumpkin` (120), `area rug` (392/700), plus the six
-  `module` wrappers.
+  `sapphire` (48), `tire` (520), `pumpkin` (120), `area rug` (392/700), `chalkboard`
+  (194), `theatre` (667), plus the six `module` wrappers.
 - Sapphire is fully parametric (colorway, gem, length, barrel, ends, chamfer, irregularity)
   and its bottom-cap inversion is fixed with `loft.orient` + `reverse`.
 - Core expressions are parsed by `expr.mjs` (no `new Function`). Layout math uses
@@ -123,12 +123,14 @@ Commit/push the public repo, check
 
 ## Known issues / next
 
-1. Port more reference props. Exposed gaps: polygon faces with holes/craters (cheese
-   wedge), fused clipped lumps (small rock), cloth/rigged families.
+1. Port more reference props. The new signage primitives (`prism`, `frame`, `plate`,
+   `block`, `gem`, `poly`) cover the fourth-sample signs; exposed gaps remain polygon
+   faces with craters (cheese wedge), fused clipped lumps (small rock), and cloth/rigged
+   families.
 2. Exact parity workflow: compare order-independently (vertices, bbox, winding) against
    the reference module; do not compare hero images to the viewer.
 3. The public repo must stay source-free; keep the reference modules here.
-4. Regenerate the gallery for the five ports.
+4. Regenerate the gallery for the seven ports.
 
 ## Why this matters
 

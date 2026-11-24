@@ -30,7 +30,7 @@ browser viewer. Public repo, published with GitHub Pages.
 index.html            split code/result viewer
 viewer.js             viewer: scene, examples, params, live cook
 style.css
-runtime/runtime.js    83-node typed graph runtime + evaluator, Three bridge
+runtime/runtime.js    89-node typed graph runtime + evaluator, Three bridge
 runtime/expr.js       parsed expression language (no eval)
 runtime/format.js     .pfn parser/serializer
 runtime/dsl.js        JS authoring DSL (for building ports)
@@ -91,15 +91,17 @@ The viewer `frame()` uses `current.cam` = `[azimuthDeg, elevationDeg]` and
 
 ## Current status (24 Nov 2026)
 
-- 83 node types; **5 published examples, all geometric ports, zero script nodes**.
+- 89 node types; **7 published examples, all geometric ports, zero script nodes**.
 - **Geometric parity (vertices, bbox and winding at 1e-4):** `cookie` (174),
-  `sapphire` (48), `tire` (520), `pumpkin` (120), `area rug` (392/700).
+  `sapphire` (48), `tire` (520), `pumpkin` (120), `area rug` (392/700),
+  `chalkboard` (194) and `theatre` (667).
 - Sapphire had an inverted bottom cap; `loft.orient`/`orientCenter` and `reverse` fixed it.
   Sapphire is now fully parametric (all reference params live, including pointed/
   truncated/broken terminations).
 - Core expressions are parsed by `runtime/expr.js` (no `new Function`): arithmetic,
-  comparisons, `?:`, arrays/objects, `let … in`, math and vector built-ins. Fields and
-  `~` params use it.
+  comparisons, `?:`, arrays/objects, `let … in`, math and vector built-ins (`mix`,
+  `deg`/`rad`, `vadd`/`vsub`/`vmul`/`vdot`/`vcross`/`vlen`). Fields and `~` params use
+  it; `let` bindings see the inputs under `s` too.
 - Layout math is node graphs: `let`, `table`, `preset`, `list`, `range`, `map`, `fold`,
   `if`, `jitter`, `draws`, point ops (`centroid`, `lerpPoint`, `mirrorPoint`,
   `rotateAbout`, `planeCut`, `gridPoint`, `direction`) and list ops (`first`, `last`,
@@ -111,11 +113,12 @@ The viewer `frame()` uses `current.cam` = `[azimuthDeg, elevationDeg]` and
 
 ## Next tasks (priority)
 
-1. Port more reference props and add them to the showcase. The current gaps are polygon
-   faces with holes / craters (cheese wedge), fused clipped lumps (small rock), and
-   cloth/rigged families.
+1. Port more reference props and add them to the showcase. The new signage primitives
+   (`prism`, `frame`, `plate`, `block`, `gem`, `poly`) make the remaining sign/cabinet
+   assets tractable; the current gaps are polygon faces with craters (cheese wedge),
+   fused clipped lumps (small rock), and cloth/rigged families.
 2. Keep every published example a verified port; do not re-add labelled approximations.
-3. Regenerate the gallery for the five ports.
+3. Regenerate the gallery for the seven ports.
 4. If adding booleans to examples, verify `manifold-3d` WASM loads from the import map and
    gate it behind `await initManifold()`.
 
@@ -131,6 +134,9 @@ node t-tire.mjs             # 8 tire variants
 node t-sapphire.mjs        # 13 sapphire param variants
 node t-pumpkin.mjs         # 6 pumpkin variants
 node t-rug.mjs             # 9 rug variants
+node t-chalkboard.mjs      # 10 menu-board variants
+node t-theatre.mjs         # 8 theatre-sign variants
+node t-expr.mjs            # angle/vector expression helpers
 node t-code.mjs            # Three object/BufferGeometry + random-stream bridge
 node t-sample3.mjs         # sample-3 template ports
 node t-bool.mjs            # Manifold boolean smoke test
@@ -162,10 +168,15 @@ gh api repos/mode777/polyfork-dsl-lab/pages/builds/latest --jq '.status,.commit'
   to `TAU`; cookie uses `PI`.
 - `geometry`/`mesh` accept `THREE.BufferGeometry`, `Mesh`, `Group` or `__kind:'geom'`.
   A script can return any of them; `geometry` makes it composable with `join`/modifiers.
+- `let` bindings are field expressions and can read graph inputs as bare names or via
+  `s` (the same `s` used by fields and `~` params).
+- `plate` triangulates an outer profile plus holes and walls every loop; `block` takes a
+  `skip` list of faces (`px nx py ny pz nz`); `poly` accepts `hint` or `inside` to orient
+  hand-authored triangles/quads.
 - `loft.diagonal='ba'` flips the quad diagonal; `loft.bandZones` is a per-band zone array;
   `loft.flip` reverses winding.
 - `mesh` zones must match part zone names; a mismatch silently uses fallback colours.
 - GitHub Pages caches assets; bump `?v=` after viewer/style/runtime changes. The public
   runtime files must import each other with `.js`, unlike the study `.mjs` sources.
-  `sync-public.mjs` uses `PUBLIC_ASSET_VERSION` (default `9`); keep it in step with
+  `sync-public.mjs` uses `PUBLIC_ASSET_VERSION` (default `10`); keep it in step with
   `index.html` and `viewer.js`.

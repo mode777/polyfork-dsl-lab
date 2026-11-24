@@ -5,6 +5,8 @@ const cases = [
   ['tire','../../scripts2/tire-ccf0eb','tire'],
   ['pumpkin','../../scripts3/pumpkin-5f977e','pumpkin'],
   ['rug','../../scripts/area-rug-5c56e2','rug'],
+  ['chalkboard','../../scripts4/chalkboard-menu-board-a24d9d','chalkboard'],
+  ['theatre','../../scripts4/theatre-vertical-sign-21c29b','theatre'],
   ['armchair','../../scripts2/lounge-armchair-5a72ca','armchair'],
   ['clam','../../scripts2/maxima-clam-429c17','clam'],
   ['quiver','../../scripts2/quiver-722a40','quiver'],
