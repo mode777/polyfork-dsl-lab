@@ -23,6 +23,9 @@ browser viewer. Public repo, published with GitHub Pages.
    extensions, and keep `.nojekyll`. GitHub Pages serves `main` / root.
 5. **Cache-bust viewer assets when changing them.** Pages caches for ~10 minutes:
    change `index.html` to `viewer.js?v=N` / `style.css?v=N` after a viewer edit.
+6. **Always publish finished work.** When a task is done, commit everything, push to
+   `main`, and confirm the Pages build before reporting completion. Do not leave finished
+   work local-only, even when the user did not explicitly ask for a push.
 
 ## Layout
 
@@ -150,12 +153,15 @@ python3 -m http.server 8000
 curl -s -o /dev/null -w '%{http_code}\n' http://localhost:8000/
 ```
 
-Publish:
+Publish (required after every finished task):
 
 ```bash
 git add -A && git commit -m "…" && git push
 gh api repos/mode777/polyfork-dsl-lab/pages/builds/latest --jq '.status,.commit'
 ```
+
+Wait for the Pages build to report `built` before calling the task complete. If the
+deployment fails, fix it and push again rather than leaving the public site stale.
 
 ## Known traps
 

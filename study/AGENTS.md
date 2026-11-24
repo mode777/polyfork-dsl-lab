@@ -23,6 +23,9 @@ Public project:
    byte-identical output.
 4. **Licence:** see https://polyfork.dev/licensing and the public `NOTICE`. Research and
    interop are fine; redistributing source or building a commercial generator is not.
+5. **Always publish finished work.** After the authoring loop and tests pass, run
+   `sync-public.mjs`, commit, push to `main`, and confirm the Pages build. Do not stop
+   with finished ports only in the working tree.
 
 ## Layout
 
