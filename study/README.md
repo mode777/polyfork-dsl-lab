@@ -38,7 +38,7 @@ prototype/
   models/area-rug.mjs v1 port: 260 -> 77 lines, exact topology/bounds
   bench.mjs / bench-rug.mjs / parity.mjs
   v2/
-    runtime.mjs     89-node typed runtime + Three bridge + code/random ops
+    runtime.mjs     92-node typed runtime + Three bridge + code/random ops
     expr.mjs        parsed expression language (no eval)
     dsl.mjs         builder DSL
     format.mjs      .pfn text + canonical JSON, round-trip tested

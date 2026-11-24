@@ -33,7 +33,7 @@ browser viewer. Public repo, published with GitHub Pages.
 index.html            split code/result viewer
 viewer.js             viewer: scene, examples, params, live cook
 style.css
-runtime/runtime.js    89-node typed graph runtime + evaluator, Three bridge
+runtime/runtime.js    92-node typed graph runtime + evaluator, Three bridge
 runtime/expr.js       parsed expression language (no eval)
 runtime/format.js     .pfn parser/serializer
 runtime/dsl.js        JS authoring DSL (for building ports)
@@ -94,22 +94,25 @@ The viewer `frame()` uses `current.cam` = `[azimuthDeg, elevationDeg]` and
 
 ## Current status (24 Nov 2026)
 
-- 89 node types; **7 published examples, all geometric ports, zero script nodes**.
+- 92 node types; **9 published examples, all geometric ports, zero script nodes**.
 - **Geometric parity (vertices, bbox and winding at 1e-4):** `cookie` (174),
   `sapphire` (48), `tire` (520), `pumpkin` (120), `area rug` (392/700),
-  `chalkboard` (194) and `theatre` (667).
+  `chalkboard` (194), `theatre` (667), `wayfinding` (482) and `desk` (280).
 - Sapphire had an inverted bottom cap; `loft.orient`/`orientCenter` and `reverse` fixed it.
   Sapphire is now fully parametric (all reference params live, including pointed/
   truncated/broken terminations).
 - Core expressions are parsed by `runtime/expr.js` (no `new Function`): arithmetic,
   comparisons, `?:`, arrays/objects, `let … in`, math and vector built-ins (`mix`,
-  `deg`/`rad`, `vadd`/`vsub`/`vmul`/`vdot`/`vcross`/`vlen`). Fields and `~` params use
+  `mixColor`, `deg`/`rad`, `vadd`/`vsub`/`vmul`/`vdot`/`vcross`/`vlen`). Fields and `~` params use
   it; `let` bindings see the inputs under `s` too.
 - Layout math is node graphs: `let`, `table`, `preset`, `list`, `range`, `map`, `fold`,
   `if`, `jitter`, `draws`, point ops (`centroid`, `lerpPoint`, `mirrorPoint`,
   `rotateAbout`, `planeCut`, `gridPoint`, `direction`) and list ops (`first`, `last`,
   `slice`, `concat`), plus `@node.field` refs. `value` is now residual scalar math.
 - Sapphire/tire/rug no longer use `script`; the showcase has zero script nodes.
+- The overhead wayfinding sign adds `pack`, `outlineRect` and `band`; `plate` gained
+  cap/wall selection, `chamferBox` face skipping, `prism` cap orientation and `mixColor`
+  expression support. The office desk reuses the new outline/band primitives.
 - The previous approximations/studies were removed from the published manifest while
   they are replaced with real ports. The gallery is stale.
 - `t-all.mjs` is count-independent and winding-aware; counts alone are not parity.
@@ -121,7 +124,7 @@ The viewer `frame()` uses `current.cam` = `[azimuthDeg, elevationDeg]` and
    assets tractable; the current gaps are polygon faces with craters (cheese wedge),
    fused clipped lumps (small rock), and cloth/rigged families.
 2. Keep every published example a verified port; do not re-add labelled approximations.
-3. Regenerate the gallery for the seven ports.
+3. Regenerate the gallery for the nine ports.
 4. If adding booleans to examples, verify `manifold-3d` WASM loads from the import map and
    gate it behind `await initManifold()`.
 
@@ -139,6 +142,8 @@ node t-pumpkin.mjs         # 6 pumpkin variants
 node t-rug.mjs             # 9 rug variants
 node t-chalkboard.mjs      # 10 menu-board variants
 node t-theatre.mjs         # 8 theatre-sign variants
+node t-wayfinding.mjs      # 15 overhead-wayfinding variants
+node t-desk.mjs            # 10 office-desk variants
 node t-expr.mjs            # angle/vector expression helpers
 node t-code.mjs            # Three object/BufferGeometry + random-stream bridge
 node t-sample3.mjs         # sample-3 template ports

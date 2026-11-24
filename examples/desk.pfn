@@ -1,0 +1,221 @@
+# polyfork graph v2 — desk
+graph desk
+in colorway enum pale-oak-white options=pale-oak-white|walnut-charcoal|oak-sage|oak-brass label=Colorway
+in top color "" label=Top
+in carcass color "" label=Carcass
+in frame color "" label=Frame
+in recess color "" label=Recess
+in width float 1.4 min=1 max=1.6 step=0.05 label=Width
+in under enum drawer options=drawer|plain|pedestal label="Under the top"
+in lived_in float 0.35 min=0 max=1 step=0.05 label="Lived in"
+n n0 let width=$width lived_in=$lived_in under=$under binds={W:"clamp(width, 1, 1.6)",L:"clamp(lived_in, 0, 1)",w:"L <= 0 ? 0 : pow(L, 0.6)",CH_T:"0.012 + w*0.010",CH_B:"0.008 + w*0.005",CORNER:"0.015 + w*0.045",FOOT:"0.004 + w*0.014",PROUD:"w*0.055",SKEW:"w*0.016",hX:W/2,CX:"W/2 - 0.050",XI:"W/2 - 0.080",ped:"under === 'pedestal'",pedW:"under === 'pedestal' ? min(0.400, (W/2 - 0.050)*2*0.42) : 0",pedX1:"W/2 - 0.080",pedX0:"under === 'pedestal' ? (W/2 - 0.080) - min(0.400, (W/2 - 0.050)*2*0.42) : 0",ox1:"under === 'pedestal' ? min(W/2 - 0.080, (W/2 - 0.080) - min(0.400, (W/2 - 0.050)*2*0.42) - 0.030) : W/2 - 0.080",pMid:"(0.060 + 0.572)/2",yr1:0,yr0:0}
+n n1 outlineRect hx=0.15 hz=0.018 c=0.008 nc=1 cz=-0.265
+n n2 value args={hX:@n0.hX,depth:@n0.CH_T} expr="hX - depth"
+n n3 value args={hZ:0.35,depth:@n0.CH_T} expr="hZ - depth"
+n n4 outlineRect hx=@n2 hz=@n3 c=@n0.CORNER nc=2
+n n5 plate profile=@n4 holes=[@n1] z0=0 z1=0 cap=true walls=none zone=top
+n n6 transform geom=@n5 rx=1.5707963267948966 ty=0.75
+n n7 reverse geom=@n6
+n n8 value args={hX:@n0.hX,depth:0} expr="hX - depth"
+n n9 value args={hZ:0.35,depth:0} expr="hZ - depth"
+n n10 outlineRect hx=@n8 hz=@n9 c=@n0.CORNER nc=2
+n n11 value args={a:0.75,b:@n0.CH_T} expr="a - b"
+n n12 value args={hX:@n0.hX,depth:@n0.CH_T} expr="hX - depth"
+n n13 value args={hZ:0.35,depth:@n0.CH_T} expr="hZ - depth"
+n n14 outlineRect hx=@n12 hz=@n13 c=@n0.CORNER nc=2
+n n15 band lower=@n10 upper=@n14 yl=@n11 yu=0.75 zone=top reverse=false skipEdge=-1
+n n16 value args={hX:@n0.hX,depth:0} expr="hX - depth"
+n n17 value args={hZ:0.35,depth:0} expr="hZ - depth"
+n n18 outlineRect hx=@n16 hz=@n17 c=@n0.CORNER nc=2
+n n19 value args={a:0.7,b:@n0.CH_B} expr="a + b"
+n n20 value args={hX:@n0.hX,depth:0} expr="hX - depth"
+n n21 value args={hZ:0.35,depth:0} expr="hZ - depth"
+n n22 outlineRect hx=@n20 hz=@n21 c=@n0.CORNER nc=2
+n n23 value args={a:0.75,b:@n0.CH_T} expr="a - b"
+n n24 band lower=@n18 upper=@n22 yl=@n19 yu=@n23 zone=top reverse=false skipEdge=-1
+n n25 value args={hX:@n0.hX,depth:@n0.CH_B} expr="hX - depth"
+n n26 value args={hZ:0.35,depth:@n0.CH_B} expr="hZ - depth"
+n n27 outlineRect hx=@n25 hz=@n26 c=@n0.CORNER nc=2
+n n28 value args={hX:@n0.hX,depth:0} expr="hX - depth"
+n n29 value args={hZ:0.35,depth:0} expr="hZ - depth"
+n n30 outlineRect hx=@n28 hz=@n29 c=@n0.CORNER nc=2
+n n31 value args={a:0.7,b:@n0.CH_B} expr="a + b"
+n n32 band lower=@n27 upper=@n30 yu=@n31 yl=0.7 zone=top reverse=false skipEdge=-1
+n n33 value args={hX:@n0.hX,depth:@n0.CH_B} expr="hX - depth"
+n n34 value args={hZ:0.35,depth:@n0.CH_B} expr="hZ - depth"
+n n35 outlineRect hx=@n33 hz=@n34 c=@n0.CORNER nc=2
+n n36 plate profile=@n35 holes=[@n1] z0=0 z1=0 cap=true walls=none zone=top
+n n37 transform geom=@n36 rx=1.5707963267948966 ty=0.7
+n n38 band lower=@n1 upper=@n1 yl=0.7 yu=0.75 zone=recess reverse=true skipEdge=-1
+n n39 value args={a:@n0.hX,b:0.05} expr="a - b"
+n n40 value args={a:@n39} expr=-a
+n n41 value args={a:@n0.hX,b:0.05} expr="a - b"
+n n42 block x0=@n40 x1=@n41 y0=0.668 z0=-0.175 y1=0.708 z1=-0.13 skip="px nx py" zone=frame
+n n43 block x0=@n0.pedX0 x1=@n0.pedX1 y0=0.06 z0=-0.18 y1=0.578 z1=0.245 skip=pz zone=carcass
+n n44 value args={a:@n0.pedX0,b:0.03} expr="a + b"
+n n45 value args={a:@n0.pedX1,b:0.03} expr="a - b"
+n n46 block x0=@n44 x1=@n45 y0=0 z0=-0.18 y1=0.06 z1=0.215 skip="py pz" zone=recess
+n n47 value args={a:@n0.pedX0,b:0.014} expr="a + b"
+n n48 value args={a:@n0.pedX1,b:0.014} expr="a - b"
+n n49 block x0=@n47 x1=@n48 y0=0.074 z0=-0.16599999999999998 y1=0.564 z1=0.245 skip=pz zone=recess
+n n50 reverse geom=@n49
+n n51 value args={a:@n0.pedX0,b:0.03} expr="a + b"
+n n52 value args={a:@n0.pedX1,b:0.03} expr="a - b"
+n n53 poly pts=[[@n0.pedX0,0.06,0.245],[@n51,0.06,0.245],[@n51,0.572,0.245],[@n0.pedX0,0.572,0.245]] zone=carcass hint=[0,0,1]
+n n54 poly pts=[[@n52,0.06,0.245],[@n0.pedX1,0.06,0.245],[@n0.pedX1,0.572,0.245],[@n52,0.572,0.245]] zone=carcass hint=[0,0,1]
+n n55 value args={a:@n0.pMid,b:0.008} expr="a - b"
+n n56 value args={a:@n0.pMid,b:0.008} expr="a + b"
+n n57 poly pts=[[@n51,@n55,0.245],[@n52,@n55,0.245],[@n52,@n56,0.245],[@n51,@n56,0.245]] zone=carcass hint=[0,0,1]
+n n58 value args={a:@n0.pMid,b:0.008} expr="a + b"
+n n59 value args={a:@n51,b:0.014} expr="a + b"
+n n60 value args={a:@n52,b:0.014} expr="a - b"
+n n61 value args={a:@n58,b:0.014} expr="a + b"
+n n62 poly pts=[[@n52,0.572,0.245],[@n51,0.572,0.245],[@n59,0.5579999999999999,0.23099999999999998],[@n60,0.5579999999999999,0.23099999999999998]] zone=carcass hint=[0,1,0]
+n n63 poly pts=[[@n51,@n58,0.245],[@n52,@n58,0.245],[@n60,@n61,0.23099999999999998],[@n59,@n61,0.23099999999999998]] zone=carcass hint=[0,-1,0]
+n n64 poly pts=[[@n51,0.572,0.245],[@n51,@n58,0.245],[@n59,@n61,0.23099999999999998],[@n59,0.5579999999999999,0.23099999999999998]] zone=carcass hint=[-1,0,0]
+n n65 poly pts=[[@n52,@n58,0.245],[@n52,0.572,0.245],[@n60,0.5579999999999999,0.23099999999999998],[@n60,@n61,0.23099999999999998]] zone=carcass hint=[1,0,0]
+n n66 join geoms=[@n62,@n63,@n64,@n65]
+n n67 value args={a:@n0.pMid,b:0.008} expr="a - b"
+n n68 value args={a:@n51,b:0.014} expr="a + b"
+n n69 value args={a:@n52,b:0.014} expr="a - b"
+n n70 value args={a:@n67,b:0.014} expr="a - b"
+n n71 poly pts=[[@n52,@n67,0.245],[@n51,@n67,0.245],[@n68,@n70,0.23099999999999998],[@n69,@n70,0.23099999999999998]] zone=carcass hint=[0,1,0]
+n n72 poly pts=[[@n51,0.06,0.245],[@n52,0.06,0.245],[@n69,0.074,0.23099999999999998],[@n68,0.074,0.23099999999999998]] zone=carcass hint=[0,-1,0]
+n n73 poly pts=[[@n51,@n67,0.245],[@n51,0.06,0.245],[@n68,0.074,0.23099999999999998],[@n68,@n70,0.23099999999999998]] zone=carcass hint=[-1,0,0]
+n n74 poly pts=[[@n52,0.06,0.245],[@n52,@n67,0.245],[@n69,@n70,0.23099999999999998],[@n69,0.074,0.23099999999999998]] zone=carcass hint=[1,0,0]
+n n75 join geoms=[@n71,@n72,@n73,@n74]
+n n76 value args={a:@n51,b:0.014} expr="a + b"
+n n77 value args={a:@n0.pMid,b:0.008} expr="a + b"
+n n78 value args={a:@n77,b:0.014} expr="a + b"
+n n79 value args={a:@n52,b:0.014} expr="a - b"
+n n80 value args={p:@n0.PROUD} expr="p*0.55"
+n n81 value args={a:@n76,b:0.006} expr="a + b"
+n n82 value args={a:@n79,b:0.006} expr="a - b"
+n n83 value args={a:@n78,b:0.006} expr="a + b"
+n n84 value args={a:@n81,b:@n82} expr="min(0.075, (b - a)*0.22)"
+n n85 value args={a:@n81,b:@n82} expr="(a + b)/2"
+n n86 value args={a:@n81,b:0.02} expr="a + b"
+n n87 value args={a:@n82,b:0.02} expr="a - b"
+n n88 value args={a:@n83,b:0.006} expr="a + b"
+n n89 block x0=@n81 y0=@n83 x1=@n82 z0=0.208 y1=0.5239999999999999 z1=0.22599999999999998 skip="" zone=carcass
+n n90 value args={a:@n85,b:@n84} expr="a - b"
+n n91 block x0=@n81 x1=@n90 y0=0.5239999999999999 z0=0.208 y1=0.5519999999999999 z1=0.22599999999999998 skip=ny zone=carcass
+n n92 value args={a:@n85,b:@n84} expr="a + b"
+n n93 block x0=@n92 x1=@n82 y0=0.5239999999999999 z0=0.208 y1=0.5519999999999999 z1=0.22599999999999998 skip=ny zone=carcass
+n n94 block x0=@n86 y0=@n88 x1=@n87 z0=-0.16599999999999998 y1=0.5199999999999999 z1=0.208 skip="py pz nz" zone=recess
+n n95 value args={a:@n86,b:0.01} expr="a + b"
+n n96 value args={a:@n88,b:0.01} expr="a + b"
+n n97 value args={a:@n87,b:0.01} expr="a - b"
+n n98 block x0=@n95 y0=@n96 x1=@n97 z0=-0.15599999999999997 y1=0.5199999999999999 z1=0.208 skip="py pz nz" zone=recess
+n n99 reverse geom=@n98
+n n100 value args={a:@n86,b:0.01} expr="a + b"
+n n101 value args={a:@n86,b:0.01} expr="a + b"
+n n102 poly pts=[[@n86,0.5199999999999999,0.208],[@n100,0.5199999999999999,0.208],[@n101,0.5199999999999999,-0.16599999999999998],[@n86,0.5199999999999999,-0.16599999999999998]] zone=recess hint=[0,1,0]
+n n103 value args={a:@n87,b:0.01} expr="a - b"
+n n104 value args={a:@n87,b:0.01} expr="a - b"
+n n105 poly pts=[[@n103,0.5199999999999999,0.208],[@n87,0.5199999999999999,0.208],[@n87,0.5199999999999999,-0.16599999999999998],[@n104,0.5199999999999999,-0.16599999999999998]] zone=recess hint=[0,1,0]
+n n106 join geoms=[@n102,@n105]
+n n107 join geoms=[@n89,@n91,@n93,@n94,@n99,@n106]
+n n108 transform geom=@n107 tz=@n80 ry=0
+n n109 value args={a:@n51,b:0.014} expr="a + b"
+n n110 value args={a:@n52,b:0.014} expr="a - b"
+n n111 value args={a:@n0.pMid,b:0.008} expr="a - b"
+n n112 value args={a:@n111,b:0.014} expr="a - b"
+n n113 value args={p:@n0.PROUD} expr="p*0.25"
+n n114 value args={a:@n109,b:0.006} expr="a + b"
+n n115 value args={a:@n110,b:0.006} expr="a - b"
+n n116 value args={a:@n112,b:0.006} expr="a - b"
+n n117 value args={a:@n114,b:@n115} expr="min(0.075, (b - a)*0.22)"
+n n118 value args={a:@n114,b:@n115} expr="(a + b)/2"
+n n119 value args={a:@n116,b:0.028} expr="a - b"
+n n120 value args={a:@n114,b:0.02} expr="a + b"
+n n121 value args={a:@n115,b:0.02} expr="a - b"
+n n122 value args={a:@n119,b:0.004} expr="a - b"
+n n123 block x0=@n114 x1=@n115 y1=@n119 y0=0.08 z0=0.208 z1=0.22599999999999998 skip="" zone=carcass
+n n124 value args={a:@n118,b:@n117} expr="a - b"
+n n125 block x0=@n114 y0=@n119 x1=@n124 y1=@n116 z0=0.208 z1=0.22599999999999998 skip=ny zone=carcass
+n n126 value args={a:@n118,b:@n117} expr="a + b"
+n n127 block x0=@n126 y0=@n119 x1=@n115 y1=@n116 z0=0.208 z1=0.22599999999999998 skip=ny zone=carcass
+n n128 block x0=@n120 x1=@n121 y1=@n122 y0=0.08600000000000001 z0=-0.16599999999999998 z1=0.208 skip="py pz nz" zone=recess
+n n129 value args={a:@n120,b:0.01} expr="a + b"
+n n130 value args={a:@n121,b:0.01} expr="a - b"
+n n131 block x0=@n129 x1=@n130 y1=@n122 y0=0.096 z0=-0.15599999999999997 z1=0.208 skip="py pz nz" zone=recess
+n n132 reverse geom=@n131
+n n133 value args={a:@n120,b:0.01} expr="a + b"
+n n134 value args={a:@n120,b:0.01} expr="a + b"
+n n135 poly pts=[[@n120,@n122,0.208],[@n133,@n122,0.208],[@n134,@n122,-0.16599999999999998],[@n120,@n122,-0.16599999999999998]] zone=recess hint=[0,1,0]
+n n136 value args={a:@n121,b:0.01} expr="a - b"
+n n137 value args={a:@n121,b:0.01} expr="a - b"
+n n138 poly pts=[[@n136,@n122,0.208],[@n121,@n122,0.208],[@n121,@n122,-0.16599999999999998],[@n137,@n122,-0.16599999999999998]] zone=recess hint=[0,1,0]
+n n139 join geoms=[@n135,@n138]
+n n140 join geoms=[@n123,@n125,@n127,@n128,@n132,@n139]
+n n141 transform geom=@n140 tz=@n113 ry=0
+n n142 value args={a:@n0.XI} expr=-a
+n n143 value args={a:@n0.CX} expr=-a
+n n144 block x0=@n143 x1=@n0.CX y0=0.572 z0=-0.2 y1=0.71 z1=0.255 skip="py pz" zone=carcass
+n n145 value args={a:@n0.CX} expr=-a
+n n146 value args={a:@n145,b:0.014} expr="a + b"
+n n147 value args={a:@n0.CX,b:0.014} expr="a - b"
+n n148 block x0=@n146 x1=@n147 y0=0.586 z0=-0.186 y1=0.7 z1=0.255 skip="pz py" zone=recess
+n n149 reverse geom=@n148
+n n150 value args={a:@n0.CX} expr=-a
+n n151 poly pts=[[@n150,0.572,0.255],[@n142,0.572,0.255],[@n142,0.7,0.255],[@n150,0.7,0.255]] zone=carcass hint=[0,0,1]
+n n152 poly pts=[[@n0.ox1,0.572,0.255],[@n0.CX,0.572,0.255],[@n0.CX,0.7,0.255],[@n0.ox1,0.7,0.255]] zone=carcass hint=[0,0,1]
+n n153 value args={a:@n142,b:0.014} expr="a + b"
+n n154 value args={a:@n0.ox1,b:0.014} expr="a - b"
+n n155 poly pts=[[@n0.ox1,0.7,0.255],[@n142,0.7,0.255],[@n153,0.6859999999999999,0.241],[@n154,0.6859999999999999,0.241]] zone=carcass hint=[0,1,0]
+n n156 poly pts=[[@n142,0.572,0.255],[@n0.ox1,0.572,0.255],[@n154,0.586,0.241],[@n153,0.586,0.241]] zone=carcass hint=[0,-1,0]
+n n157 poly pts=[[@n142,0.7,0.255],[@n142,0.572,0.255],[@n153,0.586,0.241],[@n153,0.6859999999999999,0.241]] zone=carcass hint=[-1,0,0]
+n n158 poly pts=[[@n0.ox1,0.572,0.255],[@n0.ox1,0.7,0.255],[@n154,0.6859999999999999,0.241],[@n154,0.586,0.241]] zone=carcass hint=[1,0,0]
+n n159 join geoms=[@n155,@n156,@n157,@n158]
+n n160 value args={a:@n142,b:0.014} expr="a + b"
+n n161 value args={a:@n0.ox1,b:0.014} expr="a - b"
+n n162 value args={sk:@n0.SKEW} expr="-sk*0.35"
+n n163 value args={a:@n160,b:0.006} expr="a + b"
+n n164 value args={a:@n161,b:0.006} expr="a - b"
+n n165 value args={a:@n163,b:@n164} expr="min(0.075, (b - a)*0.22)"
+n n166 value args={a:@n163,b:@n164} expr="(a + b)/2"
+n n167 value args={a:@n163,b:0.02} expr="a + b"
+n n168 value args={a:@n164,b:0.02} expr="a - b"
+n n169 block x0=@n163 x1=@n164 y0=0.592 z0=0.218 y1=0.6519999999999999 z1=0.236 skip="" zone=carcass
+n n170 value args={a:@n166,b:@n165} expr="a - b"
+n n171 block x0=@n163 x1=@n170 y0=0.6519999999999999 z0=0.218 y1=0.6799999999999999 z1=0.236 skip=ny zone=carcass
+n n172 value args={a:@n166,b:@n165} expr="a + b"
+n n173 block x0=@n172 x1=@n164 y0=0.6519999999999999 z0=0.218 y1=0.6799999999999999 z1=0.236 skip=ny zone=carcass
+n n174 block x0=@n167 x1=@n168 y0=0.598 z0=-0.186 y1=0.6479999999999999 z1=0.218 skip="py pz nz" zone=recess
+n n175 value args={a:@n167,b:0.01} expr="a + b"
+n n176 value args={a:@n168,b:0.01} expr="a - b"
+n n177 block x0=@n175 x1=@n176 y0=0.608 z0=-0.176 y1=0.6479999999999999 z1=0.218 skip="py pz nz" zone=recess
+n n178 reverse geom=@n177
+n n179 value args={a:@n167,b:0.01} expr="a + b"
+n n180 value args={a:@n167,b:0.01} expr="a + b"
+n n181 poly pts=[[@n167,0.6479999999999999,0.218],[@n179,0.6479999999999999,0.218],[@n180,0.6479999999999999,-0.186],[@n167,0.6479999999999999,-0.186]] zone=recess hint=[0,1,0]
+n n182 value args={a:@n168,b:0.01} expr="a - b"
+n n183 value args={a:@n168,b:0.01} expr="a - b"
+n n184 poly pts=[[@n182,0.6479999999999999,0.218],[@n168,0.6479999999999999,0.218],[@n168,0.6479999999999999,-0.186],[@n183,0.6479999999999999,-0.186]] zone=recess hint=[0,1,0]
+n n185 join geoms=[@n181,@n184]
+n n186 join geoms=[@n169,@n171,@n173,@n174,@n178,@n185]
+n n187 transform geom=@n186 tz=@n0.PROUD ry=@n162
+n n188 join geoms=[@n43,@n46,@n50,@n53,@n54,@n57,@n66,@n75,@n108,@n141]
+n n189 join geoms=[]
+n n190 if cond=@n0.ped then=@n188 else=@n189
+n n191 join geoms=[@n144,@n149,@n151,@n152,@n159,@n187,@n190]
+n n192 value args={u:$under} expr="u === 'plain'"
+n n193 if cond=@n192 then=@n42 else=@n191
+n n194 preset choice=$colorway overrides={top:$top,carcass:$carcass,frame:$frame,recess:$recess} presets={pale-oak-white:{top:#E3CBA5,carcass:#D2B084,frame:#FAF8F3,recess:#6B4A32},walnut-charcoal:{top:#8A6244,carcass:#6B4A32,frame:#47423C,recess:#2E2A26},oak-sage:{top:#E3CBA5,carcass:#B8946A,frame:#7E9179,recess:#4E3423},oak-brass:{top:#E3CBA5,carcass:#F8F4EF,frame:#C9A24B,recess:#8A6244}} fallback=pale-oak-white
+n n195 value args={a:0.32,b:@n0.FOOT} expr="a - b"
+n n196 value args={a:0.32,b:@n0.FOOT} expr="a - b"
+n n197 value args={a:@n196} expr=-a
+n n198 plate profile=[[@n195,0],[0.32,@n0.FOOT],[0.32,0.708],[-0.32,0.708],[-0.32,@n0.FOOT],[@n197,0]] holes=[[[0.275,0.045],[0.275,0.6629999999999999],[-0.275,0.6629999999999999],[-0.275,0.045]]] z0=0 z1=0.045 cap=both walls=both skipWalls=o2 zone=frame
+n n199 value args={side:-1,hX:@n0.hX,FT:0.045} expr="side*(hX - 0.020 - FT/2) - FT/2"
+n n200 transform geom=@n198 tx=@n199 ry=1.5707963267948966
+n n201 value args={a:0.32,b:@n0.FOOT} expr="a - b"
+n n202 value args={a:0.32,b:@n0.FOOT} expr="a - b"
+n n203 value args={a:@n202} expr=-a
+n n204 plate profile=[[@n201,0],[0.32,@n0.FOOT],[0.32,0.708],[-0.32,0.708],[-0.32,@n0.FOOT],[@n203,0]] holes=[[[0.275,0.045],[0.275,0.6629999999999999],[-0.275,0.6629999999999999],[-0.275,0.045]]] z0=0 z1=0.045 cap=both walls=both skipWalls=o2 zone=frame
+n n205 value args={side:1,hX:@n0.hX,FT:0.045} expr="side*(hX - 0.020 - FT/2) - FT/2"
+n n206 transform geom=@n204 tx=@n205 ry=1.5707963267948966
+n n207 join geoms=[@n7,@n15,@n24,@n32,@n37,@n38,@n200,@n206,@n193]
+n n208 mesh geom=@n207 zones={top:@n194.top,carcass:@n194.carcass,frame:@n194.frame,recess:@n194.recess}
+out mesh=@n208
+end

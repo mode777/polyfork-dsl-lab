@@ -7,6 +7,8 @@ const cases = [
   ['rug','../../scripts/area-rug-5c56e2','rug'],
   ['chalkboard','../../scripts4/chalkboard-menu-board-a24d9d','chalkboard'],
   ['theatre','../../scripts4/theatre-vertical-sign-21c29b','theatre'],
+  ['wayfinding','../../scripts4/overhead-wayfinding-sign-64d4e8','wayfinding'],
+  ['desk','../../scripts3/office-desk-021eb3','desk'],
   ['armchair','../../scripts2/lounge-armchair-5a72ca','armchair'],
   ['clam','../../scripts2/maxima-clam-429c17','clam'],
   ['quiver','../../scripts2/quiver-722a40','quiver'],

@@ -1,0 +1,233 @@
+# polyfork graph v2 — wayfinding
+graph wayfinding
+group hanger
+in item any 0
+in xo any 0
+in count any 2
+in y1 any 3.2
+in CHAN any 0.041
+n n0 value args={i:$item,xo:$xo,count:$count} expr="count <= 1 ? 0 : -xo + 2*xo*i/(count-1)"
+n n1 value args={x:@n0,PL:0.07} expr="x - PL"
+n n2 value args={x:@n0,PL:0.07} expr="x + PL"
+n n3 value args={y1:$y1,PT:0.012} expr="y1 + PT"
+n n4 block x0=@n1 x1=@n2 y0=$y1 y1=@n3 z0=-0.07 z1=0.07 skip=ny zone=steel
+n n5 value args={x:@n0,sx:-1,PL:0.07} expr="x + sx*(PL - 0.022)"
+n n6 value args={y1:$y1,PT:0.012} expr="y1 + PT"
+n n7 cone x=@n5 y=@n6 n=6 r=0.011 h=0.007 z=-0.04800000000000001 flip=true zone=steel
+n n8 value args={x:@n0,sx:-1,PL:0.07} expr="x + sx*(PL - 0.022)"
+n n9 value args={y1:$y1,PT:0.012} expr="y1 + PT"
+n n10 cone x=@n8 y=@n9 n=6 r=0.011 h=0.007 z=0.04800000000000001 flip=true zone=steel
+n n11 value args={x:@n0,sx:1,PL:0.07} expr="x + sx*(PL - 0.022)"
+n n12 value args={y1:$y1,PT:0.012} expr="y1 + PT"
+n n13 cone x=@n11 y=@n12 n=6 r=0.011 h=0.007 z=-0.04800000000000001 flip=true zone=steel
+n n14 value args={x:@n0,sx:1,PL:0.07} expr="x + sx*(PL - 0.022)"
+n n15 value args={y1:$y1,PT:0.012} expr="y1 + PT"
+n n16 cone x=@n14 y=@n15 n=6 r=0.011 h=0.007 z=0.04800000000000001 flip=true zone=steel
+n n17 value args={x:@n0,a:0.5235987755982988,r:0.034} expr="x + cos(a)*r"
+n n18 value args={a:0.5235987755982988,r:0.034} expr="sin(a)*r"
+n n19 value args={x:@n0,a:1.5707963267948966,r:0.034} expr="x + cos(a)*r"
+n n20 value args={a:1.5707963267948966,r:0.034} expr="sin(a)*r"
+n n21 value args={x:@n0,a:2.617993877991494,r:0.034} expr="x + cos(a)*r"
+n n22 value args={a:2.617993877991494,r:0.034} expr="sin(a)*r"
+n n23 value args={x:@n0,a:3.665191429188092,r:0.034} expr="x + cos(a)*r"
+n n24 value args={a:3.665191429188092,r:0.034} expr="sin(a)*r"
+n n25 value args={x:@n0,a:4.71238898038469,r:0.034} expr="x + cos(a)*r"
+n n26 value args={a:4.71238898038469,r:0.034} expr="sin(a)*r"
+n n27 value args={x:@n0,a:5.759586531581288,r:0.034} expr="x + cos(a)*r"
+n n28 value args={a:5.759586531581288,r:0.034} expr="sin(a)*r"
+n n29 value args={y1:$y1,PT:0.012} expr="y1 + PT"
+n n30 value args={y1:$y1,PT:0.012} expr="y1 + PT + 0.03"
+n n31 prism profile=[[@n17,@n18],[@n19,@n20],[@n21,@n22],[@n23,@n24],[@n25,@n26],[@n27,@n28]] from=@n29 to=@n30 axis=y cap=top capOrient=true zone=steel
+n n32 value args={y1:$y1,PT:0.012,chan:$CHAN} expr="4 - chan - (y1 + PT)"
+n n33 value args={y1:$y1,PT:0.012} expr="y1 + PT"
+n n34 cylinder h=@n32 x=@n0 y=@n33 r1=0.022 r2=0.022 seg=8 z=0 caps=false zone=steel
+n n35 value args={x:@n0,a:0.5235987755982988,r:0.034} expr="x + cos(a)*r"
+n n36 value args={a:0.5235987755982988,r:0.034} expr="sin(a)*r"
+n n37 value args={x:@n0,a:1.5707963267948966,r:0.034} expr="x + cos(a)*r"
+n n38 value args={a:1.5707963267948966,r:0.034} expr="sin(a)*r"
+n n39 value args={x:@n0,a:2.617993877991494,r:0.034} expr="x + cos(a)*r"
+n n40 value args={a:2.617993877991494,r:0.034} expr="sin(a)*r"
+n n41 value args={x:@n0,a:3.665191429188092,r:0.034} expr="x + cos(a)*r"
+n n42 value args={a:3.665191429188092,r:0.034} expr="sin(a)*r"
+n n43 value args={x:@n0,a:4.71238898038469,r:0.034} expr="x + cos(a)*r"
+n n44 value args={a:4.71238898038469,r:0.034} expr="sin(a)*r"
+n n45 value args={x:@n0,a:5.759586531581288,r:0.034} expr="x + cos(a)*r"
+n n46 value args={a:5.759586531581288,r:0.034} expr="sin(a)*r"
+n n47 value args={chan:$CHAN} expr="4 - chan - 0.03"
+n n48 value args={chan:$CHAN} expr="4 - chan"
+n n49 prism profile=[[@n35,@n36],[@n37,@n38],[@n39,@n40],[@n41,@n42],[@n43,@n44],[@n45,@n46]] from=@n47 to=@n48 axis=y cap=bottom capOrient=true zone=steel
+n n50 join geoms=[@n4,@n7,@n10,@n13,@n16,@n31,@n34,@n49]
+out out=@n50
+end
+in colorway enum terminal-slate options=terminal-slate|warm-charcoal|navy|pale-steel label=Colorway
+in housing color "" label=Housing
+in field color "" label="Sign field"
+in light color "" label="Light ring"
+in steel color "" label=Steel
+in width float 2.4 min=2 max=6 step=0.1 label=Width
+in drop float 0.8 min=0.4 max=1.2 step=0.05 label=Drop
+in endLights bool true label="Lit ends"
+in arrow enum right options=none|right|left|up label=Arrow
+in letters enum A options=none|A|B|C|D|E label=Letter
+in icons enum departures-toilets options=none|departures|arrivals|toilets|baggage|bag-pickup|departures-toilets|arrivals-bag-pickup label=Icons
+in legend color "" label=Legend
+in wear float 0.2 min=0 max=1 step=0.1 label=Wear
+n n0 let width=$width drop=$drop binds={W:width,H:0.6,D:0.32,CH:0.03,CHAN:0.041,PITCH:2.4,ROD_R:0.022,y1:"4 - drop",y0:"4 - drop - 0.6",cy:"4 - drop - 0.3",halfW:width/2,halfD:0.16,xo:"width/2 - 0.45",count:"max(2, ceil(2*(width/2 - 0.45)/2.4 - 1e-6) + 1)",yt:"4 - drop + 0.3*drop",k:"min(0.22, 0.4*drop)",fieldW:"width - 0.26",legendW:"width - 0.42"}
+n n1 value args={endLights:$endLights} expr="endLights ? 'px nx pz nz' : 'pz nz'"
+n n2 chamferBox w=@n0.W h=@n0.H d=@n0.D c=@n0.CH y=@n0.cy skip=@n1 zone=housing
+n n3 value args={W:@n0.W,H:@n0.H,CH:@n0.CH} expr="W/2 - CH"
+n n4 value args={W:@n0.W,H:@n0.H,CH:@n0.CH} expr="H/2 - CH"
+n n5 value args={W:@n0.W} expr="W/2 - 0.08"
+n n6 value args={H:@n0.H} expr="H/2 - 0.08"
+n n7 value args={a:@n5,b:0.05} expr="a - b"
+n n8 value args={a:@n6,b:0.05} expr="a - b"
+n n9 value args={v:@n3} expr=-v
+n n10 value args={v:@n4} expr=-v
+n n11 value args={v:@n4} expr=-v
+n n12 value args={v:@n3} expr=-v
+n n13 value args={v:@n5} expr=-v
+n n14 value args={v:@n6} expr=-v
+n n15 value args={v:@n6} expr=-v
+n n16 value args={v:@n5} expr=-v
+n n17 value args={v:@n5} expr=-v
+n n18 value args={v:@n6} expr=-v
+n n19 value args={v:@n6} expr=-v
+n n20 value args={v:@n5} expr=-v
+n n21 value args={v:@n7} expr=-v
+n n22 value args={v:@n8} expr=-v
+n n23 value args={v:@n8} expr=-v
+n n24 value args={v:@n7} expr=-v
+n n25 value args={v:@n7} expr=-v
+n n26 value args={v:@n8} expr=-v
+n n27 value args={v:@n8} expr=-v
+n n28 value args={v:@n7} expr=-v
+n n29 poly pts=[[@n9,@n10,0],[@n3,@n11,0],[@n5,@n15,0],[@n13,@n14,0]] zone=housing hint=[0,0,1]
+n n30 poly pts=[[@n13,@n14,0],[@n5,@n15,0],[@n5,@n19,-0.025],[@n17,@n18,-0.025]] zone=housing hint=[0,-1,0]
+n n31 poly pts=[[@n17,@n18,-0.025],[@n5,@n19,-0.025],[@n7,@n23,-0.025],[@n21,@n22,-0.025]] zone=light hint=[0,0,1]
+n n32 poly pts=[[@n21,@n22,-0.025],[@n7,@n23,-0.025],[@n7,@n27,-0.015000000000000001],[@n25,@n26,-0.015000000000000001]] zone=field hint=[0,-1,0]
+n n33 poly pts=[[@n3,@n11,0],[@n3,@n4,0],[@n5,@n6,0],[@n5,@n15,0]] zone=housing hint=[0,0,1]
+n n34 poly pts=[[@n5,@n15,0],[@n5,@n6,0],[@n5,@n6,-0.025],[@n5,@n19,-0.025]] zone=housing hint=[1,0,0]
+n n35 poly pts=[[@n5,@n19,-0.025],[@n5,@n6,-0.025],[@n7,@n8,-0.025],[@n7,@n23,-0.025]] zone=light hint=[0,0,1]
+n n36 poly pts=[[@n7,@n23,-0.025],[@n7,@n8,-0.025],[@n7,@n8,-0.015000000000000001],[@n7,@n27,-0.015000000000000001]] zone=field hint=[1,0,0]
+n n37 poly pts=[[@n3,@n4,0],[@n12,@n4,0],[@n16,@n6,0],[@n5,@n6,0]] zone=housing hint=[0,0,1]
+n n38 poly pts=[[@n5,@n6,0],[@n16,@n6,0],[@n20,@n6,-0.025],[@n5,@n6,-0.025]] zone=housing hint=[0,1,0]
+n n39 poly pts=[[@n5,@n6,-0.025],[@n20,@n6,-0.025],[@n24,@n8,-0.025],[@n7,@n8,-0.025]] zone=light hint=[0,0,1]
+n n40 poly pts=[[@n7,@n8,-0.025],[@n24,@n8,-0.025],[@n28,@n8,-0.015000000000000001],[@n7,@n8,-0.015000000000000001]] zone=field hint=[0,1,0]
+n n41 poly pts=[[@n12,@n4,0],[@n9,@n10,0],[@n13,@n14,0],[@n16,@n6,0]] zone=housing hint=[0,0,1]
+n n42 poly pts=[[@n16,@n6,0],[@n13,@n14,0],[@n17,@n18,-0.025],[@n20,@n6,-0.025]] zone=housing hint=[-1,0,0]
+n n43 poly pts=[[@n20,@n6,-0.025],[@n17,@n18,-0.025],[@n21,@n22,-0.025],[@n24,@n8,-0.025]] zone=light hint=[0,0,1]
+n n44 poly pts=[[@n24,@n8,-0.025],[@n21,@n22,-0.025],[@n25,@n26,-0.015000000000000001],[@n28,@n8,-0.015000000000000001]] zone=field hint=[-1,0,0]
+n n45 poly pts=[[@n25,@n26,-0.015000000000000001],[@n7,@n27,-0.015000000000000001],[@n7,@n8,-0.015000000000000001],[@n28,@n8,-0.015000000000000001]] zone=field hint=[0,0,1]
+n n46 join geoms=[@n29,@n30,@n31,@n32,@n33,@n34,@n35,@n36,@n37,@n38,@n39,@n40,@n41,@n42,@n43,@n44,@n45]
+n n47 transform geom=@n46 ty=@n0.cy tz=@n0.halfD
+n n48 value args={v:@n0.halfD} expr=-v
+n n49 transform geom=@n46 ty=@n0.cy tz=@n48 ry=3.141592653589793
+n n50 value args={D:@n0.D,CH:@n0.CH} expr="D/2 - CH"
+n n51 value args={H:@n0.H,CH:@n0.CH} expr="H/2 - CH"
+n n52 value args={D:@n0.D} expr="D/2 - 0.08"
+n n53 value args={H:@n0.H} expr="H/2 - 0.12"
+n n54 value args={a:@n52,b:0.035} expr="a - b"
+n n55 value args={a:@n53,b:0.035} expr="a - b"
+n n56 value args={v:@n50} expr=-v
+n n57 value args={v:@n51} expr=-v
+n n58 value args={v:@n51} expr=-v
+n n59 value args={v:@n50} expr=-v
+n n60 value args={v:@n52} expr=-v
+n n61 value args={v:@n53} expr=-v
+n n62 value args={v:@n53} expr=-v
+n n63 value args={v:@n52} expr=-v
+n n64 value args={v:@n52} expr=-v
+n n65 value args={v:@n53} expr=-v
+n n66 value args={v:@n53} expr=-v
+n n67 value args={v:@n52} expr=-v
+n n68 value args={v:@n54} expr=-v
+n n69 value args={v:@n55} expr=-v
+n n70 value args={v:@n55} expr=-v
+n n71 value args={v:@n54} expr=-v
+n n72 value args={v:@n54} expr=-v
+n n73 value args={v:@n55} expr=-v
+n n74 value args={v:@n55} expr=-v
+n n75 value args={v:@n54} expr=-v
+n n76 poly pts=[[@n56,@n57,0],[@n50,@n58,0],[@n52,@n62,0],[@n60,@n61,0]] zone=housing hint=[0,0,1]
+n n77 poly pts=[[@n60,@n61,0],[@n52,@n62,0],[@n52,@n66,-0.025],[@n64,@n65,-0.025]] zone=housing hint=[0,-1,0]
+n n78 poly pts=[[@n64,@n65,-0.025],[@n52,@n66,-0.025],[@n54,@n70,-0.025],[@n68,@n69,-0.025]] zone=light hint=[0,0,1]
+n n79 poly pts=[[@n68,@n69,-0.025],[@n54,@n70,-0.025],[@n54,@n74,-0.015000000000000001],[@n72,@n73,-0.015000000000000001]] zone=field hint=[0,-1,0]
+n n80 poly pts=[[@n50,@n58,0],[@n50,@n51,0],[@n52,@n53,0],[@n52,@n62,0]] zone=housing hint=[0,0,1]
+n n81 poly pts=[[@n52,@n62,0],[@n52,@n53,0],[@n52,@n53,-0.025],[@n52,@n66,-0.025]] zone=housing hint=[1,0,0]
+n n82 poly pts=[[@n52,@n66,-0.025],[@n52,@n53,-0.025],[@n54,@n55,-0.025],[@n54,@n70,-0.025]] zone=light hint=[0,0,1]
+n n83 poly pts=[[@n54,@n70,-0.025],[@n54,@n55,-0.025],[@n54,@n55,-0.015000000000000001],[@n54,@n74,-0.015000000000000001]] zone=field hint=[1,0,0]
+n n84 poly pts=[[@n50,@n51,0],[@n59,@n51,0],[@n63,@n53,0],[@n52,@n53,0]] zone=housing hint=[0,0,1]
+n n85 poly pts=[[@n52,@n53,0],[@n63,@n53,0],[@n67,@n53,-0.025],[@n52,@n53,-0.025]] zone=housing hint=[0,1,0]
+n n86 poly pts=[[@n52,@n53,-0.025],[@n67,@n53,-0.025],[@n71,@n55,-0.025],[@n54,@n55,-0.025]] zone=light hint=[0,0,1]
+n n87 poly pts=[[@n54,@n55,-0.025],[@n71,@n55,-0.025],[@n75,@n55,-0.015000000000000001],[@n54,@n55,-0.015000000000000001]] zone=field hint=[0,1,0]
+n n88 poly pts=[[@n59,@n51,0],[@n56,@n57,0],[@n60,@n61,0],[@n63,@n53,0]] zone=housing hint=[0,0,1]
+n n89 poly pts=[[@n63,@n53,0],[@n60,@n61,0],[@n64,@n65,-0.025],[@n67,@n53,-0.025]] zone=housing hint=[-1,0,0]
+n n90 poly pts=[[@n67,@n53,-0.025],[@n64,@n65,-0.025],[@n68,@n69,-0.025],[@n71,@n55,-0.025]] zone=light hint=[0,0,1]
+n n91 poly pts=[[@n71,@n55,-0.025],[@n68,@n69,-0.025],[@n72,@n73,-0.015000000000000001],[@n75,@n55,-0.015000000000000001]] zone=field hint=[-1,0,0]
+n n92 poly pts=[[@n72,@n73,-0.015000000000000001],[@n54,@n74,-0.015000000000000001],[@n54,@n55,-0.015000000000000001],[@n75,@n55,-0.015000000000000001]] zone=field hint=[0,0,1]
+n n93 join geoms=[@n76,@n77,@n78,@n79,@n80,@n81,@n82,@n83,@n84,@n85,@n86,@n87,@n88,@n89,@n90,@n91,@n92]
+n n94 transform geom=@n93 tx=@n0.halfW ty=@n0.cy ry=1.5707963267948966
+n n95 value args={v:@n0.halfW} expr=-v
+n n96 transform geom=@n93 tx=@n95 ty=@n0.cy ry=-1.5707963267948966
+n n97 join geoms=[@n94,@n96]
+n n98 join geoms=[]
+n n99 if cond=$endLights then=@n97 else=@n98
+n n100 switch cases={none:[],right:[{w:6,p:[[[0,2.3],[3.4,2.3],[3.4,3.7],[0,3.7]],[[3.4,0.6],[6,3],[3.4,5.4]]]}],left:[{w:6,p:[[[2.6,2.3],[6,2.3],[6,3.7],[2.6,3.7]],[[2.6,0.6],[0,3],[2.6,5.4]]]}],up:[{w:5,p:[[[1.8,0],[3.2,0],[3.2,3.4],[1.8,3.4]],[[0,3.4],[2.5,6],[5,3.4]]]}]} on=$arrow
+n n101 switch cases={none:[],right:[{w:6,p:[[[2.6,2.3],[6,2.3],[6,3.7],[2.6,3.7]],[[2.6,0.6],[0,3],[2.6,5.4]]]}],left:[{w:6,p:[[[0,2.3],[3.4,2.3],[3.4,3.7],[0,3.7]],[[3.4,0.6],[6,3],[3.4,5.4]]]}],up:[{w:5,p:[[[1.8,0],[3.2,0],[3.2,3.4],[1.8,3.4]],[[0,3.4],[2.5,6],[5,3.4]]]}]} on=$arrow
+n n102 switch cases={none:[],A:[{w:4,p:[[[0,0],[1,0],[1,5],[0,5]],[[3,0],[4,0],[4,5],[3,5]],[[1,5],[3,5],[3,6],[1,6]],[[0,5],[1,5],[1,6]],[[3,5],[4,5],[3,6]],[[1,2.4],[3,2.4],[3,3.4],[1,3.4]]]}],B:[{w:4,p:[[[0,0],[1,0],[1,6],[0,6]],[[1,5],[3,5],[3,6],[1,6]],[[1,2.5],[3,2.5],[3,3.5],[1,3.5]],[[1,0],[3,0],[3,1],[1,1]],[[3,3.5],[4,3.5],[4,5],[3,5]],[[3,5],[4,5],[3,6]],[[3,1],[4,1],[4,2.5],[3,2.5]],[[3,0],[4,1],[3,1]],[[3,2.5],[4,2.5],[3,3]],[[3,3],[4,3.5],[3,3.5]]]}],C:[{w:4,p:[[[0,1],[1,1],[1,5],[0,5]],[[0,5],[1,5],[1,6]],[[1,5],[4,5],[4,6],[1,6]],[[0,1],[1,0],[1,1]],[[1,0],[4,0],[4,1],[1,1]],[[3,4.1],[4,4.1],[4,5],[3,5]],[[3,1],[4,1],[4,1.9],[3,1.9]]]}],D:[{w:4,p:[[[0,0],[1,0],[1,6],[0,6]],[[1,5],[2.8,5],[2.8,6],[1,6]],[[1,0],[2.8,0],[2.8,1],[1,1]],[[3,1.2],[4,1.2],[4,4.8],[3,4.8]],[[2.8,5],[3,4.8],[4,4.8],[2.8,6]],[[2.8,1],[3,1.2],[4,1.2],[2.8,0]]]}],E:[{w:3.6,p:[[[0,0],[1,0],[1,6],[0,6]],[[1,5],[3.6,5],[3.6,6],[1,6]],[[1,2.5],[3.2,2.5],[3.2,3.5],[1,3.5]],[[1,0],[3.6,0],[3.6,1],[1,1]]]}]} on=$letters
+n n103 switch cases={none:[],departures:[{w:6.425413617981533,p:[[[0.7860945520228344,1.9319107149862078],[1.5072645554852864,1.885782720526131],[5.852313671879694,4.928218865716933],[6.425413617981533,5.880604435340228],[5.3344522003578545,5.667801694039385],[0.9894030839634478,2.625365548848583]],[[2.7459123012292723,3.8552865437129507],[4.0401822507935625,4.761544118876168],[0.69307110462207,6.000000000000001],[0.045936129839924386,5.546871212418392]],[[3.2637737727511107,3.115703715390498],[4.558043722315402,4.021961290553715],[4.57703214103586,0.4531287875816089],[3.9298971662537143,0]],[[0.9894030839634478,2.625365548848583],[1.6365380587455933,3.0784943364301918],[0.36979141416122613,3.707024621732185],[0,3.4480938859712653]],[[1.5072645554852864,1.885782720526131],[2.1543995302674324,2.33891150810774],[2.311771932368121,0.933589015522989],[1.941980518206895,0.6746582797620697]]]}],arrivals:[{w:6.425413617981533,p:[[[0.7860945520228344,4.068089285013793],[0.9894030839634478,3.374634451151417],[5.3344522003578545,0.3321983059606148],[6.425413617981533,0.11939556465977236],[5.852313671879694,1.0717811342830674],[1.5072645554852864,4.11421727947387]],[[3.2637737727511107,2.8842962846095026],[4.558043722315402,1.9780387094462848],[4.57703214103586,5.546871212418392],[3.9298971662537143,6.000000000000001]],[[2.7459123012292723,2.14471345628705],[4.0401822507935625,1.2384558811238322],[0.69307110462207,0],[0.045936129839924386,0.4531287875816089]],[[1.5072645554852864,4.11421727947387],[2.1543995302674324,3.6610884918922606],[2.311771932368121,5.066410984477012],[1.941980518206895,5.3253417202379305]],[[0.9894030839634478,3.374634451151417],[1.6365380587455933,2.9215056635698082],[0.36979141416122613,2.2929753782678155],[0,2.551906114028735]]]}],toilets:[{w:6,p:[[[1.7005216961323364,5.5487442310373085],[1.3487442310373086,5.900521696132336],[0.8512557689626917,5.900521696132336],[0.4994783038676637,5.5487442310373085],[0.49947830386766356,5.051255768962691],[0.8512557689626914,4.6994783038676635],[1.3487442310373086,4.6994783038676635],[1.7005216961323364,5.051255768962691]],[[0.1,1.6],[2.1,1.6],[1.5,4.4],[0.7,4.4]],[[0.55,0],[0.95,0],[0.95,1.6],[0.55,1.6]],[[1.25,0],[1.65,0],[1.65,1.6],[1.25,1.6]],[[2.75,0],[3.05,0],[3.05,6],[2.75,6]],[[5.400521696132336,5.5487442310373085],[5.0487442310373085,5.900521696132336],[4.551255768962691,5.900521696132336],[4.1994783038676635,5.5487442310373085],[4.1994783038676635,5.051255768962691],[4.551255768962691,4.6994783038676635],[5.0487442310373085,4.6994783038676635],[5.400521696132336,5.051255768962691]],[[4.1,2.2],[5.5,2.2],[5.5,4.4],[4.1,4.4]],[[4.15,0],[4.7,0],[4.7,2.2],[4.15,2.2]],[[4.9,0],[5.45,0],[5.45,2.2],[4.9,2.2]],[[3.6,2.4],[3.95,2.4],[3.95,4.4],[3.6,4.4]],[[5.65,2.4],[6,2.4],[6,4.4],[5.65,4.4]]]}],baggage:[{w:5,p:[[[0,0.5],[0.5,0],[4.5,0],[5,0.5],[5,4],[4.5,4.5],[0.5,4.5],[0,4]],[[1.6,4.5],[2.1,4.5],[2.1,5.5],[1.6,5.5]],[[2.9,4.5],[3.4,4.5],[3.4,5.5],[2.9,5.5]],[[1.6,5.5],[3.4,5.5],[3.4,6],[1.6,6]]]}],bag-pickup:[{w:6.4,p:[[[0.5,0],[5.9,0],[6.4,0.5],[5.9,1],[0.5,1],[0,0.5]],[[1.6,1.5],[1.9,1.2],[4.5,1.2],[4.8,1.5],[4.8,4.3],[4.5,4.6],[1.9,4.6],[1.6,4.3]],[[2.5,4.6],[2.9,4.6],[2.9,5.6],[2.5,5.6]],[[3.5,4.6],[3.9,4.6],[3.9,5.6],[3.5,5.6]],[[2.5,5.6],[3.9,5.6],[3.9,6],[2.5,6]]]}],departures-toilets:[{w:6.425413617981533,p:[[[0.7860945520228344,1.9319107149862078],[1.5072645554852864,1.885782720526131],[5.852313671879694,4.928218865716933],[6.425413617981533,5.880604435340228],[5.3344522003578545,5.667801694039385],[0.9894030839634478,2.625365548848583]],[[2.7459123012292723,3.8552865437129507],[4.0401822507935625,4.761544118876168],[0.69307110462207,6.000000000000001],[0.045936129839924386,5.546871212418392]],[[3.2637737727511107,3.115703715390498],[4.558043722315402,4.021961290553715],[4.57703214103586,0.4531287875816089],[3.9298971662537143,0]],[[0.9894030839634478,2.625365548848583],[1.6365380587455933,3.0784943364301918],[0.36979141416122613,3.707024621732185],[0,3.4480938859712653]],[[1.5072645554852864,1.885782720526131],[2.1543995302674324,2.33891150810774],[2.311771932368121,0.933589015522989],[1.941980518206895,0.6746582797620697]]]},{w:6,p:[[[1.7005216961323364,5.5487442310373085],[1.3487442310373086,5.900521696132336],[0.8512557689626917,5.900521696132336],[0.4994783038676637,5.5487442310373085],[0.49947830386766356,5.051255768962691],[0.8512557689626914,4.6994783038676635],[1.3487442310373086,4.6994783038676635],[1.7005216961323364,5.051255768962691]],[[0.1,1.6],[2.1,1.6],[1.5,4.4],[0.7,4.4]],[[0.55,0],[0.95,0],[0.95,1.6],[0.55,1.6]],[[1.25,0],[1.65,0],[1.65,1.6],[1.25,1.6]],[[2.75,0],[3.05,0],[3.05,6],[2.75,6]],[[5.400521696132336,5.5487442310373085],[5.0487442310373085,5.900521696132336],[4.551255768962691,5.900521696132336],[4.1994783038676635,5.5487442310373085],[4.1994783038676635,5.051255768962691],[4.551255768962691,4.6994783038676635],[5.0487442310373085,4.6994783038676635],[5.400521696132336,5.051255768962691]],[[4.1,2.2],[5.5,2.2],[5.5,4.4],[4.1,4.4]],[[4.15,0],[4.7,0],[4.7,2.2],[4.15,2.2]],[[4.9,0],[5.45,0],[5.45,2.2],[4.9,2.2]],[[3.6,2.4],[3.95,2.4],[3.95,4.4],[3.6,4.4]],[[5.65,2.4],[6,2.4],[6,4.4],[5.65,4.4]]]}],arrivals-bag-pickup:[{w:6.425413617981533,p:[[[0.7860945520228344,4.068089285013793],[0.9894030839634478,3.374634451151417],[5.3344522003578545,0.3321983059606148],[6.425413617981533,0.11939556465977236],[5.852313671879694,1.0717811342830674],[1.5072645554852864,4.11421727947387]],[[3.2637737727511107,2.8842962846095026],[4.558043722315402,1.9780387094462848],[4.57703214103586,5.546871212418392],[3.9298971662537143,6.000000000000001]],[[2.7459123012292723,2.14471345628705],[4.0401822507935625,1.2384558811238322],[0.69307110462207,0],[0.045936129839924386,0.4531287875816089]],[[1.5072645554852864,4.11421727947387],[2.1543995302674324,3.6610884918922606],[2.311771932368121,5.066410984477012],[1.941980518206895,5.3253417202379305]],[[0.9894030839634478,3.374634451151417],[1.6365380587455933,2.9215056635698082],[0.36979141416122613,2.2929753782678155],[0,2.551906114028735]]]},{w:6.4,p:[[[0.5,0],[5.9,0],[6.4,0.5],[5.9,1],[0.5,1],[0,0.5]],[[1.6,1.5],[1.9,1.2],[4.5,1.2],[4.8,1.5],[4.8,4.3],[4.5,4.6],[1.9,4.6],[1.6,4.3]],[[2.5,4.6],[2.9,4.6],[2.9,5.6],[2.5,5.6]],[[3.5,4.6],[3.9,4.6],[3.9,5.6],[3.5,5.6]],[[2.5,5.6],[3.9,5.6],[3.9,6],[2.5,6]]]}]} on=$icons
+n n104 concat lists=[@n100,@n102,@n103]
+n n105 concat lists=[@n101,@n102,@n103]
+n n106 pack items=@n104 maxWidth=@n0.legendW y=@n0.cy gap=4 maxScale=0.03833333333333334 z=0.1475 side=1 unitHeight=6 zone=legend
+n n107 pack items=@n105 maxWidth=@n0.legendW y=@n0.cy gap=4 maxScale=0.03833333333333334 z=0.1475 side=-1 unitHeight=6 zone=legend
+n n108 range to=@n0.count from=0
+n n109 map list=@n108 xo=@n0.xo count=@n0.count y1=@n0.y1 chan=@n0.CHAN graph=hanger
+n n110 value args={xo:@n0.xo} expr="-xo - 0.15"
+n n111 value args={xo:@n0.xo} expr="xo + 0.15"
+n n112 value args={chan:@n0.CHAN} expr="4 - chan"
+n n113 block x0=@n110 x1=@n111 y0=@n112 y1=4 z0=-0.0205 z1=0.0205 zone=steel
+n n114 value args={xo:@n0.xo} expr=-xo
+n n115 value args={yt:@n0.yt} expr="yt - 0.025"
+n n116 value args={yt:@n0.yt} expr="yt + 0.025"
+n n117 block x0=@n114 x1=@n0.xo y0=@n115 y1=@n116 z0=-0.006 z1=0.006 skip="nx px" zone=steel
+n n118 preset choice=$colorway overrides={housing:$housing,field:$field,light:$light,steel:$steel,legend:$legend} presets={terminal-slate:{housing:#282f3f,field:#3a4d6b,steel:#948f8f},warm-charcoal:{housing:#575451,field:#282f3f,steel:#948f8f},navy:{housing:#3a4d6b,field:#282f3f,steel:#8fa5b1},pale-steel:{housing:#8fa5b1,field:#282f3f,steel:#7b787c}} fallback=terminal-slate
+n n119 value args={c:@n118.housing,wear:$wear} expr="mixColor(c, '#7b787c', wear*0.18)"
+n n120 value args={c:@n118.steel,wear:$wear} expr="mixColor(c, '#696568', wear*0.25)"
+n n121 value args={xo:@n0.xo,k:@n0.k,side:-1} expr="side*(xo - k)"
+n n122 value args={xo:@n0.xo,side:-1} expr="side*xo"
+n n123 value args={yt:@n0.yt,k:@n0.k} expr="yt + k"
+n n124 value args={ax:@n121,bx:@n122} expr="bx - ax"
+n n125 value args={ay:@n0.yt,by:@n123} expr="by - ay"
+n n126 value args={dx:@n124,dy:@n125} expr="hypot(dx, dy)"
+n n127 value args={dx:@n124,dy:@n125,L:@n126} expr="-dy/L*0.02"
+n n128 value args={dx:@n124,dy:@n125,L:@n126} expr="dx/L*0.02"
+n n129 value args={a:@n121,n:@n127} expr="a + n"
+n n130 value args={a:@n0.yt,n:@n128} expr="a + n"
+n n131 value args={a:@n122,n:@n127} expr="a + n"
+n n132 value args={a:@n123,n:@n128} expr="a + n"
+n n133 value args={a:@n122,n:@n127} expr="a - n"
+n n134 value args={a:@n123,n:@n128} expr="a - n"
+n n135 value args={a:@n121,n:@n127} expr="a - n"
+n n136 value args={a:@n0.yt,n:@n128} expr="a - n"
+n n137 prism profile=[[@n135,@n136],[@n133,@n134],[@n131,@n132],[@n129,@n130]] axis=z from=-0.004 to=0.004 cap=false zone=steel
+n n138 value args={xo:@n0.xo,k:@n0.k,side:1} expr="side*(xo - k)"
+n n139 value args={xo:@n0.xo,side:1} expr="side*xo"
+n n140 value args={yt:@n0.yt,k:@n0.k} expr="yt + k"
+n n141 value args={ax:@n138,bx:@n139} expr="bx - ax"
+n n142 value args={ay:@n0.yt,by:@n140} expr="by - ay"
+n n143 value args={dx:@n141,dy:@n142} expr="hypot(dx, dy)"
+n n144 value args={dx:@n141,dy:@n142,L:@n143} expr="-dy/L*0.02"
+n n145 value args={dx:@n141,dy:@n142,L:@n143} expr="dx/L*0.02"
+n n146 value args={a:@n138,n:@n144} expr="a + n"
+n n147 value args={a:@n0.yt,n:@n145} expr="a + n"
+n n148 value args={a:@n139,n:@n144} expr="a + n"
+n n149 value args={a:@n140,n:@n145} expr="a + n"
+n n150 value args={a:@n139,n:@n144} expr="a - n"
+n n151 value args={a:@n140,n:@n145} expr="a - n"
+n n152 value args={a:@n138,n:@n144} expr="a - n"
+n n153 value args={a:@n0.yt,n:@n145} expr="a - n"
+n n154 prism profile=[[@n152,@n153],[@n150,@n151],[@n148,@n149],[@n146,@n147]] axis=z from=-0.004 to=0.004 cap=false zone=steel
+n n155 join geoms=[@n2,@n47,@n49,@n99,@n106,@n107,@n109,@n113,@n117,@n137,@n154]
+n n156 mesh geom=@n155 zones={housing:@n119,field:@n118.field,light:@n118.light,steel:@n120,legend:@n118.legend}
+out mesh=@n156
+end

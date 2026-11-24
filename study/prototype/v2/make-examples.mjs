@@ -9,14 +9,16 @@ const list = [
   ['rug','rug','Area rug','Exact geometric port: deformed lattice, folded corner, per-cell weave zones.','props'],
   ['chalkboard','chalkboard','Chalkboard menu board','Exact geometric port: mitred frame, recessed slate, live menu rows and two chalk sticks.','signage'],
   ['theatre','theatre','Theatre vertical sign','Exact geometric port: banded readerboard, enamel glyphs, marquee lamps and three crowns.','signage'],
+  ['wayfinding','wayfinding','Overhead wayfinding sign','Exact geometric port: chamfered lit cabinet, packed legend glyphs, hanger rods and braces.','signage'],
+  ['desk','desk','Office desk','Exact geometric port: chamfered slab, folded steel sleds, live drawer/plain/pedestal undercarriage.','props'],
 ];
 fs.mkdirSync('examples', { recursive: true });
 const CAM = {
   cookie: [25, 35], sapphire: [20, 12], tire: [58, 14], pumpkin: [30, 14], rug: [35, 42],
-  chalkboard: [22, 18], theatre: [18, 8],
+  chalkboard: [22, 18], theatre: [18, 8], wayfinding: [25, 12], desk: [35, 22],
 };
-const FIT = { cookie: 1.25, sapphire: 1.5, tire: 2.4, pumpkin: 1.65, rug: 1.5, chalkboard: 1.35, theatre: 1.15 };
-const STATUS = { cookie: 'port', sapphire: 'port', tire: 'port', pumpkin: 'port', rug: 'port', chalkboard: 'port', theatre: 'port' };
+const FIT = { cookie: 1.25, sapphire: 1.5, tire: 2.4, pumpkin: 1.65, rug: 1.5, chalkboard: 1.35, theatre: 1.15, wayfinding: 1.6, desk: 1.7 };
+const STATUS = { cookie: 'port', sapphire: 'port', tire: 'port', pumpkin: 'port', rug: 'port', chalkboard: 'port', theatre: 'port', wayfinding: 'port', desk: 'port' };
 const manifest = [];
 for (const [id, port, title, desc, cat] of list) {
   const mod = await import(`./ports/${port}.mjs`);

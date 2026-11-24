@@ -172,6 +172,15 @@ const B = {
   clamp: (v, a, b) => Math.min(b, Math.max(a, v)),
   lerp: (a, b, t) => a + (b - a) * t,
   mix: (a, b, t) => a + (b - a) * t,
+  mixColor: (a, b, t) => {
+    const rgb = (h) => {
+      const s = String(h).replace('#', '');
+      const n = parseInt(s.length === 3 ? s.split('').map((c) => c + c).join('') : s, 16);
+      return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+    };
+    const A = rgb(a), Bc = rgb(b), u = Math.min(1, Math.max(0, t));
+    return '#' + [0, 1, 2].map((i) => Math.round(A[i] + (Bc[i] - A[i]) * u).toString(16).padStart(2, '0')).join('');
+  },
   deg: (v) => v * 180 / Math.PI,
   rad: (v) => v * Math.PI / 180,
   smoothstep: (a, b, v) => { const t = Math.min(1, Math.max(0, (v - a) / (b - a))); return t * t * (3 - 2 * t); },

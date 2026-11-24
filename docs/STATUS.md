@@ -6,9 +6,9 @@ example policy changes.
 ## Headline
 
 The showcase is **ports only** while the remaining approximations and studies are
-replaced with real ports. Seven reference assets pass the order-independent geometric
-parity check at `1e-4`: cookie, rough sapphire, tire, pumpkin, area rug, chalkboard and
-the theatre vertical sign.
+replaced with real ports. Nine reference assets pass the order-independent geometric
+parity check at `1e-4`: cookie, rough sapphire, tire, pumpkin, area rug, chalkboard,
+the theatre vertical sign, the overhead wayfinding sign and the office desk.
 
 ## Example status
 
@@ -21,12 +21,22 @@ the theatre vertical sign.
 | **area rug** | 392 / 700 | **geometric port** | 9 nodes; named dimensions, random grid, straighten + fold group, per-cell zones. |
 | **chalkboard** | 194 | **geometric port** | 34 nodes; mitred frame sweep, recessed backing, mapped menu cells, ledge and two chalk sticks. Panels/rows/density stay live. |
 | **theatre** | 667 | **geometric port** | 374 nodes; three prebuilt word layouts, banded readerboard, enamel glyph plates, marquee lamps, three crowns, steel bracket. |
+| **wayfinding** | 482 | **geometric port** | 157 nodes; chamfered lit cabinet, recessed face rings, packed arrow/letter/icon legends, hanger rods, ceiling channel, tie bar and knee braces. |
+| **desk** | 280 | **geometric port** | 209 nodes; chamfered slab with cable slot, folded steel sleds, drawer/plain/pedestal undercarriage, live width and lived-in wear. |
 
 The previous rock/armchair/clam/basket approximations and the hair/jacket/sign/creature
 studies were removed from the published manifest. They are not shown as ports.
 
 ## What changed in this pass
 
+- Added two more exact ports: the **overhead wayfinding sign** (fourth reference sample)
+  and the **office desk** (third sample). Both keep their reference options live.
+- Added three generic nodes: `pack` (flat legend layout), `outlineRect` (chamfered
+  rectangle outlines) and `band` (connect matching outlines at two heights).
+- Extended existing nodes: `plate` can emit front/back caps and selected walls and skip
+  wall edges, `chamferBox` can skip faces, `prism` can orient its caps. The expression
+  language gained `mixColor` for the reference wear palettes.
+- Fixed `chamferBox` face winding and made the sign face panels explicit mitred quads.
 - Added two exact signage ports from the fourth reference sample: **chalkboard menu
   board** and **theatre vertical sign**. Both use the new generic sign primitives and
   keep their reference options live.
@@ -64,8 +74,8 @@ studies were removed from the published manifest. They are not shown as ports.
 
 ## What was verified
 
-- `t-all.mjs`: cookie, sapphire, tire, pumpkin, rug, chalkboard, theatre + six `module`
-  wrappers pass at default; the per-port tests cover parameter variants.
+- `t-all.mjs`: cookie, sapphire, tire, pumpkin, rug, chalkboard, theatre, wayfinding,
+  desk + six `module` wrappers pass at default; the per-port tests cover parameter variants.
 - `t-cookie.mjs`: 3/3 variants.
 - `t-tire.mjs`: 8/8 variants.
 - `t-sapphire.mjs`: 13/13 variants (all params, including broken/truncated/irregular).
@@ -73,8 +83,10 @@ studies were removed from the published manifest. They are not shown as ports.
 - `t-rug.mjs`: 9/9 variants (both sizes, pile, lived-in extremes, all patterns).
 - `t-chalkboard.mjs`: 10/10 variants (panels, rows, density extremes, colourway).
 - `t-theatre.mjs`: 8/8 variants (all words, all crowns, lit/unlit, colourway).
+- `t-wayfinding.mjs`: 15/15 variants (width/drop extremes, unlit ends, every arrow/letter/icon family, colourway).
+- `t-desk.mjs`: 10/10 variants (width extremes, all three undercarriages, lived-in extremes, colourway).
 - `t-expr.mjs`: 10/10 angle/vector expression helpers.
-- All seven showcase graphs parse and cook (`t-examples.mjs`); none contains a `script`
+- All nine showcase graphs parse and cook (`t-examples.mjs`); none contains a `script`
   node and the runtime never evaluates JavaScript for fields/params.
 - `t-code.mjs`, `t-bool.mjs`, `t-cache.mjs`, `t-sample3.mjs` pass.
 
@@ -88,11 +100,12 @@ studies were removed from the published manifest. They are not shown as ports.
 ## Next
 
 1. Port more reference props with the new ops and add them to the showcase; the
-   remaining fourth-sample signs (lit taxiway, overhead wayfinding, core rulebook,
-   marquee letter) are the next candidates.
+   remaining fourth-sample signs (lit taxiway, core rulebook, marquee letter) are the
+   next candidates. The taxiway needs a stroke/SDF glyph node; the rulebook is mostly
+   plates and bands; the marquee needs stroke union/offset.
 2. Exposed but not yet filled: polygon faces with craters (cheese wedge), fused clipped
    lumps (small rock), and more cloth/rigged families.
-3. Regenerate the gallery for the seven ports; the old images are stale.
+3. Regenerate the gallery for the nine ports; the old images are stale.
 
 ## Workspace
 

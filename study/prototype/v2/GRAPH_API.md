@@ -31,7 +31,7 @@ and a compact declarative storage format.
 | `random` | deterministic `{values,next}` stream |
 | `object` | a `THREE.Object3D` output |
 
-### Nodes (89)
+### Nodes (92)
 
 | group | nodes |
 |---|---|

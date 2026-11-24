@@ -103,5 +103,35 @@
       8
     ],
     "fit": 1.15
+  },
+  {
+    "id": "wayfinding",
+    "title": "Overhead wayfinding sign",
+    "description": "Exact geometric port: chamfered lit cabinet, packed legend glyphs, hanger rods and braces.",
+    "category": "signage",
+    "status": "port",
+    "file": "wayfinding.pfn",
+    "bytes": 23130,
+    "nodes": 157,
+    "cam": [
+      25,
+      12
+    ],
+    "fit": 1.6
+  },
+  {
+    "id": "desk",
+    "title": "Office desk",
+    "description": "Exact geometric port: chamfered slab, folded steel sleds, live drawer/plain/pedestal undercarriage.",
+    "category": "props",
+    "status": "port",
+    "file": "desk.pfn",
+    "bytes": 15869,
+    "nodes": 209,
+    "cam": [
+      35,
+      22
+    ],
+    "fit": 1.7
   }
 ]

@@ -4,7 +4,7 @@
 three.js-native node graph, the gaps those ports exposed, the nodes added to close them,
 and a compact declarative storage format.
 
-**Code:** `runtime.js` (89 node types), `expr.js`, `dsl.js`, `format.js`, `cache.js`,
+**Code:** `runtime.js` (92 node types), `expr.js`, `dsl.js`, `format.js`, `cache.js`,
 `ports/` (20 ports), `templates.mjs` (20 more). See `SAMPLE3.md` for the third sample. Run `node t-all.mjs` for the order-independent geometric parity table.
 
 ---
@@ -25,16 +25,16 @@ and a compact declarative storage format.
 | `random` | `{ values, next }` deterministic LCG stream |
 | `object` | a `THREE.Object3D` output |
 
-### Nodes (89)
+### Nodes (92)
 
 | group | nodes |
 |---|---|
-| sources | `ring`, `profile`, `path`, `grid`, `box`, `cylinder`, `sphere`, `geometry`, `prim`, `random`, `value`, `let`, `list`, `range`, `table`, `preset`, `coalesce`, `draws`, `jitter` |
-| surfaces | `loft`, `cap`, `extrude`, `revolve`, `sweep`, `inset`, `pocket`, `solidify` |
+| sources | `ring`, `profile`, `path`, `grid`, `box`, `outlineRect`, `cylinder`, `sphere`, `geometry`, `prim`, `random`, `value`, `let`, `list`, `range`, `table`, `preset`, `coalesce`, `draws`, `jitter` |
+| surfaces | `loft`, `cap`, `extrude`, `revolve`, `sweep`, `band`, `inset`, `pocket`, `solidify` |
 | signage | `prism`, `frame`, `plate`, `block`, `gem`, `poly` |
 | modifiers | `transform`, `center`, `mirror`, `reverse`, `deform`, `clip`, `join`, `centroid`, `lerpPoint`, `mirrorPoint`, `rotateAbout`, `planeCut`, `gridPoint`, `direction`, `lookup`, `first`, `last`, `slice`, `concat` |
 | distribution | `scatter`, `instance`, `arrayPolar`, `arrayLinear` |
-| control | `switch`, `fan`, `cone`, `if`, `map`, `fold` |
+| control | `switch`, `fan`, `cone`, `if`, `map`, `fold`, `pack` |
 | output | `mesh`, `group` |
 | escape hatches | `script`, `module` |
 
@@ -61,8 +61,13 @@ arrayPolar geom count radius start arc spin?
 geometry  object(THREE.BufferGeometry|Mesh|Group) zone -> geometry
 prism     profile axis(x|y|z) from to cap? zone -> geometry
 frame     hx hy profile zone -> mitred rectangular sweep
-plate     profile holes z0 z1 zone -> front face + side walls
+plate     profile holes z0 z1 cap? walls? skipWalls? zone -> cap(s) + selected walls
 block     x0 x1 y0 y1 z0 z1 skip(px nx py ny pz nz) zone -> geometry
+outlineRect hx hz c nc cx cz -> chamfered rectangle profile
+band      lower upper yl yu skipEdge? reverse? zone -> connecting quads
+pack      items[{w,p}] gap maxScale maxWidth x y z side unitHeight zone -> flat legend
+chamferBox w h d c x y z ry skip(px nx py ny pz nz) zone -> chamfered block
+prism     ... cap(true|front|back|both|top|bottom) capOrient? zone -> prism
 gem       x y z nx ny nz r ry h n zone -> faceted lamp
 poly      pts zone hint? inside? flip? -> oriented polygon
 random    seed count -> consumable stream
@@ -74,8 +79,8 @@ module    params  (wraps an existing createAsset)
 ```
 
 **Fields** are parsed expressions with `x,y,z,i,k,u,v,p,n,s` in scope, plus math,
-angle and vector built-ins (`mix`, `deg`/`rad`, `vadd`/`vsub`/`vmul`/`vdot`/`vcross`/
-`vlen`, `noise`, `hash`, `rand`). Example: `` `0.05*(0.96+rand(1000+i*7)()*0.07)` ``.
+angle and vector built-ins (`mix`, `mixColor`, `deg`/`rad`, `vadd`/`vsub`/`vmul`/`vdot`/
+`vcross`/`vlen`, `noise`, `hash`, `rand`). Example: `` `0.05*(0.96+rand(1000+i*7)()*0.07)` ``.
 The convention for arrow fields is positional `(x,y,z,i,k,u,v,p,n,s)`.
 
 **Params vs inputs:** `in` values that contain a ref are wired sockets; everything else is a

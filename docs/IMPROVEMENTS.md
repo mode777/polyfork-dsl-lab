@@ -1,7 +1,7 @@
 # Mature improvements + research notes
 
 This pass implemented only the changes that are clearly mature, and investigated the
-topics that were still unclear. Runtime is now **89 node types**.
+topics that were still unclear. Runtime is now **92 node types**.
 
 > **Parity pass (24 Nov 2026):** the runtime now has a first-class Three bridge
 > (`geometry`/`mesh` accept `BufferGeometry`/`Mesh`/`Group`), a consumable `random`

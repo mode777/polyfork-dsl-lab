@@ -45,7 +45,7 @@ prototype/
   models/*.mjs          v1 exact ports (cookie, rug)
   bench*.mjs            v1 parity benches
   v2/
-    runtime.mjs         89-node typed runtime + Three bridge (source of public runtime.js)
+    runtime.mjs         92-node typed runtime + Three bridge (source of public runtime.js)
     expr.mjs            parsed expression language (source of public runtime/expr.js)
     dsl.mjs             authoring DSL
     format.mjs          .pfn text + JSON (source of public format.js)
@@ -92,6 +92,10 @@ node t-tire.mjs             # 8 tire variants
 node t-sapphire.mjs                 # 13 sapphire variants
 node t-pumpkin.mjs                  # 6 pumpkin variants
 node t-rug.mjs                      # 9 rug variants
+node t-chalkboard.mjs               # 10 menu-board variants
+node t-theatre.mjs                  # 8 theatre-sign variants
+node t-wayfinding.mjs               # 15 overhead-wayfinding variants
+node t-desk.mjs                     # 10 office-desk variants
 node t-code.mjs                     # Three object/BufferGeometry + random stream
 node t-sample3.mjs                  # sample-3 templates
 node t-bool.mjs && node t-cache.mjs
@@ -110,10 +114,10 @@ Commit/push the public repo, check
 
 ## Current state (24 Nov 2026)
 
-- Runtime: 89 nodes; **7 published examples, all geometric ports, zero script nodes**.
+- Runtime: 92 nodes; **9 published examples, all geometric ports, zero script nodes**.
 - **Geometric parity** (vertices, bbox and winding at 1e-4): `cookie` (174),
   `sapphire` (48), `tire` (520), `pumpkin` (120), `area rug` (392/700), `chalkboard`
-  (194), `theatre` (667), plus the six `module` wrappers.
+  (194), `theatre` (667), `wayfinding` (482), `desk` (280), plus the six `module` wrappers.
 - Sapphire is fully parametric (colorway, gem, length, barrel, ends, chamfer, irregularity)
   and its bottom-cap inversion is fixed with `loft.orient` + `reverse`.
 - Core expressions are parsed by `expr.mjs` (no `new Function`). Layout math uses
@@ -133,7 +137,7 @@ Commit/push the public repo, check
 2. Exact parity workflow: compare order-independently (vertices, bbox, winding) against
    the reference module; do not compare hero images to the viewer.
 3. The public repo must stay source-free; keep the reference modules here.
-4. Regenerate the gallery for the seven ports.
+4. Regenerate the gallery for the nine ports.
 
 ## Why this matters
 

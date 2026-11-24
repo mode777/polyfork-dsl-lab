@@ -144,3 +144,22 @@ be joined directly. `let` bindings also expose graph inputs under `s`, matching 
 Expression built-ins gained `mix`, `deg`/`rad` and the missing vector operations
 (`vadd`, `vsub`, `vmul`, `vdot`, `vcross`, `vlen`). Both new ports are exact at `1e-4`
 across their parameter variants.
+
+## 11. Furniture / legend follow-up
+
+The overhead wayfinding sign and office desk added the next set of reusable operations:
+
+| node / option | replaces |
+|---|---|
+| `pack` | flat arrow/letter/pictogram rows with a shared gap and scale |
+| `outlineRect` | chamfered rectangle plans (desk slab, sleds) |
+| `band` | connecting matching outlines at two heights (slab chamfers, slot walls) |
+| `plate.cap` / `walls` / `skipWalls` | front/back caps, selected walls, and omitted wall edges |
+| `chamferBox.skip` | cabinets with a recessed face replacing one or more chamfered faces |
+| `prism.capOrient` | reference prisms whose caps must face out from a profile |
+| `mixColor` | wear/fade colour interpolation in `value` expressions |
+
+The remaining fourth-sample signs are still open: the lit taxiway needs a generic
+stroke/SDF glyph node, the core rulebook is mostly plates/bands but has two states, and
+the marquee letter needs stroke union/offset. Those are separate geometry features, not
+layout escapes.

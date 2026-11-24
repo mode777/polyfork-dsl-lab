@@ -512,18 +512,25 @@ node('extrude', { in: { profile: V.profile, depth: V.number, z0: V.number, cap: 
 // Generic polygon extrusion along X, Y or Z. The reference sign/prop builders
 // use the same three helpers (prismY, prismX and the ordinary Z extrusion) for
 // frames, ledges, chalk sticks and mullions.
-node('prism', { in: { profile: V.profile, axis: V.string, from: V.number, to: V.number, cap: V.bool, zone: V.string }, out: V.geom }, ({ p }) => {
+node('prism', { in: { profile: V.profile, axis: V.string, from: V.number, to: V.number, cap: V.any, capOrient: V.bool, zone: V.string }, out: V.geom }, ({ p }) => {
   const P = asArray(p.profile), a0 = p.from ?? 0, a1 = p.to ?? 1, axis = p.axis ?? 'z', out = [];
+  const capTop = p.cap === true || p.cap === 'top' || p.cap === 'both';
+  const capBottom = p.cap === true || p.cap === 'bottom' || p.cap === 'both';
   if (axis === 'y') {
     for (let i = 0; i < P.length; i++) {
       const [x0, z0] = P[i], [x1, z1] = P[(i + 1) % P.length];
       quad(out, [x0, a0, z0], [x1, a0, z1], [x1, a1, z1], [x0, a1, z0]);
     }
-    if (p.cap) {
+    if (capTop || capBottom) {
       const outer = P.map(([x, z]) => new THREE.Vector2(x, z));
+      const cx = P.reduce((a, q) => a + q[0] / P.length, 0), cz = P.reduce((a, q) => a + q[1] / P.length, 0);
       for (const [i, j, k] of THREE.ShapeUtils.triangulateShape(outer, [])) {
-        tri(out, [P[i][0], a1, P[i][1]], [P[j][0], a1, P[j][1]], [P[k][0], a1, P[k][1]]);
-        tri(out, [P[i][0], a0, P[i][1]], [P[k][0], a0, P[k][1]], [P[j][0], a0, P[j][1]]);
+        if (capTop) p.capOrient
+          ? triOut(out, [P[i][0], a1, P[i][1]], [P[j][0], a1, P[j][1]], [P[k][0], a1, P[k][1]], [cx, a1, cz])
+          : tri(out, [P[i][0], a1, P[i][1]], [P[j][0], a1, P[j][1]], [P[k][0], a1, P[k][1]]);
+        if (capBottom) p.capOrient
+          ? triOut(out, [P[i][0], a0, P[i][1]], [P[j][0], a0, P[j][1]], [P[k][0], a0, P[k][1]], [cx, a0, cz])
+          : tri(out, [P[i][0], a0, P[i][1]], [P[k][0], a0, P[k][1]], [P[j][0], a0, P[j][1]]);
       }
     }
   } else if (axis === 'x') {
@@ -531,10 +538,15 @@ node('prism', { in: { profile: V.profile, axis: V.string, from: V.number, to: V.
       const [z0, y0] = P[i], [z1, y1] = P[(i + 1) % P.length];
       quad(out, [a0, y0, z0], [a0, y1, z1], [a1, y1, z1], [a1, y0, z0]);
     }
-    if (p.cap) {
+    if (capTop || capBottom) {
+      const cy = P.reduce((a, q) => a + q[1] / P.length, 0), cz = P.reduce((a, q) => a + q[0] / P.length, 0);
       for (let i = 1; i + 1 < P.length; i++) {
-        tri(out, [a1, P[0][1], P[0][0]], [a1, P[i][1], P[i][0]], [a1, P[i + 1][1], P[i + 1][0]]);
-        tri(out, [a0, P[0][1], P[0][0]], [a0, P[i + 1][1], P[i + 1][0]], [a0, P[i][1], P[i][0]]);
+        if (capTop) p.capOrient
+          ? triOut(out, [a1, P[0][1], P[0][0]], [a1, P[i][1], P[i][0]], [a1, P[i + 1][1], P[i + 1][0]], [a1, cy, cz])
+          : tri(out, [a1, P[0][1], P[0][0]], [a1, P[i][1], P[i][0]], [a1, P[i + 1][1], P[i + 1][0]]);
+        if (capBottom) p.capOrient
+          ? triOut(out, [a0, P[0][1], P[0][0]], [a0, P[i][1], P[i][0]], [a0, P[i + 1][1], P[i + 1][0]], [a0, cy, cz])
+          : tri(out, [a0, P[0][1], P[0][0]], [a0, P[i + 1][1], P[i + 1][0]], [a0, P[i][1], P[i][0]]);
       }
     }
   } else {
@@ -542,11 +554,16 @@ node('prism', { in: { profile: V.profile, axis: V.string, from: V.number, to: V.
       const [x0, y0] = P[i], [x1, y1] = P[(i + 1) % P.length];
       quad(out, [x0, y0, a0], [x1, y1, a0], [x1, y1, a1], [x0, y0, a1]);
     }
-    if (p.cap) {
+    if (capTop || capBottom) {
       const outer = P.map(([x, y]) => new THREE.Vector2(x, y));
+      const cx = P.reduce((a, q) => a + q[0] / P.length, 0), cy = P.reduce((a, q) => a + q[1] / P.length, 0);
       for (const [i, j, k] of THREE.ShapeUtils.triangulateShape(outer, [])) {
-        tri(out, [P[i][0], P[i][1], a1], [P[j][0], P[j][1], a1], [P[k][0], P[k][1], a1]);
-        tri(out, [P[i][0], P[i][1], a0], [P[k][0], P[k][1], a0], [P[j][0], P[j][1], a0]);
+        if (capTop) p.capOrient
+          ? triOut(out, [P[i][0], P[i][1], a1], [P[j][0], P[j][1], a1], [P[k][0], P[k][1], a1], [cx, cy, a1])
+          : tri(out, [P[i][0], P[i][1], a1], [P[j][0], P[j][1], a1], [P[k][0], P[k][1], a1]);
+        if (capBottom) p.capOrient
+          ? triOut(out, [P[i][0], P[i][1], a0], [P[j][0], P[j][1], a0], [P[k][0], P[k][1], a0], [cx, cy, a0])
+          : tri(out, [P[i][0], P[i][1], a0], [P[k][0], P[k][1], a0], [P[j][0], P[j][1], a0]);
       }
     }
   }
@@ -574,7 +591,7 @@ node('frame', { in: { hx: V.number, hy: V.number, profile: V.profile, zone: V.st
 // Flat plate with holes, extruded from z0 to z1: triangulated front face plus
 // side walls for the outer loop and every hole. Used for sign plates, glyphs
 // and bezel frames.
-node('plate', { in: { profile: V.profile, holes: V.any, z0: V.number, z1: V.number, zone: V.string }, out: V.geom }, ({ p }) => {
+node('plate', { in: { profile: V.profile, holes: V.any, z0: V.number, z1: V.number, cap: V.bool, walls: V.string, skipWalls: V.string, zone: V.string }, out: V.geom }, ({ p }) => {
   const area2 = (L) => { let a = 0; for (let i = 0; i < L.length; i++) { const q = L[i], r = L[(i + 1) % L.length]; a += q[0] * r[1] - r[0] * q[1]; } return a / 2; };
   let outer = asArray(p.profile).map((q) => [q[0], q[1]]);
   if (area2(outer) < 0) outer = outer.slice().reverse();
@@ -585,14 +602,26 @@ node('plate', { in: { profile: V.profile, holes: V.any, z0: V.number, z1: V.numb
   const all = [...outer, ...holes.flat()];
   const V2 = (L) => L.map((q) => new THREE.Vector2(q[0], q[1]));
   const out = [], z0 = p.z0 ?? 0, z1 = p.z1 ?? z0 + 0.01;
-  for (const [i, j, k] of THREE.ShapeUtils.triangulateShape(V2(outer), holes.map(V2))) {
+  const capFront = p.cap === undefined || p.cap === true || p.cap === 'front' || p.cap === 'both';
+  const capBack = p.cap === 'back' || p.cap === 'both';
+  if (capFront || capBack) for (const [i, j, k] of THREE.ShapeUtils.triangulateShape(V2(outer), holes.map(V2))) {
     const a = all[i], b = all[j], c = all[k];
     const s = (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0]);
-    const A = [a[0], a[1], z1], B = [b[0], b[1], z1], C = [c[0], c[1], z1];
-    if (s >= 0) tri(out, A, B, C); else tri(out, A, C, B);
+    if (capFront) {
+      const A = [a[0], a[1], z1], B = [b[0], b[1], z1], C = [c[0], c[1], z1];
+      if (s >= 0) tri(out, A, B, C); else tri(out, A, C, B);
+    }
+    if (capBack) {
+      const A = [a[0], a[1], z0], B = [b[0], b[1], z0], C = [c[0], c[1], z0];
+      if (s >= 0) tri(out, A, C, B); else tri(out, A, B, C);
+    }
   }
-  for (const L of [outer, ...holes]) {
+  const walls = p.walls ?? 'both';
+  const loops = walls === 'outer' ? [[0, outer]] : walls === 'holes' ? holes.map((h, i) => [i + 1, h]) : walls === 'none' ? [] : [[0, outer], ...holes.map((h, i) => [i + 1, h])];
+  const skip = new Set(String(p.skipWalls ?? '').split(/\s+/).filter(Boolean));
+  for (const [li, L] of loops) {
     for (let i = 0; i < L.length; i++) {
+      if (skip.has(`${li === 0 ? 'o' : 'h' + (li - 1) + ':'}${i}`)) continue;
       const a = L[i], b = L[(i + 1) % L.length];
       tri(out, [a[0], a[1], z0], [b[0], b[1], z0], [b[0], b[1], z1]);
       tri(out, [a[0], a[1], z0], [b[0], b[1], z1], [a[0], a[1], z1]);
@@ -1093,6 +1122,31 @@ node('arrayLinear', { in: { geom: V.any, count: V.int, dx: V.number, dy: V.numbe
   return geom(out);
 });
 
+// Lay out a row of flat legend items (arrows, letters, pictograms) on a sign
+// face. Items are {w, p} where p is a list of 2D polygons in a 0..w by
+// 0..unitHeight box. This is the shared layout used by the signage references;
+// keeping it as a node avoids repeating the scale/offset maths per glyph.
+node('pack', { in: { items: V.any, gap: V.number, maxScale: V.number, maxWidth: V.number, x: V.number, y: V.number, z: V.number, side: V.number, unitHeight: V.number, zone: V.string }, out: V.geom }, ({ p }) => {
+  const items = p.items ?? [], gap = p.gap ?? 0;
+  const units = items.reduce((a, it) => a + (it.w ?? 0), 0) + gap * Math.max(0, items.length - 1);
+  const maxScale = p.maxScale ?? 1e9, maxWidth = p.maxWidth ?? 1e9;
+  const k = Math.min(maxScale, units > 0 ? maxWidth / units : maxScale);
+  const side = p.side ?? 1, uh = p.unitHeight ?? 6;
+  let u = -units * k / 2;
+  const buckets = new Map();
+  for (const it of items) {
+    for (const poly of it.p ?? []) {
+      const pts = poly.map(([a, b]) => [side * ((p.x ?? 0) + u + a * k), (p.y ?? 0) + (b - uh / 2) * k, side * (p.z ?? 0)]);
+      const zone = it.zone ?? p.zone ?? 'a';
+      if (!buckets.has(zone)) buckets.set(zone, []);
+      const out = buckets.get(zone);
+      for (let i = 1; i + 1 < pts.length; i++) triOut(out, pts[0], pts[i], pts[i + 1], [0, 0, 0]);
+    }
+    u += ((it.w ?? 0) + gap) * k;
+  }
+  return geom([...buckets.entries()].map(([z, pos]) => part(pos, z)));
+});
+
 node('switch', { in: { on: V.string, cases: V.any }, out: V.any }, ({ p }) => {
   const k = p.on;
   if (!(k in p.cases)) throw new Error(`switch: no case ${k}`);
@@ -1123,10 +1177,11 @@ function pushTriOut(out, a, b, c, center) {
 }
 function pushQuadOut(out, a, b, c, d, center) { pushTriOut(out, a, b, c, center); pushTriOut(out, a, c, d, center); }
 
-node('chamferBox', { in: { w: V.number, h: V.number, d: V.number, c: V.number, x: V.number, y: V.number, z: V.number, ry: V.number, zone: V.string }, out: V.geom }, ({ p }) => {
+node('chamferBox', { in: { w: V.number, h: V.number, d: V.number, c: V.number, x: V.number, y: V.number, z: V.number, ry: V.number, skip: V.string, zone: V.string }, out: V.geom }, ({ p }) => {
   const h = [p.w ?? 1, p.h ?? 1, p.d ?? 1].map((v) => v / 2);
   const c = Math.min(p.c ?? 0.02, Math.min(...h) * 0.9);
   const C = [p.x ?? 0, p.y ?? 0, p.z ?? 0];
+  const sk = new Set(String(p.skip ?? '').split(/\s+/).filter(Boolean));
   const P = (a, sa, b, sb, d2, sd) => {
     const q = [0, 0, 0];
     q[a] = sa * h[a]; q[b] = sb * (h[b] - c); q[d2] = sd * (h[d2] - c);
@@ -1134,20 +1189,21 @@ node('chamferBox', { in: { w: V.number, h: V.number, d: V.number, c: V.number, x
   };
   const out = [];
   for (let a = 0; a < 3; a++) for (const sa of [-1, 1]) {
+    if (sk.has((sa < 0 ? 'n' : 'p') + 'xyz'[a])) continue;
     const b = (a + 1) % 3, d2 = (a + 2) % 3;
     pushQuadOut(out,
-      P(a, sa, b, -1, d2, -1), P(a, sa, b, 1, d2, -1), P(a, sa, b, 1, d2, 1), P(a, sa, b, -1, d2, 1), C);
+      P(a, sa, b, -1, d2, -1), P(a, sa, b, 1, d2, -1), P(a, sa, b, 1, d2, 1), P(a, sa, b, -1, d2, 1), [0, 0, 0]);
   }
   for (let a = 0; a < 3; a++) for (let b = a + 1; b < 3; b++) {
     const d2 = 3 - a - b;
     for (const sa of [-1, 1]) for (const sb of [-1, 1]) {
       pushQuadOut(out,
         P(a, sa, b, sb, d2, -1), P(a, sa, b, sb, d2, 1),
-        P(b, sb, a, sa, d2, 1), P(b, sb, a, sa, d2, -1), C);
+        P(b, sb, a, sa, d2, 1), P(b, sb, a, sa, d2, -1), [0, 0, 0]);
     }
   }
   for (const sa of [-1, 1]) for (const sb of [-1, 1]) for (const sd of [-1, 1]) {
-    pushTriOut(out, P(0, sa, 1, sb, 2, sd), P(1, sb, 2, sd, 0, sa), P(2, sd, 0, sa, 1, sb), C);
+    pushTriOut(out, P(0, sa, 1, sb, 2, sd), P(1, sb, 2, sd, 0, sa), P(2, sd, 0, sa, 1, sb), [0, 0, 0]);
   }
   const q = [];
   for (let i = 0; i < out.length; i += 3) q.push(out[i] + C[0], out[i + 1] + C[1], out[i + 2] + C[2]);
@@ -1159,6 +1215,38 @@ node('chamferBox', { in: { w: V.number, h: V.number, d: V.number, c: V.number, x
     }
   }
   return geom(part(q, p.zone ?? 'a'));
+});
+
+// Chamfered rectangle outline used by furniture and signage: four straight
+// sides with `nc` facets in each corner. Keeping this as a node avoids
+// repeating the corner loop in every port.
+node('outlineRect', { in: { hx: V.number, hz: V.number, c: V.number, nc: V.int, cx: V.number, cz: V.number }, out: V.profile }, ({ p }) => {
+  const hx = p.hx ?? 0.5, hz = p.hz ?? 0.5, c = p.c ?? 0, nc = Math.max(1, Math.round(p.nc ?? 1));
+  const cx = p.cx ?? 0, cz = p.cz ?? 0;
+  if (c <= 1e-6) return profile([[cx + hx, cz - hz], [cx + hx, cz + hz], [cx - hx, cz + hz], [cx - hx, cz - hz]]);
+  const out = [];
+  const corners = [[hx - c, hz - c, 0], [-(hx - c), hz - c, Math.PI / 2], [-(hx - c), -(hz - c), Math.PI], [hx - c, -(hz - c), 3 * Math.PI / 2]];
+  for (const [qx, qz, a0] of corners) {
+    for (let i = 0; i <= nc; i++) {
+      const a = a0 + (i / nc) * Math.PI / 2;
+      out.push([cx + qx + Math.cos(a) * c, cz + qz + Math.sin(a) * c]);
+    }
+  }
+  return profile(out);
+});
+
+// Connect two matching 2D outlines at different heights. This is the
+// chamfer/band helper used by the furniture references.
+node('band', { in: { lower: V.profile, upper: V.profile, yl: V.number, yu: V.number, zone: V.string, skipEdge: V.int, reverse: V.bool }, out: V.geom }, ({ p }) => {
+  const L = asArray(p.lower), U = asArray(p.upper);
+  const lo = p.reverse ? L.slice().reverse() : L, up = p.reverse ? U.slice().reverse() : U;
+  const n = Math.min(lo.length, up.length), out = [];
+  for (let i = 0; i < n; i++) {
+    if (i === p.skipEdge) continue;
+    const j = (i + 1) % n;
+    quad(out, [lo[i][0], p.yl, lo[i][1]], [up[i][0], p.yu, up[i][1]], [up[j][0], p.yu, up[j][1]], [lo[j][0], p.yl, lo[j][1]]);
+  }
+  return geom(part(out, p.zone ?? 'a'));
 });
 
 // ---------------------------------------------------------------- spline / scatter3d / instancing

@@ -30,6 +30,8 @@ Current hand-port results:
 | area rug | 392/700 | PASS, 9 variants |
 | chalkboard | 194 | PASS, 10 variants |
 | theatre | 667 | PASS, 8 variants |
+| wayfinding | 482 | PASS, 15 variants |
+| desk | 280 | PASS, 10 variants |
 
 The six `module` wrappers also pass because they call the reference `createAsset()`
 directly.
@@ -73,6 +75,12 @@ node option per asset:
 | `prism` | `axis: x|y|z` | extrude a polygon along an axis (ledges, mullions, sticks) |
 | `frame` | `hx`, `hy`, `profile` | mitred rectangular frame sweep |
 | `plate` | `profile`, `holes`, `z0`, `z1` | triangulated face plus outer/hole walls |
+| `plate` | `cap`, `walls`, `skipWalls` | front/back cap selection, selected walls, omitted wall edges |
+| `chamferBox` | `skip` | chamfered block with selected faces omitted |
+| `prism` | `cap: top|bottom|both`, `capOrient` | one-sided caps and outward-oriented cap winding |
+| `outlineRect` | `hx`, `hz`, `c`, `nc` | chamfered rectangle outline |
+| `band` | `lower`, `upper`, `yl`, `yu` | connect matching outlines at two heights |
+| `pack` | `items`, `gap`, `maxScale`, `maxWidth` | flat legend rows |
 | `block` | `skip` | box with selected faces omitted |
 | `gem` | `r`, `ry`, `h`, `n` | faceted marquee lamp / socket cap |
 | `poly` | `hint` / `inside` | orient hand-authored sign triangles and quads |
