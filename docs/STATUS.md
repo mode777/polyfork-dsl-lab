@@ -35,13 +35,13 @@ parity check at `1e-4`, including the ten new ports added in this pass.
 | **prize** | 768 | **geometric port** | 33 nodes; live diameter/height lathe, deck/foot ring and bulb ring. |
 | **grass** | 660 | **geometric port** | 96 nodes; lofted three-sided blades, burn/scorch zones and pebble ring. |
 | **coral** | 534 | **geometric port** | 15 nodes; integrated fluted columns and four-ring mound. |
-| **rowboat** | 1262 | **geometric port** | 401 nodes; clinker hull, ribs, thwarts, oarlocks and stowed oars. |
+| **rowboat** | 1262 | **geometric port** | 54 nodes; clinker hull, ribs, thwarts, oarlocks and stowed oars; stem caps stitched with `bridge`. |
 | **basket** | 672 | **geometric port** | 25 nodes; checkered weave, braided bands, rope handles and lid/fill. |
 | **contextmenu** | 788 | **geometric port** | 13 nodes; drafted glass sheet and pill rows. |
-| **lookout** | 962 | **geometric port** | 485 nodes; trestle, planked shaft, glazed cabin, railing and roof. |
-| **cafe** | 540 | **geometric port** | 122 nodes; faceted table, three chairs and two mugs at term 0.6. |
-| **keyboard** | 698 | **geometric port** | 113 nodes; tufted scissor-lift seat, legs, rails and crank. |
-| **chair** | 848 | **geometric port** | 851 nodes; swivel seat, tufted back pad, nailheads and footring. |
+| **lookout** | 962 | **geometric port** | 125 nodes; trestle, planked shaft, glazed cabin, railing and roof; `beam`/`opening`/`block` parts. |
+| **cafe** | 540 | **geometric port** | 71 nodes; faceted table, three chairs and two mugs at term 0.6; `beam` handles. |
+| **keyboard** | 698 | **geometric port** | 71 nodes; tufted scissor-lift seat, legs, rails and crank; loft/fan tufts. |
+| **chair** | 848 | **geometric port** | 73 nodes; swivel seat, tufted back pad, nailheads and footring; `stud`/`quiltedPad`/`bridge`. |
 
 The previous rock/armchair/clam/basket approximations and the hair/jacket/sign/creature
 studies were removed from the published manifest. Armchair, clam and basket are now real
@@ -53,8 +53,14 @@ ports; rock/cheese, the core rulebook and marquee letter remain open.
   **wooden rowboat**, **woven storage basket**, **context menu list**, **lookout watchtower**,
   **cafe table set**, **keyboard bench** and **table game chair**. No per-asset node type was
   added; they use `loft`/`revolve`/`prism`/`block`/`plate`/`poly`/`pill`.
-- Extended the generic DSL: `loft.zoneField`, `diagonal=abba`, raw/flipped caps,
-  degenerate-triangle skipping in `loft`/`poly`, and the reusable `pill` node.
+- Refactored the face-dump `poly` usage in those ports into reusable primitives: `beam`
+  (oriented strut), `frustum` (tapered box), `opening` (recessed window/door), `stud`
+  (nail/button), `quiltedPad` (tufted panel), `bandPath` (bent rib) and `bridge` (stitched
+  profile transition). `poly` is now reserved for isolated irregular faces, and
+  `t-poly-budget.mjs` fails an example above 80 `poly` nodes.
+- Extended the generic DSL: `loft.zoneField`, `skipEdges`, `diagonal=abba`/`short`, raw/flipped
+  caps, flat-cap winding, degenerate-triangle skipping in `loft`/`poly`, and the reusable
+  `pill`, `beam`, `frustum`, `opening`, `stud`, `quiltedPad`, `bandPath` and `bridge` nodes.
 - Added ten exact ports: **composite plaza tile**, **maxima clam**, **tram track tile**,
   **lounge armchair**, **wattle fence run**, **arrow quiver**, **interior door leaf**,
   **lit taxiway sign**, **tiled roof section** and **baggage carousel**.

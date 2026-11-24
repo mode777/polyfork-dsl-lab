@@ -336,8 +336,8 @@
     "category": "props",
     "status": "port",
     "file": "rowboat.pfn",
-    "bytes": 104083,
-    "nodes": 401,
+    "bytes": 41232,
+    "nodes": 54,
     "cam": [
       35,
       25
@@ -381,8 +381,8 @@
     "category": "architecture",
     "status": "port",
     "file": "lookout.pfn",
-    "bytes": 79850,
-    "nodes": 485,
+    "bytes": 21560,
+    "nodes": 125,
     "cam": [
       30,
       15
@@ -396,8 +396,8 @@
     "category": "props",
     "status": "port",
     "file": "cafe.pfn",
-    "bytes": 25587,
-    "nodes": 122,
+    "bytes": 17944,
+    "nodes": 71,
     "cam": [
       30,
       20
@@ -411,8 +411,8 @@
     "category": "props",
     "status": "port",
     "file": "keyboard.pfn",
-    "bytes": 31784,
-    "nodes": 113,
+    "bytes": 27184,
+    "nodes": 71,
     "cam": [
       30,
       18
@@ -426,8 +426,8 @@
     "category": "props",
     "status": "port",
     "file": "chair.pfn",
-    "bytes": 209527,
-    "nodes": 851,
+    "bytes": 37606,
+    "nodes": 73,
     "cam": [
       30,
       15

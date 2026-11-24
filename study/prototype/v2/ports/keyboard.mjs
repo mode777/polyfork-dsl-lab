@@ -1,6 +1,6 @@
 // Keyboard bench — a scissor-lift seat with a tufted cushion, four legs, rails
 // and a crank. The reference loft/post/beam helpers map to generic lofts; the
-// cushion top and buttons are explicit polys.
+// cushion tufts are loft/fan bands and the buttons are `stud` nodes.
 import { graph } from '../dsl.mjs';
 import { at, TAU, clamp, lerp } from './_kit.mjs';
 
@@ -74,17 +74,11 @@ export default function build(g, params = {}) {
     for (let i = 0; i < N; i++) {
       const xl = xs[2 * i], xm = xs[2 * i + 1], xr = xs[2 * i + 2], C = [xm, y2 - E.tuft, 0];
       const poly = [[xl, y2, tb], [xm, y2, tb], [xr, y2, tb], [xr, y2, -tb], [xm, y2, -tb], [xl, y2, -tb]];
-      if (E.tuft <= 0) { for (let k = 0; k < 6; k++) parts.push(g.poly({ pts: [C, poly[k], poly[(k + 1) % 6]], zone: 'cushion' })); continue; }
+      if (E.tuft <= 0) { parts.push(g.fan({ ring: poly, apex: C, zone: 'cushion' })); continue; }
       const f = 0.42, yi = y2 - E.tuft * 0.3, inner = poly.map(([x, , z]) => [xm + (x - xm) * f, yi, z * f]);
-      for (let k = 0; k < 6; k++) {
-        const k1 = (k + 1) % 6;
-        parts.push(g.poly({ pts: [poly[k], poly[k1], inner[k1]], zone: 'cushion' }));
-        parts.push(g.poly({ pts: [poly[k], inner[k1], inner[k]], zone: 'cushion' }));
-        parts.push(g.poly({ pts: [C, inner[k], inner[k1]], zone: 'cushion' }));
-      }
-      const apex = [xm, y2 - E.tuft + 0.021, 0], ring = [];
-      for (let k = 0; k < 6; k++) { const a = (k / 6) * TAU; ring.push([xm + Math.sin(a) * 0.020, y2 - E.tuft, Math.cos(a) * 0.020]); }
-      for (let k = 0; k < 6; k++) parts.push(g.poly({ pts: [apex, ring[k], ring[(k + 1) % 6]], zone: 'cushion' }));
+      parts.push(g.loft({ rings: [poly, inner], zones: { band: 'cushion' } }));
+      parts.push(g.fan({ ring: inner, apex: C, zone: 'cushion' }));
+      parts.push(g.stud({ x: xm, y: y2 - E.tuft, z: 0, nx: 0, ny: 1, nz: 0, ux: 0, uy: 0, uz: 1, r: 0.020, h: 0.021, n: 6, phase: 0, zone: 'cushion' }));
     }
   }
 

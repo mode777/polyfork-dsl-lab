@@ -18,7 +18,7 @@ geometry only.
 ```
 index.html            the split code / result viewer
 app.js                viewer (three.js scene, params, live cook)
-runtime/runtime.js    104-node typed graph runtime + evaluator, Three bridge
+runtime/runtime.js    111-node typed graph runtime + evaluator, Three bridge
 runtime/parts.js      graph wrappers for the ported part builders
 runtime/builders.js   pure geometry builders used by those part nodes
 runtime/expr.js       parsed expression language (no eval)
@@ -87,13 +87,13 @@ The parser, serializer and evaluator are in `runtime/`. `.pfn` is the authoring 
 `cache.js` shows a compact content-addressed JSON cache (arrays pooled and base64-encoded,
 ≈84% smaller on graphs with repeated rings).
 
-## Node set (104)
+## Node set (111)
 
 | group | nodes |
 |---|---|
 | sources | `ring profile path grid box chamferBox outlineRect cylinder sphere plane card cone curl pointsGrid geometry prim faces random value let list range table preset coalesce draws jitter` |
 | ported parts | `plazaTile clamAnimal tramTile armchair wattleFence quiver doorLeaf taxiwaySign roofGable carousel` |
-| surfaces | `loft loftProfile cap extrude revolve sweep band inset pocket solidify bevelProfile fan fanRing wrapShell` |
+| surfaces | `loft bridge loftProfile cap extrude revolve sweep band bandPath inset pocket solidify bevelProfile fan fanRing wrapShell beam frustum opening stud quiltedPad` |
 | signage | `prism frame plate block gem pill poly` |
 | modifiers | `transform center mirror reverse deform clip join cavity centroid lerpPoint mirrorPoint rotateAbout planeCut gridPoint direction lookup first last slice concat` |
 | distribution | `scatter scatterSurface scatterVolume instance instancedMesh arrayPolar arrayLinear` |
@@ -111,10 +111,10 @@ has `spin`; `reverse` flips winding; `prim` calls a real Three geometry construc
 `prism`/`frame`/`plate`/`block`/`gem`/`pill`/`poly` cover swept frames, holed plates,
 skipped-face blocks, faceted lamps, rounded UI pills and hand-authored polygons. The ten face-soup ports use dedicated part nodes
 (`plazaTile`, `clamAnimal`, `tramTile`, `armchair`, `wattleFence`, `quiver`, `doorLeaf`,
-`taxiwaySign`, `roofGable`, `carousel`) backed by `builders.mjs`. The next ten ports are
-expressed entirely with the generic node set (`loft`, `revolve`, `prism`, `block`,
-`plate`, `poly`, `pill`); `faces` remains the low-level escape hatch for genuinely
-irregular face soups. `plate` can emit
+`taxiwaySign`, `roofGable`, `carousel`) backed by `builders.mjs`. The ten generic-node ports use `loft`/`revolve`/`prism`/`block`/`plate`/`poly`/`pill`
+plus the reusable `beam` (oriented strut), `frustum` (tapered box), `opening` (recessed
+window/door), `stud` (nail/button), `quiltedPad` (tufted panel), `bandPath` (bent rib)
+and `bridge` (stitched profile transition) primitives. `faces` remains the low-level escape hatch for genuinely irregular face soups. `plate` can emit
 either cap and selected walls, `chamferBox` can skip faces, `prism` can orient its caps,
 `outlineRect` and `band` build chamfered furniture outlines, and `pack` lays out flat
 legend items.

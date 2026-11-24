@@ -75,6 +75,7 @@ export function loft(g, rings, opts = {}) {
     bandZones: opts.bandZones,
     zoneField: opts.zoneField,
     values: opts.values,
+    skipEdges: opts.skipEdges,
     diagonal: opts.diagonal,
     flip: opts.flip,
     orient: opts.orient,

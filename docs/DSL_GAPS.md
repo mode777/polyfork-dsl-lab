@@ -210,3 +210,25 @@ extensions:
 No `script`, `module`, `faces` dump or single-asset node is used by the published graphs.
 The shared authoring helpers live in `ports/_kit.mjs` (loft/beam/prism/poly wrappers and
 vector/profile helpers), not in the runtime.
+
+## 12. Generic-node props follow-up
+
+The ten generic-node ports exposed the same construction techniques in several scripts:
+rectangular members, tapered boxes, recessed openings, repeated fasteners, tufted pads,
+bent ribs and transitions between profiles with different vertex counts. Those are now
+named nodes rather than per-face `poly` calls:
+
+| node / option | replaces |
+|---|---|
+| `beam` | oriented rectangular struts, rails, braces and handles |
+| `frustum` | tapered boxes, planks and posts between two rings |
+| `opening` | recessed window/door/hatch surrounds |
+| `stud` | repeated nails, rivets and buttons |
+| `quiltedPad` | tufted rectangular upholstery panels |
+| `bandPath` | bent ribs and bands swept along a 2D path |
+| `bridge` | stitched transitions between profiles with different vertex counts |
+| `loft.skipEdges` / `diagonal=short` | omitted edges and shortest-diagonal quad splits |
+| flat loft caps | stable winding when the cap point is the ring centroid |
+
+`poly` remains for isolated irregular faces (blade roots, oar blade caps, glyph arrows).
+`t-poly-budget.mjs` fails an example above 80 `poly` nodes so a face dump cannot return.

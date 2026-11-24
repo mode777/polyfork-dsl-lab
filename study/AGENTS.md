@@ -45,7 +45,7 @@ prototype/
   models/*.mjs          v1 exact ports (cookie, rug)
   bench*.mjs            v1 parity benches
   v2/
-    runtime.mjs         104-node typed runtime + Three bridge (source of public runtime.js)
+    runtime.mjs         111-node typed runtime + Three bridge (source of public runtime.js)
     parts.mjs           part-node wrappers (source of public runtime/parts.js)
     builders.mjs        pure geometry builders used by parts.mjs
     expr.mjs            parsed expression language (source of public runtime/expr.js)
@@ -91,6 +91,7 @@ node t-examples.mjs                 # parse + cook all published examples
 node t-all.mjs                      # order-independent geometric parity
 node t-ports10.mjs                  # first ten ports: parity + variants + colourways
 node t-ports10b.mjs                 # ten generic-node ports: parity + variants
+node t-poly-budget.mjs              # reject face-dump-sized poly counts
 node t-cookie.mjs                   # cookie default / 3-chip / 14-chip
 node t-tire.mjs             # 8 tire variants
 node t-sapphire.mjs                 # 13 sapphire variants
@@ -118,10 +119,12 @@ Commit/push the public repo, check
 
 ## Current state (24 Nov 2026)
 
-- Runtime: 104 nodes; **29 published examples, all geometric ports, zero script nodes**.
+- Runtime: 111 nodes; **29 published examples, all geometric ports, zero script nodes**.
 - The ten face-soup ports are dedicated part nodes backed by `builders.mjs`; their `.pfn`
   files are ~0.7-1.3 KB and expose geometry options as graph inputs. The next ten ports
-  are generic-node graphs and add no per-asset runtime type.
+  are generic-node graphs and add no per-asset runtime type; their repeated parts use the
+  reusable `beam`, `frustum`, `opening`, `stud`, `quiltedPad`, `bandPath`, `bridge` and
+  `pill` primitives instead of per-face `poly` dumps.
 - **Geometric parity** (vertices, bbox and winding at 1e-4): `cookie` (174),
   `sapphire` (48), `tire` (520), `pumpkin` (120), `area rug` (392/700), `chalkboard`
   (194), `theatre` (667), `wayfinding` (482), `desk` (280), `plaza` (292), `clam` (792),

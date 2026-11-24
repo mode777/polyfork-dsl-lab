@@ -4,7 +4,7 @@
 three.js-native node graph, the gaps those ports exposed, the nodes added to close them,
 and a compact declarative storage format.
 
-**Code:** `runtime.js` (104 node types), `parts.js`/`builders.js` (ported part nodes and their pure builders), `expr.js`, `dsl.js`, `format.js`, `cache.js`,
+**Code:** `runtime.js` (111 node types), `parts.js`/`builders.js` (ported part nodes and their pure builders), `expr.js`, `dsl.js`, `format.js`, `cache.js`,
 `ports/` (29 published ports), `templates.mjs` (older archetype graphs). See `SAMPLE3.md` for the third sample. Run `node t-all.mjs` for the order-independent geometric parity table.
 
 ---
@@ -25,13 +25,13 @@ and a compact declarative storage format.
 | `random` | `{ values, next }` deterministic LCG stream |
 | `object` | a `THREE.Object3D` output |
 
-### Nodes (104)
+### Nodes (111)
 
 | group | nodes |
 |---|---|
 | sources | `ring`, `profile`, `path`, `grid`, `box`, `outlineRect`, `cylinder`, `sphere`, `geometry`, `prim`, `faces`, `random`, `value`, `let`, `list`, `range`, `table`, `preset`, `coalesce`, `draws`, `jitter` |
 | ported parts | `plazaTile`, `clamAnimal`, `tramTile`, `armchair`, `wattleFence`, `quiver`, `doorLeaf`, `taxiwaySign`, `roofGable`, `carousel` |
-| surfaces | `loft`, `cap`, `extrude`, `revolve`, `sweep`, `band`, `inset`, `pocket`, `solidify` |
+| surfaces | `loft`, `bridge`, `cap`, `extrude`, `revolve`, `sweep`, `band`, `bandPath`, `inset`, `pocket`, `solidify`, `beam`, `frustum`, `opening`, `stud`, `quiltedPad` |
 | signage | `prism`, `frame`, `plate`, `block`, `gem`, `pill`, `poly` |
 | modifiers | `transform`, `center`, `mirror`, `reverse`, `deform`, `clip`, `join`, `centroid`, `lerpPoint`, `mirrorPoint`, `rotateAbout`, `planeCut`, `gridPoint`, `direction`, `lookup`, `first`, `last`, `slice`, `concat` |
 | distribution | `scatter`, `instance`, `arrayPolar`, `arrayLinear` |
@@ -39,7 +39,7 @@ and a compact declarative storage format.
 | output | `mesh`, `group` |
 | escape hatches | `script`, `module` |
 
-Update: the runtime now also has `faces`, `curl`, `scatterVolume`, `pathOnSurface`, `bandOnSurface`, `ribbon`, `wrapShell`, `text`, `skeleton`, `skin`, `pose`, `prism`, `frame`, `plate`, `block`, `gem` and `poly`; the public repo uses `.js` extensions.
+Update: the runtime now also has `faces`, `curl`, `scatterVolume`, `pathOnSurface`, `bandOnSurface`, `ribbon`, `wrapShell`, `text`, `skeleton`, `skin`, `pose`, `prism`, `frame`, `plate`, `block`, `gem`, `poly`, `beam`, `frustum`, `opening`, `stud`, `quiltedPad`, `bandPath` and `bridge`; the public repo uses `.js` extensions.
 
 Key signatures:
 

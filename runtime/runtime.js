@@ -3,8 +3,8 @@
 import * as THREE from 'three';
 import { mergeGeometries, toCreasedNormals } from 'three/addons/utils/BufferGeometryUtils.js';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
-import { compileExpr, evalExpr, parseExpr } from './expr.js?v=14';
-import { registerParts } from './parts.js?v=14';
+import { compileExpr, evalExpr, parseExpr } from './expr.js?v=15';
+import { registerParts } from './parts.js?v=15';
 
 export const TAU = Math.PI * 2;
 export const ADDONS = { mergeGeometries, toCreasedNormals, RoundedBoxGeometry };
@@ -109,6 +109,7 @@ const sub3 = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
 const mul3 = (a, s) => [a[0] * s, a[1] * s, a[2] * s];
 const dot3 = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
 const cross3 = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+const len3 = (a) => Math.hypot(a[0], a[1], a[2]);
 const asArray = (v) => (v && typeof v === 'object' && Array.isArray(v.pts) ? v.pts : v);
 const hash01 = (a, b = 0, c = 0) => { const h = Math.sin(a * 127.1 + b * 311.7 + c * 74.7) * 43758.5453; return h - Math.floor(h); };
 function xf(pos, p) {
@@ -416,7 +417,7 @@ node('fanRing', { in: { r: V.number, y: V.number, n: V.int, phase: V.number, ape
   return geom(part(out, p.zone ?? 'a'));
 });
 
-node('loft', { in: { rings: V.any, capTop: V.any, capBottom: V.any, zones: V.any, diagonal: V.string, bandZones: V.any, zoneField: V.field, values: V.any, flip: V.bool, orient: V.bool, orientCenter: V.vec3, capTopFlip: V.bool, capBottomFlip: V.bool, capTopRaw: V.bool, capBottomRaw: V.bool }, out: V.geom }, ({ p }) => {
+node('loft', { in: { rings: V.any, capTop: V.any, capBottom: V.any, zones: V.any, diagonal: V.string, bandZones: V.any, zoneField: V.field, values: V.any, skipEdges: V.any, flip: V.bool, orient: V.bool, orientCenter: V.vec3, capTopFlip: V.bool, capBottomFlip: V.bool, capTopRaw: V.bool, capBottomRaw: V.bool }, out: V.geom }, ({ p }) => {
   const rings = p.rings.map(asArray);
   const zones = p.zones ?? {};
   const out = {};
@@ -440,9 +441,18 @@ node('loft', { in: { rings: V.any, capTop: V.any, capBottom: V.any, zones: V.any
     if (p.flip) { emitTri(pos, a, c, b); emitTri(pos, a, d, c); }
     else { emitTri(pos, a, b, c); emitTri(pos, a, c, d); }
   };
+  const emitQuadShort = (pos, a, b, c, d) => {
+    if (len3(sub3(a, c)) <= len3(sub3(b, d)) + 1e-9) {
+      if (p.flip) { emitTri(pos, a, c, b); emitTri(pos, a, d, c); } else { emitTri(pos, a, b, c); emitTri(pos, a, c, d); }
+    } else {
+      if (p.flip) { emitTri(pos, a, d, b); emitTri(pos, b, d, c); } else { emitTri(pos, a, b, d); emitTri(pos, b, c, d); }
+    }
+  };
+  const skipSet = new Set(Array.isArray(p.skipEdges) ? p.skipEdges : String(p.skipEdges ?? '').split(/\s+/).filter(Boolean).map(Number));
   for (let k = 0; k < rings.length - 1; k++) {
     const A = rings[k], B = rings[k + 1], n = A.length, pos = [];
     for (let i = 0; i < n; i++) {
+      if (skipSet.has(i)) continue;
       const j = (i + 1) % n;
       // 'ab' is the historical runtime diagonal; 'ba' matches the common
       // Polyfork loft helper (A[j]-B[i] diagonal) used by cookie/rug; 'abba'
@@ -450,6 +460,7 @@ node('loft', { in: { rings: V.any, capTop: V.any, capBottom: V.any, zones: V.any
       // organic sweeps such as the coral columns.
       if (p.diagonal === 'ba') emitQuad(pos, A[j], A[i], B[i], B[j]);
       else if (p.diagonal === 'abba') emitQuad(pos, A[i], B[i], B[j], A[j]);
+      else if (p.diagonal === 'short') emitQuadShort(pos, A[i], A[j], B[j], B[i]);
       else emitQuad(pos, A[i], A[j], B[j], B[i]);
     }
     const zone = p.zoneField ? fieldValue(p.zoneField, { i: 0, k, vals: p.values, s: p })
@@ -457,9 +468,11 @@ node('loft', { in: { rings: V.any, capTop: V.any, capBottom: V.any, zones: V.any
         : (typeof zones.band === 'function' ? zones.band(k) : (zones.band ?? 'a'));
     if (p.zoneField) {
       for (let i = 0; i < n; i++) {
+        if (skipSet.has(i)) continue;
         const j = (i + 1) % n, one = [];
         if (p.diagonal === 'ba') emitQuad(one, A[j], A[i], B[i], B[j]);
         else if (p.diagonal === 'abba') emitQuad(one, A[i], B[i], B[j], A[j]);
+        else if (p.diagonal === 'short') emitQuadShort(one, A[i], A[j], B[j], B[i]);
         else emitQuad(one, A[i], A[j], B[j], B[i]);
         const z = fieldValue(p.zoneField, { i, k, vals: p.values, s: p });
         put(z, one);
@@ -468,12 +481,13 @@ node('loft', { in: { rings: V.any, capTop: V.any, capBottom: V.any, zones: V.any
   }
   const triOut = (out, a, b, c, hint) => {
     const n = cross3(sub3(b, a), sub3(c, a));
-    if (dot3(n, hint) >= 0) tri(out, a, b, c); else tri(out, a, c, b);
+    if (!hint || dot3(n, hint) >= 0) tri(out, a, b, c); else tri(out, a, c, b);
   };
+  const flatHint = (h) => (len3(h) > 1e-9 ? norm(h) : null);
   if (p.capTop) {
     const A = rings[rings.length - 1], n = A.length, pos = [];
     const c = A.reduce((q, r) => add3(q, mul3(r, 1 / n)), [0, 0, 0]);
-    const hint = norm(sub3(p.capTop, c));
+    const hint = flatHint(sub3(p.capTop, c));
     for (let i = 0; i < n; i++) {
       if (p.capTopRaw) tri(pos, p.capTop, A[(i + 1) % n], A[i]);
       else if (p.capTopFlip) triOut(pos, A[i], A[(i + 1) % n], p.capTop, hint);
@@ -485,7 +499,7 @@ node('loft', { in: { rings: V.any, capTop: V.any, capBottom: V.any, zones: V.any
   if (p.capBottom) {
     const A = rings[0], n = A.length, pos = [];
     const c = A.reduce((q, r) => add3(q, mul3(r, 1 / n)), [0, 0, 0]);
-    const hint = norm(sub3(c, p.capBottom));
+    const hint = flatHint(sub3(c, p.capBottom));
     for (let i = 0; i < n; i++) {
       if (p.capBottomRaw) tri(pos, p.capBottom, A[i], A[(i + 1) % n]);
       else if (p.capBottomFlip) triOut(pos, A[(i + 1) % n], A[i], p.capBottom, hint);
@@ -495,6 +509,54 @@ node('loft', { in: { rings: V.any, capTop: V.any, capBottom: V.any, zones: V.any
     put(zones.capBottom ?? 'a', pos);
   }
   return geom(Object.entries(out).map(([z, pos]) => part(pos, z)));
+});
+
+// Stitch two profiles with different vertex counts: walk both loops by
+// normalized parameter and emit a triangle whenever the lagging loop advances.
+// This is the reference stem/gore/zipper stitch, not a face dump.
+node('bridge', { in: { a: V.any, b: V.any, closed: V.bool, inside: V.vec3, hint: V.vec3, flip: V.bool, zone: V.string, zoneField: V.field, values: V.any }, out: V.geom }, ({ p }) => {
+  const A = asArray(p.a) ?? [], B = asArray(p.b) ?? [];
+  const nA = A.length, nB = B.length;
+  if (nA < 2 || nB < 2) return geom([]);
+  const closed = p.closed === true, buckets = new Map();
+  const put = (z, pos) => { if (!buckets.has(z)) buckets.set(z, []); buckets.get(z).push(...pos); };
+  const emit = (a, b, c, ctx) => {
+    const n = cross3(sub3(b, a), sub3(c, a));
+    if (len3(n) < 1e-12) return;
+    const cen = [(a[0] + b[0] + c[0]) / 3, (a[1] + b[1] + c[1]) / 3, (a[2] + b[2] + c[2]) / 3];
+    const h = p.hint ?? (p.inside ? sub3(cen, p.inside) : null);
+    let pts = [a, b, c];
+    if (p.flip) pts = [a, c, b];
+    if (h && dot3(n, h) < 0) pts = [pts[0], pts[2], pts[1]];
+    const zone = p.zoneField ? fieldValue(p.zoneField, { ...ctx, y: cen[1], vals: p.values, s: p }) : (p.zone ?? 'a');
+    put(zone, pts.flat());
+  };
+  if (closed) {
+    let i = 0, j = 0;
+    while (i < nA || j < nB) {
+      const ta = i / nA, tb = j / nB;
+      if (j >= nB || (i < nA && ta <= tb + 1e-12)) {
+        emit(A[i % nA], A[(i + 1) % nA], B[j % nB], { i, j });
+        i++;
+      } else {
+        emit(A[i % nA], B[(j + 1) % nB], B[j % nB], { i, j });
+        j++;
+      }
+    }
+  } else {
+    let i = 0, j = 0;
+    while (i < nA - 1 || j < nB - 1) {
+      const ta = i / (nA - 1), tb = j / (nB - 1);
+      if (j >= nB - 1 || (i < nA - 1 && ta <= tb + 1e-12)) {
+        emit(A[i], A[i + 1], B[j], { i, j });
+        i++;
+      } else {
+        emit(A[i], B[j + 1], B[j], { i, j });
+        j++;
+      }
+    }
+  }
+  return geom([...buckets.entries()].map(([z, pos]) => part(pos, z)));
 });
 
 node('cap', { in: { profile: V.profile, holes: V.any, z: V.number, flip: V.bool, zone: V.string }, out: V.geom }, ({ p }) => {
@@ -723,6 +785,158 @@ node('block', { in: { x0: V.number, x1: V.number, y0: V.number, y1: V.number, z0
   };
   const out = [], m = [(x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2];
   for (const k of Object.keys(F)) if (!sk.has(k)) quadOut(out, ...F[k], m);
+  return geom(part(out, p.zone ?? 'a'));
+});
+
+// Oriented rectangular beam: a box swept between two points with a chosen
+// up-reference and selected faces. The reference strut/rail/ladder helpers all
+// reduce to this; it is not tied to a particular asset.
+node('beam', { in: { a: V.any, b: V.any, t: V.number, d: V.number, up: V.vec3, skip: V.string, zone: V.string }, out: V.geom }, ({ p }) => {
+  const A = p.a ?? [0, 0, 0], B = p.b ?? [1, 0, 0];
+  const ab = sub3(B, A), len = Math.hypot(ab[0], ab[1], ab[2]) || 1, u = mul3(ab, 1 / len);
+  const up = p.up ?? [0, 1, 0];
+  const n = norm(sub3(up, mul3(u, dot3(up, u))));
+  const v = norm(cross3(n, u)), mid = mul3(add3(A, B), 0.5);
+  const t = p.t ?? 0.1, d = p.d ?? 0.1;
+  const P = (i, j, k) => add3(add3(add3(mid, mul3(u, i ? len / 2 : -len / 2)), mul3(v, j ? t / 2 : -t / 2)), mul3(n, k ? d / 2 : -d / 2));
+  const sk = new Set(String(p.skip ?? '').split(/\s+/).filter(Boolean));
+  const out = [];
+  if (!sk.has('px')) quad(out, P(1, 0, 1), P(1, 0, 0), P(1, 1, 0), P(1, 1, 1));
+  if (!sk.has('nx')) quad(out, P(0, 0, 0), P(0, 0, 1), P(0, 1, 1), P(0, 1, 0));
+  if (!sk.has('py')) quad(out, P(0, 1, 1), P(1, 1, 1), P(1, 1, 0), P(0, 1, 0));
+  if (!sk.has('ny')) quad(out, P(0, 0, 0), P(1, 0, 0), P(1, 0, 1), P(0, 0, 1));
+  if (!sk.has('pz')) quad(out, P(0, 0, 1), P(1, 0, 1), P(1, 1, 1), P(0, 1, 1));
+  if (!sk.has('nz')) quad(out, P(1, 0, 0), P(0, 0, 0), P(0, 1, 0), P(1, 1, 0));
+  return geom(part(out, p.zone ?? 'a'));
+});
+
+// Recessed opening: outer/inner loops, a proud front ring, outer wall, inner
+// reveal and a recessed panel. Windows, doors and hatch surrounds use this.
+node('opening', { in: { outer: V.any, inner: V.any, proud: V.number, sink: V.number, backset: V.number, ringZone: V.string, panelZone: V.string }, out: V.geom }, ({ p }) => {
+  const outer = p.outer ?? [], inner = p.inner ?? [], n = Math.min(outer.length, inner.length);
+  const F = p.proud ?? 0.06, B = -(p.backset ?? 0.04), P = F - (p.sink ?? 0.05);
+  const out = [], ringZone = p.ringZone ?? 'a', panelZone = p.panelZone ?? ringZone;
+  for (let i = 0; i < n; i++) {
+    const j = (i + 1) % n, o0 = outer[i], o1 = outer[j], i0 = inner[i], i1 = inner[j];
+    quad(out, [o0[0], o0[1], F], [o1[0], o1[1], F], [i1[0], i1[1], F], [i0[0], i0[1], F]);
+    quad(out, [o0[0], o0[1], B], [o1[0], o1[1], B], [o1[0], o1[1], F], [o0[0], o0[1], F]);
+    quad(out, [i0[0], i0[1], P], [i0[0], i0[1], F], [i1[0], i1[1], F], [i1[0], i1[1], P]);
+  }
+  const panel = inner.map((q) => [q[0], q[1], P]);
+  const panelPos = [];
+  for (let i = 1; i + 1 < panel.length; i++) tri(panelPos, panel[0], panel[i], panel[i + 1]);
+  return geom([part(out, ringZone), part(panelPos, panelZone)]);
+});
+
+// Tapered prism between two matching rings, with selectable side faces and
+// end caps. Planks, tapered posts, frusta and roof/leg sections use this.
+node('frustum', { in: { a: V.any, b: V.any, skip: V.string, capA: V.bool, capB: V.bool, zone: V.string }, out: V.geom }, ({ p }) => {
+  const A = p.a ?? [], B = p.b ?? [], n = Math.min(A.length, B.length);
+  const sk = new Set(String(p.skip ?? '').split(/\s+/).filter(Boolean));
+  const out = [];
+  for (let i = 0; i < n; i++) {
+    if (sk.has(String(i))) continue;
+    const j = (i + 1) % n;
+    quad(out, A[i], A[j], B[j], B[i]);
+  }
+  if (p.capA !== false && !sk.has('capA') && n >= 3) for (let i = 1; i < n - 1; i++) tri(out, A[0], A[n - i], A[n - i - 1]);
+  if (p.capB !== false && !sk.has('capB') && n >= 3) for (let i = 1; i < n - 1; i++) tri(out, B[0], B[i], B[i + 1]);
+  return geom(part(out, p.zone ?? 'a'));
+});
+
+// Faceted stud/button/rivet: a base ring in the plane normal to n, with an
+// apex pushed along n and optionally offset along the base tangent. Chair
+// nails, upholstery buttons and other repeated fasteners use it.
+node('stud', { in: { x: V.number, y: V.number, z: V.number, nx: V.number, ny: V.number, nz: V.number, ux: V.number, uy: V.number, uz: V.number, r: V.number, h: V.number, n: V.int, phase: V.number, bed: V.number, ax: V.number, ay: V.number, az: V.number, zone: V.string }, out: V.geom }, ({ p }) => {
+  const c = [p.x ?? 0, p.y ?? 0, p.z ?? 0];
+  const nr = norm([p.nx ?? 0, p.ny ?? 1, p.nz ?? 0]);
+  const ref = p.ux !== undefined ? [p.ux, p.uy ?? 0, p.uz ?? 0] : (Math.abs(nr[1]) > 0.9 ? [1, 0, 0] : [0, 1, 0]);
+  const u = norm(sub3(ref, mul3(nr, dot3(ref, nr)))), v = norm(cross3(nr, u));
+  const n = Math.max(3, Math.round(p.n ?? 4)), r = p.r ?? 0.01, h = p.h ?? 0.01;
+  const base = add3(c, mul3(nr, p.bed ?? 0));
+  const apex = add3(add3(c, mul3(nr, h)), [p.ax ?? 0, p.ay ?? 0, p.az ?? 0]);
+  const ring = [];
+  for (let i = 0; i < n; i++) {
+    const a = (p.phase ?? 0) + (i / n) * TAU;
+    ring.push(add3(base, add3(mul3(u, Math.cos(a) * r), mul3(v, Math.sin(a) * r))));
+  }
+  const out = [];
+  for (let i = 0; i < n; i++) tri(out, apex, ring[i], ring[(i + 1) % n]);
+  return geom(part(out, p.zone ?? 'a'));
+});
+
+// Quilted rectangular pad: rounded plan, raised/rear faces, a tufted grid and
+// optional buttons. The chair back and other upholstered panels use the same
+// reference construction, so the graph stays a pad rather than a face list.
+node('quiltedPad', { in: { x: V.number, y: V.number, z: V.number, width: V.number, height: V.number, radius: V.number, inset: V.number, side: V.number, front: V.number, fi: V.number, recline: V.number, gap: V.number, z0: V.number, puff: V.number, pit: V.number, sad: V.number, bevel: V.number, btnA: V.number, btnH: V.number, colOut: V.number, rowMid: V.number, rowMin: V.number, rows: V.any, cols: V.any, buttons: V.bool, zone: V.string }, out: V.geom }, ({ p }) => {
+  const x0 = p.x ?? 0, y0 = p.y ?? 0, z0 = p.z ?? 0;
+  const W = p.width ?? 0.36, PH = p.height ?? 0.31, RC = p.radius ?? 0.03, RI = p.inset ?? 0.012;
+  const WS = p.side ?? 0.05, WF = p.front ?? 0.07, FI = p.fi ?? 0.022, REC = p.recline ?? 7 * Math.PI / 180;
+  const GAP = p.gap ?? 0.035, Z0 = p.z0 ?? -(0.228 + 0.035), PUFF = p.puff ?? 0.005, PIT = p.pit ?? 0.012, SAD = p.sad ?? 0.002;
+  const BEV = p.bevel ?? 0.007, BTA = p.btnA ?? 0.0105, BTH = p.btnH ?? 0.02, CO = p.colOut ?? 0.25, RM = p.rowMid ?? 0.106, RMIN = p.rowMin ?? 0.065;
+  const c = Math.cos(REC), s = Math.sin(REC);
+  const padPoint = (u, v, w) => [x0 + u, y0 + GAP + v * c + w * s, z0 + Z0 - v * s + w * c];
+  const padDir = (du, dv, dw) => [du, dv * c + dw * s, -dv * s + dw * c];
+  const fh = PH - 2 * FI, nMid = Math.max(0, Math.floor((fh - 2 * RMIN) / RM + 1e-9)), outer = (fh - nMid * RM) / 2;
+  const rowsV = p.rows ?? (() => { const r = [FI, FI + outer]; for (let i = 0; i < nMid; i++) r.push(r[r.length - 1] + RM); r.push(PH - FI); return r; })();
+  const fw = W - 2 * FI;
+  const colsU = p.cols ?? [-fw / 2, -fw / 2 + CO * fw, fw / 2 - CO * fw, fw / 2];
+  const hw = W / 2, nR = rowsV.length - 1;
+  const fb = [], vIn = rowsV.slice(1, -1), uL = colsU[0], uR = colsU[3], vB = rowsV[0], vT = rowsV[nR];
+  fb.push({ u: uL, v: vB, corner: [-1, -1] }, { u: colsU[1], v: vB, edge: 'b' }, { u: colsU[2], v: vB, edge: 'b' }, { u: uR, v: vB, corner: [1, -1] });
+  for (const v of vIn) fb.push({ u: uR, v, edge: 'r' });
+  fb.push({ u: uR, v: vT, corner: [1, 1] }, { u: colsU[2], v: vT, edge: 't' }, { u: colsU[1], v: vT, edge: 't' }, { u: uL, v: vT, corner: [-1, 1] });
+  for (const v of vIn.slice().reverse()) fb.push({ u: uL, v, edge: 'l' });
+  const ring = (ins) => {
+    const pts = [], rc = RC - ins;
+    fb.forEach((f, i) => {
+      if (f.corner) {
+        const [sx, sy] = f.corner, cu = sx * (hw - RC), cv = sy < 0 ? RC : PH - RC, a0 = sx < 0 ? (sy < 0 ? 180 : 90) : (sy < 0 ? 270 : 0);
+        for (let k = 0; k < 3; k++) { const a = (a0 + 45 * k) * Math.PI / 180; pts.push({ u: cu + rc * Math.cos(a), v: cv + rc * Math.sin(a), f: i }); }
+      } else if (f.edge === 'b') pts.push({ u: f.u, v: ins, f: i });
+      else if (f.edge === 't') pts.push({ u: f.u, v: PH - ins, f: i });
+      else if (f.edge === 'r') pts.push({ u: hw - ins, v: f.v, f: i });
+      else pts.push({ u: -hw + ins, v: f.v, f: i });
+    });
+    return pts;
+  };
+  const rear = ring(RI), full = ring(0), N = full.length, out = [];
+  const triH = (a, b, c2, hint) => { const n = cross3(sub3(b, a), sub3(c2, a)); if (dot3(n, hint) >= 0) tri(out, a, b, c2); else tri(out, a, c2, b); };
+  const quadH = (a, b, c2, d, hint) => { if (len3(sub3(a, c2)) <= len3(sub3(b, d)) + 1e-9) { triH(a, b, c2, hint); triH(a, c2, d, hint); } else { triH(a, b, d, hint); triH(b, c2, d, hint); } };
+  const out2 = (a, b) => { const du = b.u - a.u, dv = b.v - a.v, l = Math.hypot(du, dv) || 1; return padDir(dv / l, -du / l, 0); };
+  for (let i = 0; i < N; i++) {
+    const j = (i + 1) % N, hint = add3(out2(full[i], full[j]), padDir(0, 0, -1), 0.2);
+    quadH(padPoint(rear[i].u, rear[i].v, 0), padPoint(rear[j].u, rear[j].v, 0), padPoint(full[j].u, full[j].v, WS), padPoint(full[i].u, full[i].v, WS), hint);
+  }
+  const rc0 = padPoint(0, PH / 2, 0), BACK = padDir(0, 0, -1);
+  for (let i = 0; i < N; i++) { const j = (i + 1) % N; triH(rc0, padPoint(rear[i].u, rear[i].v, 0), padPoint(rear[j].u, rear[j].v, 0), BACK); }
+  const F = (i) => padPoint(fb[i].u, fb[i].v, WF), FWD = padDir(0, 0, 1);
+  for (let i = 0; i < N; i++) {
+    const j = (i + 1) % N, hint = add3(out2(full[i], full[j]), FWD, 1), a = padPoint(full[i].u, full[i].v, WS), b = padPoint(full[j].u, full[j].v, WS);
+    if (full[i].f === full[j].f) triH(a, b, F(full[i].f), hint); else quadH(a, b, F(full[j].f), F(full[i].f), hint);
+  }
+  const border = (i, j) => i === 0 || i === 3 || j === 0 || j === nR;
+  const nodeAt = (i, j) => padPoint(colsU[i], rowsV[j], border(i, j) ? WF : WF - PIT);
+  for (let j = 0; j < nR; j++) for (let i = 0; i < 3; i++) {
+    const ij = [[i, j], [i + 1, j], [i + 1, j + 1], [i, j + 1]], o = ij.map(([a, b]) => nodeAt(a, b));
+    const u0 = colsU[i] + BEV, u1 = colsU[i + 1] - BEV, v0 = rowsV[j] + BEV, v1 = rowsV[j + 1] - BEV;
+    const pn = [padPoint(u0, v0, WF + PUFF), padPoint(u1, v0, WF + PUFF), padPoint(u1, v1, WF + PUFF), padPoint(u0, v1, WF + PUFF)];
+    quadH(pn[0], pn[1], pn[2], pn[3], FWD);
+    for (let k = 0; k < 4; k++) {
+      const m = (k + 1) % 4, [a0, b0] = ij[k], [a1, b1] = ij[m];
+      if (!border(a0, b0) || !border(a1, b1)) {
+        const sad = padPoint((colsU[a0] + colsU[a1]) / 2, (rowsV[b0] + rowsV[b1]) / 2, WF - SAD);
+        triH(o[k], sad, pn[k], FWD); triH(sad, pn[m], pn[k], FWD); triH(sad, o[m], pn[m], FWD);
+      } else quadH(o[k], o[m], pn[m], pn[k], FWD);
+    }
+  }
+  if (p.buttons !== false) {
+    const du = padDir(1, 0, 0), dv = padDir(0, 1, 0);
+    for (let j = 1; j < nR; j++) for (const i of [1, 2]) {
+      const ctr = nodeAt(i, j), q = [[1, 1], [-1, 1], [-1, -1], [1, -1]].map(([a, b]) => add3(add3(ctr, mul3(du, a * BTA)), mul3(dv, b * BTA))), apex = add3(ctr, mul3(FWD, BTH));
+      for (let k = 0; k < 4; k++) triH(apex, q[k], q[(k + 1) % 4], FWD);
+    }
+  }
   return geom(part(out, p.zone ?? 'a'));
 });
 
@@ -982,11 +1196,11 @@ node('solidify', { in: { grid: V.any, topZone: V.any, botZone: V.any, wallZone: 
 });
 
 // ---------------------------------------------------------------- nodes: modifiers
-node('transform', { in: { geom: V.any, tx: V.number, ty: V.number, tz: V.number, rx: V.number, ry: V.number, rz: V.number, s: V.any }, out: V.geom }, ({ p }) => {
+node('transform', { in: { geom: V.any, tx: V.number, ty: V.number, tz: V.number, rx: V.number, ry: V.number, rz: V.number, s: V.any, order: V.string }, out: V.geom }, ({ p }) => {
   const g = toGeometry(p.geom), m = new THREE.Matrix4();
   m.compose(
     new THREE.Vector3(p.tx ?? 0, p.ty ?? 0, p.tz ?? 0),
-    new THREE.Quaternion().setFromEuler(new THREE.Euler(p.rx ?? 0, p.ry ?? 0, p.rz ?? 0, 'XYZ')),
+    new THREE.Quaternion().setFromEuler(new THREE.Euler(p.rx ?? 0, p.ry ?? 0, p.rz ?? 0, p.order ?? 'XYZ')),
     Array.isArray(p.s) ? new THREE.Vector3(p.s[0] ?? 1, p.s[1] ?? 1, p.s[2] ?? 1)
       : new THREE.Vector3(p.s ?? 1, p.s ?? 1, p.s ?? 1),
   );
@@ -1706,6 +1920,31 @@ node('ribbon', { in: { path: V.path, width: V.number, fold: V.number, zone: V.st
     quad(out, A[0], A[1], B[1], B[0]); quad(out, A[1], A[2], B[2], B[1]);
     quad(out, A[0], B[0], B[1], A[1]); quad(out, A[1], B[1], B[2], A[2]);
   }
+  return geom(part(out, p.zone ?? 'a'));
+});
+
+// Band swept along a 2D path: outer and inner offsets at two Z heights. This
+// is the generic rib/frame band used by boat ribs and similar bent members.
+node('bandPath', { in: { path: V.any, out: V.number, into: V.any, z0: V.number, z1: V.number, zone: V.string }, out: V.geom }, ({ p }) => {
+  const path = p.path ?? [], outW = p.out ?? 0.02, intoIn = p.into ?? outW, z0 = p.z0 ?? 0, z1 = p.z1 ?? 0.02;
+  const into = (i) => (Array.isArray(intoIn) ? intoIn[i] : intoIn);
+  const n = path.length, nrm = [];
+  for (let i = 0; i < n; i++) {
+    let nx = 0, ny = 0;
+    if (i > 0) { const dx = path[i][0] - path[i - 1][0], dy = path[i][1] - path[i - 1][1], m = Math.hypot(dx, dy) || 1; nx += dy / m; ny += -dx / m; }
+    if (i < n - 1) { const dx = path[i + 1][0] - path[i][0], dy = path[i + 1][1] - path[i][1], m = Math.hypot(dx, dy) || 1; nx += dy / m; ny += -dx / m; }
+    const m = Math.hypot(nx, ny) || 1; nrm.push([nx / m, ny / m]);
+  }
+  const A = path.map((q, i) => [q[0] + nrm[i][0] * outW, q[1] + nrm[i][1] * outW]);
+  const B = path.map((q, i) => [q[0] - nrm[i][0] * into(i), q[1] - nrm[i][1] * into(i)]);
+  const at3 = (q, z) => [q[0], q[1], z], out = [];
+  for (let i = 0; i < n - 1; i++) {
+    quad(out, at3(A[i], z0), at3(B[i], z0), at3(B[i + 1], z0), at3(A[i + 1], z0));
+    quad(out, at3(A[i], z1), at3(A[i + 1], z1), at3(B[i + 1], z1), at3(B[i], z1));
+    quad(out, at3(B[i], z0), at3(B[i], z1), at3(B[i + 1], z1), at3(B[i + 1], z0));
+  }
+  quad(out, at3(A[0], z0), at3(A[0], z1), at3(B[0], z1), at3(B[0], z0));
+  quad(out, at3(A[n - 1], z0), at3(B[n - 1], z0), at3(B[n - 1], z1), at3(A[n - 1], z1));
   return geom(part(out, p.zone ?? 'a'));
 });
 

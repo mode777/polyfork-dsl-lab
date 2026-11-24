@@ -1,6 +1,7 @@
 // Cafe table set — faceted table top/column/foot, three chairs with square
 // seats, apron/back boards, and two mugs. The lathes use revolve; boxes use
-// block; the chair back is a prism. Default term is the reference 0.6.
+// block; the chair back is a prism and the mug handles are `beam` boxes.
+// Default term is the reference 0.6.
 import { graph } from '../dsl.mjs';
 import { at, TAU, clamp } from './_kit.mjs';
 
@@ -27,13 +28,6 @@ const ngon = (n, rin) => {
 const octSquare = (h, c) => [[h - c, h], [h, h - c], [h, c - h], [h - c, -h], [c - h, -h], [-h, c - h], [-h, h - c], [c - h, h]];
 const at3 = (plan, y) => plan.map((p) => [p[0], y, p[1]]);
 
-function skipFaces(skip) {
-  const map = { x: 'px', y: 'py', z: 'pz' };
-  return String(skip).split(/\s+/).filter(Boolean).map((s) => {
-    const axis = s[0], sign = s[1];
-    return map[axis] + (sign === '+' ? '' : '');
-  }).join(' ');
-}
 function box(g, zone, x0, x1, y0, y1, z0, z1, skip = '') {
   const sk = [];
   for (const s of String(skip).split(/\s+/).filter(Boolean)) {
@@ -45,19 +39,14 @@ function box(g, zone, x0, x1, y0, y1, z0, z1, skip = '') {
 }
 
 function extrudeX(g, zone, prof, x0, x1) {
-  const out = [], n = prof.length;
-  const cy = prof.reduce((s, q) => s + q[1], 0) / n, cz = prof.reduce((s, q) => s + q[0], 0) / n;
-  for (let i = 0; i < n; i++) {
-    const a = prof[i], b = prof[(i + 1) % n];
-    out.push(g.poly({ pts: [[x0, a[1], a[0]], [x0, b[1], b[0]], [x1, b[1], b[0]], [x1, a[1], a[0]]], hint: [0, (a[1] + b[1]) / 2 - cy, (a[0] + b[0]) / 2 - cz], zone }));
-  }
-  for (const [x, d] of [[x0, -1], [x1, 1]]) {
-    for (let i = 1; i + 1 < n; i++) out.push(g.poly({ pts: [[x, prof[0][1], prof[0][0]], [x, prof[i][1], prof[i][0]], [x, prof[i + 1][1], prof[i + 1][0]]], hint: [d, 0, 0], zone }));
-  }
-  return out;
+  const A = prof.map(([z, y]) => [x0, y, z]), B = prof.map(([z, y]) => [x1, y, z]);
+  return [
+    g.loft({ rings: [A, B], zones: { band: zone } }),
+    g.poly({ pts: A, hint: [-1, 0, 0], zone }),
+    g.poly({ pts: B, hint: [1, 0, 0], zone }),
+  ];
 }
-
-function lathe(g, zone, rings, cx, cz, capBottom, capTop, seg) {
+function lathe(g, zone, rings, cx, cz, capBottom, capTop) {
   const prof = rings.map(([plan, y]) => plan.map((p) => [p[0] + cx, y, p[1] + cz]));
   const out = [g.loft({ rings: prof, zones: { band: zone } })];
   // The reference lathe fan uses ring[0] as the centre and stops one edge
@@ -80,9 +69,9 @@ export default function build(g, params = {}) {
   const chairs = Math.round(P.chairs), term = P.term, shape = P.topShape;
   const S = [], T = [];
   const topPlan = shape === 'square' ? (d) => octSquare(SQ_HALF - d, SQ_CORNER - d * (2 - Math.SQRT2)) : (d) => ngon(12, TOP_IN - d);
-  S.push(lathe(g, 'timber', [[topPlan(0), TOP_Y - TOP_T], [topPlan(0), TOP_Y - TOP_CH], [topPlan(TOP_CH), TOP_Y]], 0, 0, true, true, 12));
+  S.push(lathe(g, 'timber', [[topPlan(0), TOP_Y - TOP_T], [topPlan(0), TOP_Y - TOP_CH], [topPlan(TOP_CH), TOP_Y]], 0, 0, true, true));
   S.push(g.revolve({ profile: [[COL_R0, COL_Y0], [COL_R1, COL_Y1]], seg: 8, inRadius: true, zone: 'base' }));
-  S.push(lathe(g, 'base', [[ngon(12, FOOT_IN), 0], [ngon(12, FOOT_IN), FOOT_BAND], [ngon(12, FOOT_IN - FOOT_CH), FOOT_H]], 0, 0, true, true, 12));
+  S.push(lathe(g, 'base', [[ngon(12, FOOT_IN), 0], [ngon(12, FOOT_IN), FOOT_BAND], [ngon(12, FOOT_IN - FOOT_CH), FOOT_H]], 0, 0, true, true));
 
   const chair = () => {
     const out = [];
@@ -93,7 +82,7 @@ export default function build(g, params = {}) {
       out.push(box(g, 'frame', xa, xb, 0, BACK_Y0 + 0.02, -zo, -zi, 'y+'));
     }
     const sq = (d) => [[-hx + d, -hz + d], [hx - d, -hz + d], [hx - d, hz - d], [-hx + d, hz - d]];
-    out.push(lathe(g, 'timber', [[sq(0), yb], [sq(0), SEAT_Y - SEAT_CH], [sq(SEAT_CH), SEAT_Y]], 0, 0, true, true, 4));
+    out.push(lathe(g, 'timber', [[sq(0), yb], [sq(0), SEAT_Y - SEAT_CH], [sq(SEAT_CH), SEAT_Y]], 0, 0, true, true));
     const r0 = yb - RAIL_H, r1 = yb + 0.005, ro = zo - RAIL_SET, ri = ro - RAIL_T, rx = xi + 0.005;
     out.push(box(g, 'frame', -rx, rx, r0, r1, ri, ro, 'y+ x+ x-'));
     out.push(box(g, 'frame', -rx, rx, r0, r1, -ro, -ri, 'y+ x+ x-'));
@@ -141,22 +130,16 @@ export default function build(g, params = {}) {
       const y1 = TOP_Y + CUP_H, outer = ring(CUP_R1), inner = ring(CUP_R1 - CUP_RIM);
       const lo = ring(CUP_R0).map((p) => [p[0], TOP_Y - 0.002, p[1]]), hi = outer.map((p) => [p[0], y1, p[1]]);
       T.push(g.loft({ rings: [lo, hi], zones: { band: 'cups' } }));
-      for (let i = 0; i < 6; i++) {
-        const j = (i + 1) % 6;
-        T.push(g.poly({ pts: [[outer[i][0], y1, outer[i][1]], [outer[j][0], y1, outer[j][1]], [inner[j][0], y1, inner[j][1]], [inner[i][0], y1, inner[i][1]]], hint: [0, 1, 0], zone: 'cups' }));
-      }
+      T.push(g.loft({ rings: [outer.map((p) => [p[0], y1, p[1]]), inner.map((p) => [p[0], y1, p[1]])], zones: { band: 'cups' } }));
       T.push(g.poly({ pts: inner.map((p) => [p[0], y1, p[1]]), hint: [0, 1, 0], zone: 'coffee' }));
       const hr0 = CUP_R0 - 0.002, hr1 = CUP_R1 + 0.018;
       const hc = [cx + h[0] * (hr0 + hr1) / 2, TOP_Y + 0.044, cz + h[1] * (hr0 + hr1) / 2];
-      const ax = [[h[0], 0, h[1]], [0, 1, 0], [w[0], 0, w[1]]], half = [(hr1 - hr0) / 2, 0.024, 0.006];
-      const P3 = (a, b, c) => [hc[0] + ax[0][0] * a * half[0] + ax[1][0] * b * half[1] + ax[2][0] * c * half[2], hc[1] + ax[0][1] * a * half[0] + ax[1][1] * b * half[1] + ax[2][1] * c * half[2], hc[2] + ax[0][2] * a * half[0] + ax[1][2] * b * half[1] + ax[2][2] * c * half[2]];
-      const q = (a,b,c,d,hint) => T.push(g.poly({ pts: [P3(...a), P3(...b), P3(...c), P3(...d)], hint, zone: 'cups' }));
-      const nw = [-w[0], 0, -w[1]], pw = [w[0], 0, w[1]], ph = [h[0], 0, h[1]];
-      q([-1,-1,-1],[1,-1,-1],[1,1,-1],[-1,1,-1], nw);
-      q([-1,-1,1],[1,-1,1],[1,1,1],[-1,1,1], pw);
-      q([1,-1,-1],[1,-1,1],[1,1,1],[1,1,-1], ph);
-      q([-1,-1,-1],[1,-1,-1],[1,-1,1],[-1,-1,1], [0,-1,0]);
-      q([-1,1,-1],[1,1,-1],[1,1,1],[-1,1,1], [0,1,0]);
+      const hl = (hr1 - hr0) / 2;
+      T.push(g.beam({
+        a: [hc[0] - h[0] * hl, hc[1], hc[2] - h[1] * hl],
+        b: [hc[0] + h[0] * hl, hc[1], hc[2] + h[1] * hl],
+        t: 0.012, d: 0.048, up: [0, 1, 0], skip: 'nx', zone: 'cups',
+      }));
     });
   }
 

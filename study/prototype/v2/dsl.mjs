@@ -48,6 +48,7 @@ class Builder {
 
   // surfaces
   loft(o) { return this.add('loft', { rings: o.rings, capTop: o.capTop, capBottom: o.capBottom }, strip({ ...o, zoneField: o.zoneField !== undefined ? F(o.zoneField) : undefined }, ['rings', 'capTop', 'capBottom'])); }
+  bridge(o = {}) { return this.add('bridge', { a: o.a, b: o.b }, strip({ ...o, zoneField: o.zoneField !== undefined ? F(o.zoneField) : undefined }, ['a', 'b'])); }
   extrude(o) { return this.add('extrude', { profile: o.profile }, { depth: o.depth, z0: o.z0, cap: o.cap }); }
   prism(o) { return this.add('prism', { profile: o.profile }, strip(o, ['profile'])); }
   frame(o) { return this.add('frame', { profile: o.profile }, strip(o, ['profile'])); }
@@ -57,6 +58,12 @@ class Builder {
   band(o = {}) { return this.add('band', { lower: o.lower, upper: o.upper }, strip(o, ['lower', 'upper'])); }
   gem(o = {}) { return this.add('gem', {}, o); }
   pill(o = {}) { return this.add('pill', {}, o); }
+  beam(o = {}) { return this.add('beam', { a: o.a, b: o.b }, strip(o, ['a', 'b'])); }
+  frustum(o = {}) { return this.add('frustum', { a: o.a, b: o.b }, strip(o, ['a', 'b'])); }
+  opening(o = {}) { return this.add('opening', { outer: o.outer, inner: o.inner }, strip(o, ['outer', 'inner'])); }
+  stud(o = {}) { return this.add('stud', {}, o); }
+  quiltedPad(o = {}) { return this.add('quiltedPad', {}, o); }
+  bandPath(o = {}) { return this.add('bandPath', { path: o.path }, strip(o, ['path'])); }
   poly(o = {}) { return this.add('poly', { pts: o.pts }, strip(o, ['pts'])); }
   faces(o = {}) { return this.add('faces', { faces: o.faces }, strip(o, ['faces'])); }
   pack(o = {}) { return this.add('pack', { items: o.items }, strip(o, ['items'])); }

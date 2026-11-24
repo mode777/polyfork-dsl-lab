@@ -33,7 +33,7 @@ browser viewer. Public repo, published with GitHub Pages.
 index.html            split code/result viewer
 viewer.js             viewer: scene, examples, params, live cook
 style.css
-runtime/runtime.js    104-node typed graph runtime + evaluator, Three bridge
+runtime/runtime.js    111-node typed graph runtime + evaluator, Three bridge
 runtime/parts.js      graph wrappers for the ported part builders
 runtime/builders.js   pure geometry builders used by those part nodes
 runtime/expr.js       parsed expression language (no eval)
@@ -98,7 +98,7 @@ The viewer `frame()` uses `current.cam` = `[azimuthDeg, elevationDeg]` and
 
 ## Current status (24 Nov 2026)
 
-- 104 node types; **29 published examples, all geometric ports, zero script nodes**.
+- 111 node types; **29 published examples, all geometric ports, zero script nodes**.
 - The ten face-soup ports are dedicated part nodes backed by `builders.mjs`; their `.pfn`
   files are ~0.7-1.3 KB and expose geometry options as graph inputs. The next ten ports
   are built only from generic nodes, not per-asset runtime types.
@@ -124,11 +124,15 @@ The viewer `frame()` uses `current.cam` = `[azimuthDeg, elevationDeg]` and
 - The overhead wayfinding sign adds `pack`, `outlineRect` and `band`; `plate` gained
   cap/wall selection, `chamferBox` face skipping, `prism` cap orientation and `mixColor`
   expression support. The office desk reuses the new outline/band primitives.
-- The ten new ports are generic-node graphs: `loft` gained `zoneField`, `abba`
-  diagonal, raw/flipped caps and degenerate-triangle skipping; `pill` is a reusable
-  rounded UI row; `poly` now skips degenerate triangles. No per-asset node was added.
-  `faces` remains the low-level escape hatch. `doorLeaf` keeps its glass in a separate
-  material slot, and its hinge knuckles are baked through the reference's lived-in shear.
+- The ten generic-node ports use reusable primitives rather than face dumps: `beam`
+  (oriented strut), `frustum` (tapered box), `opening` (recessed window/door), `stud`
+  (nail/button), `quiltedPad` (tufted panel), `bandPath` (bent rib), `bridge` (stitched
+  profile transition) and `pill` (rounded UI row). `loft` gained `zoneField`, `skipEdges`,
+  `abba`/`short` diagonals, raw/flipped caps and degenerate-triangle skipping; `poly`
+  now skips degenerate triangles and flat loft caps keep their raw winding. No per-asset
+  node was added. `faces` remains the low-level escape hatch. `doorLeaf`
+  keeps its glass in a separate material slot, and its hinge knuckles are baked through
+  the reference's lived-in shear.
 - The previous approximations/studies were removed from the published manifest while
   they are replaced with real ports. The gallery is stale.
 - `t-all.mjs` is count-independent and winding-aware; counts alone are not parity.
@@ -153,6 +157,7 @@ node t-examples.mjs        # parses/cooks every published pfn
 node t-all.mjs             # order-independent vertex/bbox/winding parity
 node t-ports10.mjs         # first ten ports: parity + variants + colourways
 node t-ports10b.mjs        # ten generic-node ports: parity + variants
+node t-poly-budget.mjs     # reject face-dump-sized poly counts
 node t-cookie.mjs          # cookie default / 3-chip / 14-chip
 node t-tire.mjs             # 8 tire variants
 node t-sapphire.mjs        # 13 sapphire param variants
