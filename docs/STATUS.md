@@ -47,6 +47,8 @@ Verified with `t-all.mjs` (order-independent triangle/vertex/bbox comparison at 
 
 - All 12 graphs parse and cook (`t-examples.mjs`).
 - `cookie`, `sapphire`, `tire` and the six `module` wrappers pass `t-all.mjs`.
+  Cookie is parametric; sapphire/tire are verified at default and still bake some
+  profile/station arrays, so their non-default sliders are not yet live.
 - Manifold booleans, group/repeat, skinning, surface scatter, text and clipping are
   exercised by tests in the study workspace.
 - Public runtime/examples cook under the `.js` import layout.
@@ -64,7 +66,7 @@ Comparing the published viewer against Polyfork `hero.png` conflates **geometry*
 **camera**, **lighting**, **background** and **tone mapping**. For parity work:
 
 1. Compare the reference `.mjs` module and the `.pfn` graph order-independently:
-   triangle set, vertex set and bbox (`t-all.mjs`), not just counts.
+   vertex set and bbox (`t-all.mjs`), not just triangle counts.
 2. For visual checks, use the same renderer, camera, lighting and background.
 3. Keep the reference modules outside this repo; never commit them.
 
@@ -72,7 +74,9 @@ Comparing the published viewer against Polyfork `hero.png` conflates **geometry*
 
 1. Port the remaining public props (rock, armchair, clam, basket) with the new low-level
    ops, then decide whether to replace the four studies with actual ports.
-2. Regenerate the gallery after the next geometry pass.
+2. Make sapphire/tire fully parametric (their generated `.pfn` currently bakes some
+   profile/station arrays at default).
+3. Regenerate the gallery after the next geometry pass.
 3. Keep exact ports labelled as such; do not mix “original study” and “port” in the same
    claim.
 
