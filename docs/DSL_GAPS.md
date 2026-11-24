@@ -102,9 +102,9 @@ groups can return records without a special accessor node.
 
 ## 7. `script` today
 
-`script` still exists as an optional host escape hatch for Three/addons geometry. It is
-not used by any published example, and a strict backend can reject it. The core graph
-evaluation path has no dependency on it.
+`script` still exists as an optional host escape hatch for Three/addons geometry, but it is
+**disabled by default**: `evaluate()` throws unless the host passes `{ allowScript: true }`.
+No published example uses it, so the default runtime cannot execute JavaScript at all.
 
 ## 8. Acceptance (met)
 

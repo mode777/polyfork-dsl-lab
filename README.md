@@ -75,7 +75,8 @@ end
 - `group … end` — subgraph · `repeat count= graph=` — repeated subgraph
 - `map` / `fold` over a list with a `group` as the function; `value` builds derived
   values from parsed expressions
-- `script` and `module` — explicit escape hatches (marked, never implicit)
+- `script` and `module` — explicit host escape hatches; `script` is disabled unless the
+  host opts in, and no example uses it
 - `geometry`/`mesh` also accept a `THREE.BufferGeometry`, `Mesh` or `Group`; a `script`
   can return one and the rest of the graph can join/transform it.
 - `random` exposes a deterministic consumable stream; `scatter` can consume it via `rng`.

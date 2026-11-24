@@ -15,7 +15,7 @@ const obj = g1.script({
   `,
 });
 g1.out('mesh', g1.mesh(obj));
-console.log('code object', stats(evaluate(g1.ir).outputs.mesh));
+console.log('code object', stats(evaluate(g1.ir, {}, { allowScript: true }).outputs.mesh));
 
 // A code node can return a BufferGeometry; geometry/mesh bridge it into the
 // graph's zone/colour path.
@@ -29,7 +29,7 @@ const buf = g2.script({
   `,
 });
 g2.out('mesh', g2.mesh(g2.geometry({ object: buf, zone: 'metal' }), { zones: { metal: '#c2c7cd' } }));
-console.log('code buffer', stats(evaluate(g2.ir).outputs.mesh));
+console.log('code buffer', stats(evaluate(g2.ir, {}, { allowScript: true }).outputs.mesh));
 
 // A random stream is consumable and deterministic.
 const g3 = graph('random-stream');

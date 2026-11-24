@@ -127,6 +127,7 @@ function coerce(v) { return v; }
 
 export function evaluate(graph, values = {}, opts = {}) {
   const memo = new Map();
+  const allowScript = opts.allowScript === true;
   const root = opts.root ?? graph;
   const params = { ...Object.fromEntries(graph.inputs.map((i) => [i.name, i.default])), ...values };
   const paramValue = (v) => {
@@ -166,7 +167,7 @@ export function evaluate(graph, values = {}, opts = {}) {
       if (!def) throw new Error(`unknown node type ${n.type}`);
       const inp = {};
       for (const [k, val] of Object.entries(n.in)) inp[k] = paramValue(resolve(val, ctx));
-      const out = def.fn({ inputs: inp, p: { ...inp, ...evalNodeParams(n.p) }, graph: root, params, evaluate, resolve, ctx: { ...ctx, params } });
+      const out = def.fn({ inputs: inp, p: { ...inp, ...evalNodeParams(n.p) }, graph: root, params, evaluate, resolve, ctx: { ...ctx, params, allowScript } });
       memo.set(key, out);
       return out;
     }
@@ -1511,7 +1512,8 @@ const SCRIPT_HELPERS = {
   lerp: (a, b, t) => a + (b - a) * t,
   TAU,
 };
-node('script', { in: { inputs: V.any }, out: V.any }, ({ p, inputs }) => {
+node('script', { in: { inputs: V.any }, out: V.any }, ({ p, inputs, ctx }) => {
+  if (!ctx?.allowScript) throw new Error('script: disabled by host (pass { allowScript: true } to evaluate)');
   const fn = new Function('inputs', 'p', 'THREE', 'ADDONS', 'H', `
     "use strict";
     ${p.src}

@@ -166,5 +166,5 @@ gh api repos/mode777/polyfork-dsl-lab/pages/builds/latest --jq '.status,.commit'
 - `mesh` zones must match part zone names; a mismatch silently uses fallback colours.
 - GitHub Pages caches assets; bump `?v=` after viewer/style/runtime changes. The public
   runtime files must import each other with `.js`, unlike the study `.mjs` sources.
-  `sync-public.mjs` uses `PUBLIC_ASSET_VERSION` (default `6`); keep it in step with
+  `sync-public.mjs` uses `PUBLIC_ASSET_VERSION` (default `7`); keep it in step with
   `index.html` and `viewer.js`.
