@@ -4,7 +4,7 @@
 three.js-native node graph, the gaps those ports exposed, the nodes added to close them,
 and a compact declarative storage format.
 
-**Code:** `runtime.js` (65 node types), `expr.js`, `dsl.js`, `format.js`, `cache.js`,
+**Code:** `runtime.js` (83 node types), `expr.js`, `dsl.js`, `format.js`, `cache.js`,
 `ports/` (20 ports), `templates.mjs` (20 more). See `SAMPLE3.md` for the third sample. Run `node t-all.mjs` for the order-independent geometric parity table.
 
 ---
@@ -25,13 +25,13 @@ and a compact declarative storage format.
 | `random` | `{ values, next }` deterministic LCG stream |
 | `object` | a `THREE.Object3D` output |
 
-### Nodes (65)
+### Nodes (83)
 
 | group | nodes |
 |---|---|
-| sources | `ring`, `profile`, `path`, `grid`, `box`, `cylinder`, `sphere`, `geometry`, `prim`, `random`, `value`, `list`, `range` |
+| sources | `ring`, `profile`, `path`, `grid`, `box`, `cylinder`, `sphere`, `geometry`, `prim`, `random`, `value`, `let`, `list`, `range`, `table`, `preset`, `coalesce`, `draws`, `jitter` |
 | surfaces | `loft`, `cap`, `extrude`, `revolve`, `sweep`, `inset`, `pocket`, `solidify` |
-| modifiers | `transform`, `center`, `mirror`, `reverse`, `deform`, `clip`, `join` |
+| modifiers | `transform`, `center`, `mirror`, `reverse`, `deform`, `clip`, `join`, `centroid`, `lerpPoint`, `mirrorPoint`, `rotateAbout`, `planeCut`, `gridPoint`, `direction`, `lookup`, `first`, `last`, `slice`, `concat` |
 | distribution | `scatter`, `instance`, `arrayPolar`, `arrayLinear` |
 | control | `switch`, `fan`, `cone`, `if`, `map`, `fold` |
 | output | `mesh`, `group` |

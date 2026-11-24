@@ -1,6 +1,6 @@
-// Area rug — exact geometric port as a pure node graph: a random value grid,
-// a position expression, a diagonal straighten, a fold threaded through a
-// repeat group, then solidify with per-cell zones.
+// Area rug — exact geometric port. Named dimensions (`let`), a random value
+// stream, a position expression, a diagonal straighten, a fold threaded through
+// a group with gridPoint/direction, and solidify with per-cell zones.
 import { graph, expr, field } from '../dsl.mjs';
 
 const PALETTE = {
@@ -10,7 +10,7 @@ const PALETTE = {
   'slate-teal': { field: '#F0F2F1', border: '#3E7C86', motif: '#B4AAA0', backing: '#8C837A' },
 };
 
-const P = JSON.stringify(PALETTE);
+const at = (r, k) => ({ __ref: `${r.__ref}.${k}` });
 
 export default function build(g) {
   const colorway = g.input('colorway', 'enum', 'linen-sage', { options: Object.keys(PALETTE), label: 'Colorway' });
@@ -23,13 +23,20 @@ export default function build(g) {
   const pile = g.input('pile', 'float', 0.25, { min: 0, max: 1, step: 0.05, label: 'Pile' });
   const livedIn = g.input('lived_in', 'float', 0.35, { min: 0, max: 1, step: 0.05, label: 'Lived in' });
 
-  const NX = g.value({ expr: "s.size === 'large' ? 15 : 10" });
-  const NZ = g.value({ expr: "s.size === 'large' ? 10 : 8" });
-  const W = g.value({ expr: "s.size === 'large' ? 3 : 2" });
-  const D = g.value({ expr: "s.size === 'large' ? 2 : 1.5" });
-  const count = g.value({ args: { NX, NZ }, expr: '(NX + 1) * (NZ + 1)' });
-  const rng = g.random({ seed: 7681, count });
-  const wob = { __ref: `${rng.__ref}.values` };
+  const dims = g.let({
+    in: { size },
+    binds: {
+      nx: "size === 'large' ? 15 : 10",
+      nz: "size === 'large' ? 10 : 8",
+      w: "size === 'large' ? 3 : 2",
+      d: "size === 'large' ? 2 : 1.5",
+      count: '(nx + 1) * (nz + 1)',
+    },
+  });
+  const NX = at(dims, 'nx'), NZ = at(dims, 'nz'), W = at(dims, 'w'), D = at(dims, 'd');
+
+  const rng = g.random({ seed: 7681, count: at(dims, 'count') });
+  const wob = at(rng, 'values');
 
   const grid = g.grid({
     nx: NX, nz: NZ, w: W, d: D,
@@ -66,10 +73,14 @@ export default function build(g) {
     const acc = h.input('acc', 'any', null);
     const NX = h.input('NX', 'any', null);
     const NZ = h.input('NZ', 'any', null);
-    const pivot = h.value({ expr: 'acc.top[NX - (4 - item)][NZ]' });
-    const axis = h.value({
-      expr: 'vnorm([acc.top[NX][NZ - 3][0] - acc.top[NX - 3][NZ][0], 0, acc.top[NX][NZ - 3][2] - acc.top[NX - 3][NZ][2]])',
+    const idx = h.let({
+      in: { item, NX, NZ },
+      binds: { pi: 'NX - (4 - item)', i0: 'NX - 3', j1: 'NZ - 3' },
     });
+    const pivot = h.gridPoint({ grid: acc, i: at(idx, 'pi'), j: NZ });
+    const p0 = h.gridPoint({ grid: acc, i: at(idx, 'i0'), j: NZ });
+    const p1 = h.gridPoint({ grid: acc, i: NX, j: at(idx, 'j1') });
+    const axis = h.direction({ a: p0, b: p1, flatten: 'y' });
     const phi = h.value({ expr: '-s.lived_in * (95 * PI / 180) * pow(item / 3, 1.5)' });
     const folded = h.deform({
       geom: acc,
@@ -79,8 +90,9 @@ export default function build(g) {
     h.out('out', folded);
   });
 
-  const foldSteps = g.range({ from: 1, to: 4 });
-  const folded = g.fold({ list: foldSteps, init: straightened, graph: 'rug-fold', NX, NZ });
+  const folded = g.fold({
+    list: g.range({ from: 1, to: 4 }), init: straightened, graph: 'rug-fold', NX, NZ,
+  });
 
   const slab = g.solidify({
     grid: folded,
@@ -92,8 +104,11 @@ export default function build(g) {
     diagonal: 'ref', wallOrder: 'ref',
   });
 
-  const color = (key) => expr(`s.${key} || (${P}[s.colorway] || ${P}['linen-sage']).${key}`);
+  const pal = g.preset({
+    choice: colorway, presets: PALETTE, fallback: 'linen-sage',
+    overrides: { field: fieldColor, border, motif, backing },
+  });
   return g.mesh(slab, {
-    zones: { field: color('field'), border: color('border'), motif: color('motif'), backing: color('backing') },
+    zones: { field: at(pal, 'field'), border: at(pal, 'border'), motif: at(pal, 'motif'), backing: at(pal, 'backing') },
   });
 }

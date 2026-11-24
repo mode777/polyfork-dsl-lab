@@ -56,49 +56,51 @@ Supported:
   exp log hypot sign clamp lerp smoothstep fract hash noise rand`
 - vector helpers: `centroid sum vnorm vrot darken`
 
-## 5. Generic data nodes
+## 5. Generic operations
 
-Six nodes cover the structure the code blocks provided:
+Structure is now expressed by named operations, not by a catch-all `value`:
 
-| node | purpose |
+| operation | purpose |
 |---|---|
-| `value` | evaluate an expression to a value; `args` binds refs into it |
-| `list` | list literal of refs/values |
-| `range` | integer range for iteration |
-| `map` | apply a `group` to each list item; group sees `item`/`index` |
-| `fold` | thread an accumulator through a list; group sees `item`/`index`/`acc` |
-| `if` | select one of two values |
-
-`@node.field` reads a named output from a multi-output node or group, so `map`/`fold`
-groups can return records without a special accessor node.
+| `let` | named derived values, one node, many outputs |
+| `table` | rows with named columns |
+| `preset` | colourway lookup plus per-key overrides |
+| `coalesce` | explicit override else preset |
+| `list` / `range` | list literals and index ranges |
+| `map` / `fold` | apply a `group` to items / thread an accumulator |
+| `if` | value-level select |
+| `draws` / `jitter` | named consecutive draws / point jitter from a stream |
+| `centroid`, `lerpPoint`, `mirrorPoint`, `rotateAbout`, `planeCut` | point/ring operations |
+| `gridPoint`, `direction` | grid access and normalised direction |
+| `first`, `last`, `slice`, `concat` | list access and assembly |
+| `value` | residual scalar/vector expression only |
 
 ## 6. How the ports are expressed now
 
-### Sapphire
+### Sapphire (47 nodes)
 
-- `random(20261103, 12 + 2*nStations)` provides the reference draw stream.
-- `map(range 6)` builds the jittered section; `bevelProfile` + `if` chooses bevel vs raw.
-- `map(range nStations)` builds jittered stations; nested `map` builds rings.
-- a second `random` seeded from `@rng.state` gives the tip jitter; `value` computes tips.
-- `switch` selects pointed/truncated/broken; `reverse` handles the dished fracture cap.
-- No code block, 50 nodes.
+- `let` derives `pl`, `irr`, `bar`, `ch`, station count and draw count.
+- `jitter` builds the section from base points + amplitudes + the stream.
+- `bevelProfile` + `if` chooses bevel vs raw.
+- `map` over `range n` builds stations with `draws`; nested `map` builds rings.
+- `centroid`/`value` build the tips; `switch` selects pointed/truncated/broken.
+- `planeCut`, `mirrorPoint`, `first`/`last`/`slice`/`concat` build the broken branch;
+  `reverse` handles the dished fracture cap.
 
-### Tire
+### Tire (17 nodes)
 
-- `value` holds the profile row table.
-- `map` builds the scaled profile and zone list.
-- `revolve.mod` is an expression reading `vals.rows[k]`; no generated field string.
-- No code block, 28 nodes.
+- `let` derives all dimensions once.
+- `table` holds the 15 profile rows with `r/z/block/parity/zone` columns.
+- `map` projects the profile and zone list; `revolve.mod` reads `vals.rows[k].block`.
+- `preset` resolves the colourway and applies explicit colour overrides.
 
-### Area rug
+### Area rug (9 nodes)
 
-- `random(7681, (NX+1)*(NZ+1))` provides the wobble values.
-- `grid.position` is one `let … in` expression using `vals.wob`.
-- `deform` straightens the ruck diagonal (top only).
-- `fold(range 1..3)` threads the grid through a group that computes pivot/axis/phi and
-  rotates the subset with `vrot`.
-- `solidify` uses a per-cell zone expression.
-- No code block, 12 nodes.
+- `let` derives `nx/nz/w/d/count` from size.
+- `random` + `grid.position` build the lattice.
+- `deform` straightens the ruck diagonal; `fold` threads the grid through a group that
+  uses `gridPoint`/`direction`/`rotateAbout` math for the subset.
+- `solidify` applies per-cell zones; `preset` handles colourway + overrides.
 
 ## 7. `script` today
 

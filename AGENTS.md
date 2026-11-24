@@ -30,7 +30,7 @@ browser viewer. Public repo, published with GitHub Pages.
 index.html            split code/result viewer
 viewer.js             viewer: scene, examples, params, live cook
 style.css
-runtime/runtime.js    65-node typed graph runtime + evaluator, Three bridge
+runtime/runtime.js    83-node typed graph runtime + evaluator, Three bridge
 runtime/expr.js       parsed expression language (no eval)
 runtime/format.js     .pfn parser/serializer
 runtime/dsl.js        JS authoring DSL (for building ports)
@@ -91,7 +91,7 @@ The viewer `frame()` uses `current.cam` = `[azimuthDeg, elevationDeg]` and
 
 ## Current status (24 Nov 2026)
 
-- 65 node types; **5 published examples, all geometric ports, zero script nodes**.
+- 83 node types; **5 published examples, all geometric ports, zero script nodes**.
 - **Geometric parity (vertices, bbox and winding at 1e-4):** `cookie` (174),
   `sapphire` (48), `tire` (520), `pumpkin` (120), `area rug` (392/700).
 - Sapphire had an inverted bottom cap; `loft.orient`/`orientCenter` and `reverse` fixed it.
@@ -100,9 +100,10 @@ The viewer `frame()` uses `current.cam` = `[azimuthDeg, elevationDeg]` and
 - Core expressions are parsed by `runtime/expr.js` (no `new Function`): arithmetic,
   comparisons, `?:`, arrays/objects, `let … in`, math and vector built-ins. Fields and
   `~` params use it.
-- Layout math is node graphs: `value`, `list`, `range`, `map`, `fold`, `if`, plus
-  `@node.field` refs. `prim`, `reverse`, `revolve.ringMode`/caps, `solidify` reference
-  diagonals and input `label`/`step` remain.
+- Layout math is node graphs: `let`, `table`, `preset`, `list`, `range`, `map`, `fold`,
+  `if`, `jitter`, `draws`, point ops (`centroid`, `lerpPoint`, `mirrorPoint`,
+  `rotateAbout`, `planeCut`, `gridPoint`, `direction`) and list ops (`first`, `last`,
+  `slice`, `concat`), plus `@node.field` refs. `value` is now residual scalar math.
 - Sapphire/tire/rug no longer use `script`; the showcase has zero script nodes.
 - The previous approximations/studies were removed from the published manifest while
   they are replaced with real ports. The gallery is stale.
@@ -166,5 +167,5 @@ gh api repos/mode777/polyfork-dsl-lab/pages/builds/latest --jq '.status,.commit'
 - `mesh` zones must match part zone names; a mismatch silently uses fallback colours.
 - GitHub Pages caches assets; bump `?v=` after viewer/style/runtime changes. The public
   runtime files must import each other with `.js`, unlike the study `.mjs` sources.
-  `sync-public.mjs` uses `PUBLIC_ASSET_VERSION` (default `7`); keep it in step with
+  `sync-public.mjs` uses `PUBLIC_ASSET_VERSION` (default `9`); keep it in step with
   `index.html` and `viewer.js`.

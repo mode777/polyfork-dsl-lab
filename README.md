@@ -18,7 +18,7 @@ geometry only.
 ```
 index.html            the split code / result viewer
 app.js                viewer (three.js scene, params, live cook)
-runtime/runtime.js    65-node typed graph runtime + evaluator, Three bridge
+runtime/runtime.js    83-node typed graph runtime + evaluator, Three bridge
 runtime/expr.js       parsed expression language (no eval)
 runtime/format.js     .pfn text parser and serializer
 runtime/dsl.js        JavaScript authoring DSL
@@ -73,8 +73,8 @@ end
 - `` `expr` `` — field expression, evaluated per vertex/index
 - `` ~`expr` `` — parameter expression, evaluated once per cook (`s` = inputs)
 - `group … end` — subgraph · `repeat count= graph=` — repeated subgraph
-- `map` / `fold` over a list with a `group` as the function; `value` builds derived
-  values from parsed expressions
+- `map` / `fold` over a list with a `group` as the function; `let` derives named values;
+  `table` gives rows named columns; `preset` resolves a colourway with overrides
 - `script` and `module` — explicit host escape hatches; `script` is disabled unless the
   host opts in, and no example uses it
 - `geometry`/`mesh` also accept a `THREE.BufferGeometry`, `Mesh` or `Group`; a `script`
@@ -85,13 +85,13 @@ The parser, serializer and evaluator are in `runtime/`. `.pfn` is the authoring 
 `cache.js` shows a compact content-addressed JSON cache (arrays pooled and base64-encoded,
 ≈84% smaller on graphs with repeated rings).
 
-## Node set (65)
+## Node set (83)
 
 | group | nodes |
 |---|---|
-| sources | `ring profile path grid box chamferBox cylinder sphere plane card cone curl pointsGrid geometry prim random value list range` |
+| sources | `ring profile path grid box chamferBox cylinder sphere plane card cone curl pointsGrid geometry prim random value let list range table preset coalesce draws jitter` |
 | surfaces | `loft loftProfile cap extrude revolve sweep inset pocket solidify bevelProfile fan fanRing wrapShell` |
-| modifiers | `transform center mirror reverse deform clip join cavity` |
+| modifiers | `transform center mirror reverse deform clip join cavity centroid lerpPoint mirrorPoint rotateAbout planeCut gridPoint direction lookup first last slice concat` |
 | distribution | `scatter scatterSurface scatterVolume instance instancedMesh arrayPolar arrayLinear` |
 | character | `skeleton skin pose` |
 | surface-relative | `pathOnSurface bandOnSurface ribbon` |

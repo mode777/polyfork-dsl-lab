@@ -1,28 +1,15 @@
 # polyfork graph v2 — sapphire
 graph sapphire
-group gem-section
-in item any null
-in v any null
-n n0 value expr=<<<
-let base = [[0.034, 0.023], [0.017, 0.046], [-0.017, 0.046], [-0.034, 0.023], [-0.017, 0], [0.017, 0]],
-        jit = [[0.00408, 0.00414], [0.00612, 0.00276], [0.00612, 0.00276], [0.00408, 0.00414], [0.00544, 0], [0.00544, 0]],
-        irr = clamp(s.irregularity, 0, 1)
-      in [base[item][0] + (v[2*item]*2 - 1) * jit[item][0] * irr,
-          base[item][1] + (v[2*item+1]*2 - 1) * jit[item][1] * irr]
->>>
-out out=@n0
-end
 group gem-station
 in item any null
-in v any null
+in rng any null
 in n any null
-n n0 value expr=<<<
-let irr = clamp(s.irregularity, 0, 1), bar = clamp(s.barrel, 0, 1), pl = 0.074 * clamp(s.length, 0.5, 1.8),
-        x = (n === 3 && item === 1) ? 0 : (item === 0 ? -pl/2 : pl/2),
-        base = (n === 3 && item === 1) ? 1 + 0.18 * bar : 1
-      in { x, s: base * (1 + (v[12+2*item]*2 - 1) * 0.1 * irr), dz: (v[13+2*item]*2 - 1) * 0.1 * 0.034 * irr }
->>>
-out out=@n0
+in pl any null
+in irr any null
+in bar any null
+n n0 draws rng=$rng item=$item n=2 offset=12
+n n1 let item=$item n=$n pl=$pl irr=$irr bar=$bar d=@n0 binds={x:"(n === 3 && item === 1) ? 0 : (item === 0 ? -pl/2 : pl/2)",base:"(n === 3 && item === 1) ? 1 + 0.18 * bar : 1",s:"base * (1 + (d[0]*2 - 1) * 0.1 * irr)",dz:"(d[1]*2 - 1) * 0.1 * 0.034 * irr"}
+out out=@n1
 end
 group gem-ring-point
 in item any null
@@ -39,31 +26,17 @@ end
 group gem-cap-ring
 in item any null
 in apex any null
-n n0 value expr="[item[0] + 0.55*(apex[0]-item[0]), item[1] + 0.55*(apex[1]-item[1]), item[2] + 0.55*(apex[2]-item[2])]"
+n n0 lerpPoint a=$item b=$apex t=0.55
 out out=@n0
 end
 group gem-mirror-point
 in item any null
-n n0 value expr="[-item[0], item[1], item[2]]"
+n n0 mirrorPoint point=$item axis=x
 out out=@n0
 end
 group gem-mirror-ring
 in item any null
 n n0 map list=$item graph=gem-mirror-point
-out out=@n0
-end
-group gem-cut-point
-in item any null
-in r0 any null
-in r1 any null
-n n0 value expr=<<<
-let p0 = r0[item], p1 = r1[item], d = [p1[0]-p0[0], p1[1]-p0[1], p1[2]-p0[2]],
-        yc = centroid(r0)[1], xc = r0[0][0] + 0.3*(r1[0][0]-r0[0][0]),
-        num = xc + 0.45*(p0[1]-yc) + 0.3*p0[2] - p0[0],
-        den = d[0] - 0.45*d[1] - 0.3*d[2],
-        tt = clamp(num/den, 0.04, 0.9)
-      in [p0[0] + tt*d[0], p0[1] + tt*d[1], p0[2] + tt*d[2]]
->>>
 out out=@n0
 end
 in colorway enum royal-blue options=royal-blue|ruby-red|golden-yellow|green|white label=Colorway
@@ -73,19 +46,19 @@ in barrel float 0 min=0 max=1 step=0.05 label="Barrel bulge"
 in ends enum pointed options=pointed|truncated|broken label=Terminations
 in chamfer float 0.3 min=0 max=1 step=0.05 label="Edge bevel"
 in irregularity float 0 min=0 max=1 step=0.05 label="Natural irregularity"
-n n0 value expr="(clamp(s.barrel,0,1) > 0.001 || clamp(s.irregularity,0,1) > 0.001) ? 3 : 2"
-n n1 value args={nStations:@n0} expr="12 + 2 * nStations"
-n n2 random count=@n1 seed=20261103
-n n3 range from=0 to=6
-n n4 map list=@n3 v=@n2.values graph=gem-section
+n n0 let length=$length barrel=$barrel irregularity=$irregularity chamfer=$chamfer binds={pl:"0.074 * clamp(length, 0.5, 1.8)",irr:"clamp(irregularity, 0, 1)",bar:"clamp(barrel, 0, 1)",ch:"clamp(chamfer, 0, 1)",n:"(bar > 0.001 || irr > 0.001) ? 3 : 2",draws:"12 + 2 * n"}
+n n1 random count=@n0.draws seed=20261103
+n n2 value expr="[[0.034, 0.023], [0.017, 0.046], [-0.017, 0.046], [-0.034, 0.023], [-0.017, 0], [0.017, 0]]"
+n n3 value expr="[[0.00408, 0.00414], [0.00612, 0.00276], [0.00612, 0.00276], [0.00408, 0.00414], [0.00544, 0], [0.00544, 0]]"
+n n4 jitter points=@n2 amps=@n3 rng=@n1 amount=@n0.irr offset=0 dims=2
 n n5 bevelProfile profile=@n4 dist=~`clamp(s.chamfer,0,1) * 0.2 * 0.034`
 n n6 if cond=~`clamp(s.chamfer,0,1) > 0.001` then=@n5 else=@n4
-n n7 range to=@n0 from=0
-n n8 map list=@n7 v=@n2.values n=@n0 graph=gem-station
+n n7 range to=@n0.n from=0
+n n8 map list=@n7 rng=@n1 n=@n0.n pl=@n0.pl irr=@n0.irr bar=@n0.bar graph=gem-station
 n n9 map list=@n8 profile=@n6 graph=gem-ring
-n n10 value args={rings:@n9} expr="rings[0]"
-n n11 value args={rings:@n9} expr="rings[rings.length - 1]"
-n n12 random seed=@n2.state count=6
+n n10 first list=@n9
+n n11 last list=@n9
+n n12 random seed=@n1.state count=6
 n n13 value args={ring:@n11,t:@n12.values} expr=<<<
 let c = centroid(ring), irr = clamp(s.irregularity, 0, 1) in
       [c[0] + 0.033 * (1 + 0.3 * (t[0]*2 - 1) * irr),
@@ -101,37 +74,34 @@ let c = centroid(ring), irr = clamp(s.irregularity, 0, 1) in
 n n15 loftProfile profile=@n6 capTop=@n13 capBottom=@n14 stations=@n8 zones={band:gem,capTop:gem,capBottom:gem} orient=true
 n n16 map list=@n11 apex=@n13 graph=gem-cap-ring
 n n17 map list=@n10 apex=@n14 graph=gem-cap-ring
-n n18 value args={ring:@n16} expr="centroid(ring)"
-n n19 value args={ring:@n17} expr="centroid(ring)"
+n n18 centroid points=@n16
+n n19 centroid points=@n17
 n n20 loft rings=@n9 zones={band:gem} orient=true
-n n21 list items=[@n11,@n16]
-n n22 loft rings=@n21 zones={band:gem} orient=true
-n n23 list items=[@n16]
-n n24 loft rings=@n23 capTop=@n18 zones={capTop:gem} orient=true
-n n25 list items=[@n10,@n17]
-n n26 loft rings=@n25 zones={band:gem} orient=true
-n n27 list items=[@n17]
-n n28 loft rings=@n27 capBottom=@n19 zones={capBottom:gem} orient=true
-n n29 join geoms=[@n20,@n22,@n24,@n26,@n28]
-n n30 value args={ring:@n10} expr=ring.length
-n n31 range to=@n30 from=0
-n n32 value args={rings:@n9} expr="rings[1]"
-n n33 map list=@n31 r0=@n10 r1=@n32 graph=gem-cut-point
-n n34 map list=@n33 graph=gem-mirror-point
-n n35 map list=@n9 graph=gem-mirror-ring
-n n36 value args={cut:@n34,rings:@n35} expr="[cut].concat(rings.slice(1))"
-n n37 value args={rings:@n36} expr="rings[rings.length - 1]"
-n n38 value args={apex:@n13} expr="[-apex[0], apex[1], apex[2]]"
-n n39 value args={ring:@n34} expr="let c = centroid(ring) in [c[0] - 0.3*0.033, c[1] + 0.2*0.023, c[2] - 0.2*0.034]"
-n n40 list items=[@n34]
-n n41 loft rings=@n40 capBottom=@n39 zones={capBottom:gem} orient=true
-n n42 reverse geom=@n41
-n n43 loft rings=@n36 zones={band:gem} orient=true
-n n44 list items=[@n37]
-n n45 loft rings=@n44 capTop=@n38 zones={capTop:gem} orient=true
-n n46 join geoms=[@n43,@n45,@n42]
-n n47 switch cases={pointed:@n15,truncated:@n29,broken:@n46} on=$ends
-n n48 center geom=@n47
-n n49 mesh geom=@n48 zones={gem:~`s.gem || ({"royal-blue":"#536aaa","ruby-red":"#a2222d","golden-yellow":"#dbbf57","green":"#50a14f","white":"#dddbdb"})[s.colorway] || '#536aaa'`} materials={gem:{roughness:0.22,metalness:0.2}}
-out mesh=@n49
+n n21 loft rings=[@n11,@n16] zones={band:gem} orient=true
+n n22 loft rings=[@n16] capTop=@n18 zones={capTop:gem} orient=true
+n n23 loft rings=[@n10,@n17] zones={band:gem} orient=true
+n n24 loft rings=[@n17] capBottom=@n19 zones={capBottom:gem} orient=true
+n n25 join geoms=[@n20,@n21,@n22,@n23,@n24]
+n n26 value args={rings:@n9} expr="rings[1]"
+n n27 value args={ring:@n10} expr="centroid(ring)[1]"
+n n28 value args={r0:@n10,r1:@n26} expr="r0[0][0] + 0.3*(r1[0][0] - r0[0][0])"
+n n29 planeCut r0=@n10 r1=@n26 xc=@n28 yc=@n27 a=0.45 b=0.3
+n n30 map list=@n29 graph=gem-mirror-point
+n n31 map list=@n9 graph=gem-mirror-ring
+n n32 slice list=@n31 from=1
+n n33 concat lists=[[@n30],@n32]
+n n34 last list=@n33
+n n35 mirrorPoint point=@n13 axis=x
+n n36 value args={ring:@n30} expr="let c = centroid(ring) in [c[0] - 0.3*0.033, c[1] + 0.2*0.023, c[2] - 0.2*0.034]"
+n n37 loft rings=@n33 zones={band:gem} orient=true
+n n38 loft rings=[@n34] capTop=@n35 zones={capTop:gem} orient=true
+n n39 loft rings=[@n30] capBottom=@n36 zones={capBottom:gem} orient=true
+n n40 reverse geom=@n39
+n n41 join geoms=[@n37,@n38,@n40]
+n n42 switch cases={pointed:@n15,truncated:@n25,broken:@n41} on=$ends
+n n43 preset choice=$colorway presets={royal-blue:#536aaa,ruby-red:#a2222d,golden-yellow:#dbbf57,green:#50a14f,white:#dddbdb} fallback=royal-blue
+n n44 center geom=@n42
+n n45 coalesce value=$gem fallback=@n43
+n n46 mesh geom=@n44 zones={gem:@n45} materials={gem:{roughness:0.22,metalness:0.2}}
+out mesh=@n46
 end

@@ -1492,6 +1492,122 @@ node('fold', { in: { list: V.any, init: V.any, graph: V.string }, out: V.any }, 
   return acc;
 });
 
+// Named derived values: one node, many outputs. Each binding is a field
+// expression evaluated in order, so later bindings can use earlier ones.
+node('let', { in: {}, out: V.any }, ({ p, inputs, params }) => {
+  const env = { ...params, ...inputs };
+  const out = {};
+  for (const [k, v] of Object.entries(p.binds ?? {})) {
+    const val = isField(v) ? fieldValue(v, env) : typeof v === 'string' ? fieldValue(field(v), env) : v;
+    env[k] = val;
+    out[k] = val;
+  }
+  return p.outs ? Object.fromEntries(p.outs.map((k) => [k, out[k]])) : out;
+});
+
+// Row/column table: rows are arrays, access is by column name.
+node('table', { in: { rows: V.any }, out: V.any }, ({ p }) => {
+  const cols = p.cols ?? [];
+  return (p.rows ?? []).map((r) => Object.fromEntries(cols.map((c, i) => [c, r[i]])));
+});
+
+// Named preset lookup: presets is a record of records, choice selects one.
+node('preset', { in: { choice: V.any, overrides: V.any }, out: V.any }, ({ p }) => {
+  const presets = p.presets ?? {};
+  const base = presets[p.choice] ?? presets[p.fallback] ?? Object.values(presets)[0] ?? {};
+  if (typeof base !== 'object' || base === null) return base;
+  const out = { ...base };
+  for (const [k, v] of Object.entries(p.overrides ?? {})) {
+    if (v !== '' && v !== undefined && v !== null) out[k] = v;
+  }
+  return out;
+});
+
+// First non-empty value, used for "explicit override else preset".
+node('coalesce', { in: { value: V.any, fallback: V.any }, out: V.any }, ({ p }) => {
+  const v = p.value;
+  return (v === '' || v === undefined || v === null) ? p.fallback : v;
+});
+
+// Consecutive draws from a random stream: item*count + offset.
+node('draws', { in: { rng: V.any, item: V.int, n: V.int, offset: V.int }, out: V.any }, ({ p }) => {
+  const values = Array.isArray(p.rng) ? p.rng : (p.rng?.values ?? []);
+  const n = Math.max(0, Math.round(p.n ?? 1));
+  const start = Math.round((p.offset ?? 0) + (p.item ?? 0) * n);
+  return values.slice(start, start + n);
+});
+
+// Jitter a point list from a stream: dims draws per point, symmetric offset.
+node('jitter', { in: { points: V.any, amps: V.any, rng: V.any, offset: V.int, dims: V.int, amount: V.number }, out: V.any }, ({ p }) => {
+  const pts = asArray(p.points) ?? [];
+  const values = Array.isArray(p.rng) ? p.rng : (p.rng?.values ?? []);
+  const dims = Math.max(1, Math.round(p.dims ?? 2));
+  const offset = Math.round(p.offset ?? 0);
+  return pts.map((q, i) => {
+    const amp = p.amps ? asArray(p.amps)[i] ?? p.amps : 1;
+    const a = Array.isArray(amp) ? amp : [amp, amp, amp];
+    return q.map((v, d) => {
+      if (d >= dims) return v;
+      const r = values[offset + i * dims + d] ?? 0;
+      return v + (r * 2 - 1) * (a[d] ?? 0) * (p.amount ?? 1);
+    });
+  });
+});
+
+node('centroid', { in: { points: V.any }, out: V.any }, ({ p }) => {
+  const q = asArray(p.points) ?? [], c = [0, 0, 0];
+  for (const v of q) { c[0] += v[0] / q.length; c[1] += v[1] / q.length; c[2] += v[2] / q.length; }
+  return c;
+});
+
+node('lerpPoint', { in: { a: V.any, b: V.any, t: V.number }, out: V.any }, ({ p }) => {
+  const t = p.t ?? 0.5;
+  return [0, 1, 2].map((k) => p.a[k] + (p.b[k] - p.a[k]) * t);
+});
+
+node('mirrorPoint', { in: { point: V.any, axis: V.string }, out: V.any }, ({ p }) => {
+  const q = [...p.point];
+  const k = p.axis === 'y' ? 1 : p.axis === 'z' ? 2 : 0;
+  q[k] = -q[k];
+  return q;
+});
+
+node('rotateAbout', { in: { point: V.any, pivot: V.any, axis: V.any, angle: V.number }, out: V.any }, ({ p }) => {
+  const v = sub3(p.point, p.pivot), ax = norm(p.axis), phi = p.angle ?? 0;
+  const k = cross3(ax, v), d = dot3(ax, v), c = Math.cos(phi), s = Math.sin(phi);
+  return add3(p.pivot, [v[0] * c + k[0] * s + ax[0] * d * (1 - c),
+    v[1] * c + k[1] * s + ax[1] * d * (1 - c),
+    v[2] * c + k[2] * s + ax[2] * d * (1 - c)]);
+});
+
+node('planeCut', { in: { r0: V.any, r1: V.any, a: V.number, b: V.number, xc: V.number, yc: V.number, clampLo: V.number, clampHi: V.number }, out: V.any }, ({ p }) => {
+  const r0 = asArray(p.r0), r1 = asArray(p.r1), a = p.a ?? 0, b = p.b ?? 0;
+  const lo = p.clampLo ?? 0.04, hi = p.clampHi ?? 0.9;
+  return r0.map((p0, i) => {
+    const p1 = r1[i];
+    const d = sub3(p1, p0);
+    const num = (p.xc ?? 0) + a * (p0[1] - (p.yc ?? 0)) + b * p0[2] - p0[0];
+    const den = d[0] - a * d[1] - b * d[2];
+    const t = Math.min(hi, Math.max(lo, num / den));
+    return add3(p0, mul3(d, t));
+  });
+});
+
+node('gridPoint', { in: { grid: V.any, i: V.int, j: V.int }, out: V.any }, ({ p }) => p.grid?.top?.[p.i]?.[p.j]);
+
+node('direction', { in: { a: V.any, b: V.any, flatten: V.string }, out: V.any }, ({ p }) => {
+  const d = sub3(p.b, p.a);
+  if (p.flatten === 'y') d[1] = 0;
+  return norm(d);
+});
+
+node('lookup', { in: { object: V.any }, out: V.any }, ({ p }) => p.object?.[p.key]);
+
+node('first', { in: { list: V.any }, out: V.any }, ({ p }) => (asArray(p.list) ?? [])[0]);
+node('last', { in: { list: V.any }, out: V.any }, ({ p }) => { const q = asArray(p.list) ?? []; return q[q.length - 1]; });
+node('slice', { in: { list: V.any, from: V.int, to: V.int }, out: V.any }, ({ p }) => (asArray(p.list) ?? []).slice(p.from ?? 0, p.to ?? undefined));
+node('concat', { in: { lists: V.any }, out: V.any }, ({ p }) => (p.lists ?? []).flatMap((q) => asArray(q) ?? []));
+
 // script escape hatch: receives resolved inputs, returns any value. The scope
 // intentionally matches the reference modules: THREE, the BufferGeometryUtils
 // addons, raw tri/quad/part/geom, ring and the same LCG. A script can return a

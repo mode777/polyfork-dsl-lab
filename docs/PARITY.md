@@ -68,9 +68,15 @@ node option per asset:
 | `solidify` | `topZoneField` / `botZoneField` | per-cell colour zones |
 | `reverse` | — | flip every triangle winding (dished caps) |
 | `prim` | `type`, `args` | call a real `THREE.*Geometry` constructor |
-| `layout` | `in`/`let`/`fn`/`out` | pure layout math with typed inputs and named outputs |
-| layout `rng` | `next`/`take`/`grid` | deterministic random values without hand-rolled LCGs |
-| `@node.field` | — | read a named layout output directly |
+| `let` | `in`, `binds`, `outs` | named derived values, one node |
+| `table` | `cols`, `rows` | rows with named columns |
+| `preset` | `choice`, `presets`, `overrides` | colourway plus explicit overrides |
+| `jitter` / `draws` | stream slicing | point jitter and named consecutive draws |
+| `centroid`, `lerpPoint`, `mirrorPoint`, `rotateAbout`, `planeCut` | point/ring ops | geometry point math |
+| `gridPoint`, `direction`, `first`, `last`, `slice`, `concat` | access/assembly | grid and list structure |
+| `map` / `fold` | group as function | per-item values / threaded accumulator |
+| `value` | residual expression | scalar/vector math only |
+| `@node.field` | — | read a named multi-output value |
 | `scatter` | `lazy: true` | draw size/yaw only after a candidate passes min-distance |
 | `scatter` | `yawScale` | reference helpers use `PI`, not `TAU` |
 | `scatter` | `rng` | consume a shared `random` stream |

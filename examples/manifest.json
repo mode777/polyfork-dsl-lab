@@ -21,8 +21,8 @@
     "category": "props",
     "status": "port",
     "file": "sapphire.pfn",
-    "bytes": 5721,
-    "nodes": 50,
+    "bytes": 4834,
+    "nodes": 47,
     "cam": [
       20,
       12
@@ -36,8 +36,8 @@
     "category": "props",
     "status": "port",
     "file": "tire.pfn",
-    "bytes": 6103,
-    "nodes": 28,
+    "bytes": 3286,
+    "nodes": 17,
     "cam": [
       58,
       14
@@ -66,8 +66,8 @@
     "category": "props",
     "status": "port",
     "file": "rug.pfn",
-    "bytes": 6261,
-    "nodes": 12,
+    "bytes": 3618,
+    "nodes": 9,
     "cam": [
       35,
       42

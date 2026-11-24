@@ -42,7 +42,7 @@ prototype/
   models/*.mjs          v1 exact ports (cookie, rug)
   bench*.mjs            v1 parity benches
   v2/
-    runtime.mjs         65-node typed runtime + Three bridge (source of public runtime.js)
+    runtime.mjs         83-node typed runtime + Three bridge (source of public runtime.js)
     expr.mjs            parsed expression language (source of public runtime/expr.js)
     dsl.mjs             authoring DSL
     format.mjs          .pfn text + JSON (source of public format.js)
@@ -107,7 +107,7 @@ Commit/push the public repo, check
 
 ## Current state (24 Nov 2026)
 
-- Runtime: 65 nodes; **5 published examples, all geometric ports, zero script nodes**.
+- Runtime: 83 nodes; **5 published examples, all geometric ports, zero script nodes**.
 - **Geometric parity** (vertices, bbox and winding at 1e-4): `cookie` (174),
   `sapphire` (48), `tire` (520), `pumpkin` (120), `area rug` (392/700), plus the six
   `module` wrappers.

@@ -86,6 +86,24 @@ class Builder {
   instance(o) { return this.add('instance', { points: o.points, proto: o.proto }, { orient: o.orient, scale: o.scale, yawSign: o.yawSign }); }
   geometry(o) { return this.add('geometry', { object: o.object }, { zone: o.zone }); }
   value(o) { return this.add('value', o.args ? { args: o.args } : {}, { expr: o.expr }); }
+  let(o) { return this.add('let', o.in ?? {}, { binds: o.binds, outs: o.outs }); }
+  table(o) { return this.add('table', { rows: o.rows }, { cols: o.cols }); }
+  preset(o) { return this.add('preset', { choice: o.choice, overrides: o.overrides }, { presets: o.presets, fallback: o.fallback }); }
+  coalesce(o) { return this.add('coalesce', { value: o.value, fallback: o.fallback }, {}); }
+  draws(o) { return this.add('draws', { rng: o.rng }, { item: o.item, n: o.n, offset: o.offset }); }
+  jitter(o) { return this.add('jitter', { points: o.points, amps: o.amps, rng: o.rng }, { offset: o.offset, dims: o.dims, amount: o.amount }); }
+  centroid(o) { return this.add('centroid', { points: o.points }, {}); }
+  lerpPoint(o) { return this.add('lerpPoint', { a: o.a, b: o.b }, { t: o.t }); }
+  mirrorPoint(o) { return this.add('mirrorPoint', { point: o.point }, { axis: o.axis }); }
+  rotateAbout(o) { return this.add('rotateAbout', { point: o.point, pivot: o.pivot, axis: o.axis }, { angle: o.angle }); }
+  planeCut(o) { return this.add('planeCut', { r0: o.r0, r1: o.r1 }, strip(o, ['r0', 'r1'])); }
+  gridPoint(o) { return this.add('gridPoint', { grid: o.grid }, { i: o.i, j: o.j }); }
+  direction(o) { return this.add('direction', { a: o.a, b: o.b }, { flatten: o.flatten }); }
+  lookup(o) { return this.add('lookup', { object: o.object }, { key: o.key }); }
+  first(o) { return this.add('first', { list: o.list }, {}); }
+  last(o) { return this.add('last', { list: o.list }, {}); }
+  slice(o) { return this.add('slice', { list: o.list }, { from: o.from, to: o.to }); }
+  concat(o) { return this.add('concat', { lists: o.lists }, {}); }
   list(items) { return this.add('list', { items }, {}); }
   range(o) { return this.add('range', {}, o); }
   map(o) { return this.add('map', { list: o.list, ...strip(o, ['list', 'graph']) }, { graph: o.graph }); }

@@ -14,10 +14,10 @@ parity check at `1e-4`: cookie, rough sapphire, tire, pumpkin and area rug.
 | example | tris | status | notes |
 |---|---:|---|---|
 | **cookie** | 174 | **geometric port** | exact vertices/bbox at default, 3-chip/thin and 14-chip/thick. |
-| **sapphire** | 48 | **geometric port** | all reference params live: colorway, gem, length, barrel, ends (pointed/truncated/broken), chamfer, irregularity. Winding verified. |
-| **tire** | 520 | **geometric port** | tread, caps, hub and lug ring; seated at `y=CY`; colorway/facets/width/rimSize live. |
+| **sapphire** | 48 | **geometric port** | 47 nodes; jittered section, bevel, mapped stations/rings, point ops, termination switch. All reference params live. |
+| **tire** | 520 | **geometric port** | 17 nodes; `let` dimensions, a 5-column row table, one preset, expression tread modulation. |
 | **pumpkin** | 120 | **geometric port** | alternating lobe/groove revolve; real `THREE.CylinderGeometry` stem; squash/ribs live. |
-| **area rug** | 392 / 700 | **geometric port** | small/large, pile, lived-in fold, plain/bordered/geometric patterns, per-cell zones. |
+| **area rug** | 392 / 700 | **geometric port** | 9 nodes; named dimensions, random grid, straighten + fold group, per-cell zones. |
 
 The previous rock/armchair/clam/basket approximations and the hair/jacket/sign/creature
 studies were removed from the published manifest. They are not shown as ports.
@@ -32,8 +32,11 @@ studies were removed from the published manifest. They are not shown as ports.
 - Added a **parsed expression language** (`runtime/expr.js`, no `new Function`) for
   fields and `~` params: arithmetic, comparisons, `?:`, arrays/objects, `let … in`, math
   and vector built-ins.
-- Replaced code-block layouts with generic node graphs: `value`, `list`, `range`,
-  `map`, `fold`, `if`, and `@node.field` refs. Sapphire/tire/rug are pure graphs.
+- Replaced code-block layouts with generic node graphs. Structural work now uses
+  `let` (named derivations), `table` (named columns), `preset` (colourway + overrides),
+  `map`/`fold`, `jitter`/`draws`, point ops (`centroid`, `lerpPoint`, `mirrorPoint`,
+  `rotateAbout`, `planeCut`, `gridPoint`, `direction`) and list ops (`first`, `last`,
+  `slice`, `concat`). `value` is residual scalar math only.
 - Added `prim` (exact Three geometry constructors), `reverse` (face winding),
   `revolve.ringMode`/`zoneField`/caps, `solidify.diagonal`/`wallOrder`/zone fields, and
   input `label`/`step` metadata.

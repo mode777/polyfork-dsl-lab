@@ -31,13 +31,13 @@ and a compact declarative storage format.
 | `random` | deterministic `{values,next}` stream |
 | `object` | a `THREE.Object3D` output |
 
-### Nodes (65)
+### Nodes (83)
 
 | group | nodes |
 |---|---|
-| sources | `ring`, `profile`, `path`, `grid`, `box`, `cylinder`, `sphere`, `geometry`, `prim`, `random`, `value`, `list`, `range` |
+| sources | `ring`, `profile`, `path`, `grid`, `box`, `cylinder`, `sphere`, `geometry`, `prim`, `random`, `value`, `let`, `list`, `range`, `table`, `preset`, `coalesce`, `draws`, `jitter` |
 | surfaces | `loft`, `cap`, `extrude`, `revolve`, `sweep`, `inset`, `pocket`, `solidify` |
-| modifiers | `transform`, `center`, `mirror`, `reverse`, `deform`, `clip`, `join` |
+| modifiers | `transform`, `center`, `mirror`, `reverse`, `deform`, `clip`, `join`, `centroid`, `lerpPoint`, `mirrorPoint`, `rotateAbout`, `planeCut`, `gridPoint`, `direction`, `lookup`, `first`, `last`, `slice`, `concat` |
 | distribution | `scatter`, `instance`, `arrayPolar`, `arrayLinear` |
 | control | `switch`, `fan`, `cone`, `if`, `map`, `fold` |
 | output | `mesh`, `group` |
