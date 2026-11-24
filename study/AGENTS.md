@@ -18,8 +18,9 @@ Public project:
    renders, no downloads in the public tree. Never use `git add -f` on `study/scripts*`.
 2. **Never commit the ignored assets.** The study code/docs are published; `scripts*/`,
    `node_modules/`, downloaded renders and `data/catalogue.json` are gitignored.
-3. **Ports are original DSL constructions.** When copying a `.pfn` to the public repo,
-   do not describe it as a byte-identical port unless it was verified as such.
+3. **Ports are our own DSL graphs.** Some are geometric ports for demo/interop. Only
+   describe one as exact when `t-all.mjs` passes at the documented tolerance; never claim
+   byte-identical output.
 4. **Licence:** see https://polyfork.dev/licensing and the public `NOTICE`. Research and
    interop are fine; redistributing source or building a commercial generator is not.
 
@@ -41,7 +42,7 @@ prototype/
   models/*.mjs          v1 exact ports (cookie, rug)
   bench*.mjs            v1 parity benches
   v2/
-    runtime.mjs         55-node typed runtime (source of public runtime.js)
+    runtime.mjs         57-node typed runtime + Three bridge (source of public runtime.js)
     dsl.mjs             authoring DSL
     format.mjs          .pfn text + JSON (source of public format.js)
     cache.mjs           content-addressed array cache
@@ -49,7 +50,8 @@ prototype/
     templates.mjs       creature/boat/building/... archetype graphs
     make-examples.mjs   writes examples/*.pfn + manifest.json
     t-examples.mjs      parse + cook every pfn
-    t-all.mjs           sample-2 ports vs original modules
+    t-all.mjs           order-independent geometric parity vs original modules
+    t-code.mjs          Three object/BufferGeometry + random stream smoke test
     t-sample3.mjs       sample-3 template ports
     t-bool.mjs          Manifold CSG smoke test
     t-cache.mjs         cache round-trip/size
@@ -80,31 +82,33 @@ From `prototype/v2`:
 ```bash
 node make-examples.mjs              # writes examples/*.pfn + manifest
 node t-examples.mjs                 # parse + cook all published examples
-node t-all.mjs                      # sample-2 parity
+node t-all.mjs                      # order-independent geometric parity
+node t-cookie.mjs                   # cookie default / 3-chip / 14-chip
+node t-code.mjs                     # Three object/BufferGeometry + random stream
 node t-sample3.mjs                  # sample-3 templates
 node t-bool.mjs && node t-cache.mjs
 ```
 
-Then copy to the public repo:
+Then sync to the public repo:
 
 ```bash
-cp runtime.mjs ../../../runtime/runtime.js
-cp dsl.mjs ../../../runtime/dsl.js
-cp format.mjs ../../../runtime/format.js
-cp cache.mjs ../../../runtime/cache.js
-cp examples/*.pfn examples/manifest.json ../../../examples/
+node sync-public.mjs
 ```
 
-Keep the `.js` extensions in the public repo. If viewer code changes, bump
-`viewer.js?v=N` in the public `index.html` (Pages caches ~10 min). Commit/push the public
-repo, check `gh api repos/mode777/polyfork-dsl-lab/pages/builds/latest`.
+It copies the runtime with the `.js` import rewrite and the generated examples. If viewer
+code changes, bump `viewer.js?v=N` in the public `index.html` (Pages caches ~10 min).
+Commit/push the public repo, check
+`gh api repos/mode777/polyfork-dsl-lab/pages/builds/latest`.
 
 ## Current state (24 Nov 2026)
 
-- Runtime: 55 nodes; all 12 published examples cook.
-- Closest: `sapphire` (48 tris), `tire` (520), `cookie` (174, rebuilt from reference
-  construction), `pumpkin` (412, visual close).
-- Approximations: `rock`, `armchair`, `clam`, `basket`.
+- Runtime: 57 nodes; all 12 published examples cook.
+- **Geometric parity**: `cookie` (174), `sapphire` (48), `tire` (520) pass the strict
+  order-independent comparison at 1e-4, plus the six `module` wrappers.
+- The runtime has a first-class Three bridge, consumable `random` stream, non-uniform
+  `instance` scale, `loft` diagonal/band-zone/flip controls, and script scope
+  `THREE`/`ADDONS`/`H`.
+- Approximations: `rock`, `armchair`, `clam`, `basket`; `pumpkin` is visually close.
 - **Not ports**: `hair`, `jacket`, `sign`, `creature`. They are original studies; do not
   compare them to valet/taxiway-sign/goat as if equal.
 - Gallery is older than the last geometry pass; regenerate if precise.

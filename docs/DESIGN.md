@@ -4,8 +4,8 @@
 three.js-native node graph, the gaps those ports exposed, the nodes added to close them,
 and a compact declarative storage format.
 
-**Code:** `runtime.js` (55 node types), `dsl.js`, `format.js`, `cache.js`,
-`ports/` (20 ports), `templates.mjs` (20 more). See `SAMPLE3.md` for the third sample. Run `node t-all.mjs` for the port table.
+**Code:** `runtime.js` (57 node types), `dsl.js`, `format.js`, `cache.js`,
+`ports/` (20 ports), `templates.mjs` (20 more). See `SAMPLE3.md` for the third sample. Run `node t-all.mjs` for the order-independent geometric parity table.
 
 ---
 
@@ -22,13 +22,14 @@ and a compact declarative storage format.
 | `path` | `[[x,y,z], …]`, optional closed |
 | `field` | JS expression string; evaluated per vertex/index |
 | `number/int/bool/string/color/enum/vec3` | scalars |
+| `random` | `{ values, next }` deterministic LCG stream |
 | `object` | a `THREE.Object3D` output |
 
-### Nodes (32)
+### Nodes (57)
 
 | group | nodes |
 |---|---|
-| sources | `ring`, `profile`, `path`, `grid`, `box`, `cylinder`, `sphere` |
+| sources | `ring`, `profile`, `path`, `grid`, `box`, `cylinder`, `sphere`, `geometry`, `random` |
 | surfaces | `loft`, `cap`, `extrude`, `revolve`, `sweep`, `inset`, `pocket`, `solidify` |
 | modifiers | `transform`, `center`, `mirror`, `deform`, `clip`, `join` |
 | distribution | `scatter`, `instance`, `arrayPolar`, `arrayLinear` |
@@ -43,19 +44,24 @@ Key signatures:
 ```
 ring      n r y sx sz phase radius(field)
 grid      nx nz w d position(field -> [x,y,z])
-loft      rings[] capTop? capBottom? zones{band,capTop,capBottom}
+loft      rings[] capTop? capBottom? zones{band,capTop,capBottom} diagonal('ab'|'ba')
+          bandZones[]? flip?
 revolve   profile[[r,y]] seg phase inRadius axis('y'|'z') zone(k)|zones mod(field i,k)
 sweep     path section twist caps
 inset     profile dist -> profile
 pocket    profile depth bevel -> geometry (walls + floor, no CSG)
 solidify  grid topZone botZone wallZone
 clip      geom nx ny nz d cap -> geometry (plane split + capped cut)
-scatter   count minDist seed tries sample(field) height(field) size(field) -> points
-instance  points proto -> geometry
-arrayPolar geom count radius start arc
+scatter   count minDist seed tries sample(field) height(field) size(field|vec3)
+          yawScale? lazy? rng? -> points
+instance  points proto [sx,sy,sz] scale? yawSign? -> geometry
+arrayPolar geom count radius start arc spin?
+geometry  object(THREE.BufferGeometry|Mesh|Group) zone -> geometry
+random    seed count -> consumable stream
 switch    on cases{a:ref,b:ref}
 mesh      geom zones{zone:hex} materials{zone:{slot,roughness,metalness,opacity}}
-script    inputs{...} src  (JS, `return` any value)
+          crease?  (accepts a THREE object directly)
+script    inputs{...} src  (JS: THREE, ADDONS, H; return any value)
 module    params  (wraps an existing createAsset)
 ```
 
@@ -72,17 +78,23 @@ parameter. They are merged for node evaluation.
   evaluated; lazy branches are a TODO).
 - `arrayPolar`/`arrayLinear` cover the common repeats.
 - There is **no group/repeat-zone node yet**; ports inline loops or use arrays.
-- `script` is the general escape hatch: typed inputs in, any value out.
+- `script` is the general escape hatch: typed inputs in, any value out. It sees `THREE`,
+  `ADDONS` (`mergeGeometries`, `toCreasedNormals`, `RoundedBoxGeometry`) and `H`
+  (`tri`, `quad`, `part`, `geom`, `ring`, `prng`, `clamp`, `lerp`). A script can return
+  a `BufferGeometry`/`Mesh`/`Group`; `geometry` or `mesh` bridges it back.
 - `module` wraps a whole `.mjs` generator; used for rigged assets.
+- `random` is a deterministic stream consumed by `scatter` (or future nodes). This is
+  what makes reference PRNG order reproducible.
 
 ---
 
 ## 2. The 20 ports
 
 Method: a port is a `build(g, P)` function that emits graph nodes and returns the output.
-Meshes are compared to the original module on triangle count, vertex count and bounds at
-default parameters. "Parity" means tris and verts exactly equal; "near" within 15%;
-"sketch" means the construction is expressed but detail is deliberately reduced.
+Parity is now order-independent: same vertex count, vertex set and bbox at a tolerance
+(`t-all.mjs`, default `1e-4`). Triangle count/centroid distance is reported separately for
+diagnosis. Counts alone are not parity. "Near" means the construction is close but outside
+tolerance; "sketch" means detail is deliberately reduced.
 
 | asset | class | orig tris | port tris | ratio | nodes | status |
 |---|---|---:|---:|---:|---:|---|

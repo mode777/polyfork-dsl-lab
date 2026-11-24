@@ -8,7 +8,7 @@ export default function build(g, P = {}) {
   const length = g.input('length', 'float', 1.0, { min: 0.5, max: 1.8 });
   const barrel = g.input('barrel', 'float', 0.0, { min: 0, max: 1 });
   const ends = g.input('ends', 'enum', 'pointed', { options: ['pointed', 'truncated', 'broken'] });
-  const chamfer = g.input('chamfer', 'float', 0.18, { min: 0, max: 1 });
+  const chamfer = g.input('chamfer', 'float', 0.3, { min: 0, max: 1 });
   const irregularity = g.input('irregularity', 'float', 0.0, { min: 0, max: 1 });
   const gem = g.input('gem', 'color', '#536aaa');
 
@@ -16,7 +16,7 @@ export default function build(g, P = {}) {
   const PL = 0.074 * clamp(P.length ?? 1.0, 0.5, 1.8);
   const irr = clamp(P.irregularity ?? 0, 0, 1);
   const bar = clamp(P.barrel ?? 0, 0, 1);
-  const ch = clamp(P.chamfer ?? 0.18, 0, 1);
+  const ch = clamp(P.chamfer ?? 0.3, 0, 1);
   const rand = prng(20261103);
   const j = () => rand() * 2 - 1;
 

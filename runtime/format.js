@@ -1,6 +1,6 @@
 // Compact text + canonical JSON storage for v2 graphs.
 // Text is line-oriented, diffable, and keeps all wiring explicit.
-import { Graph } from './runtime.js';
+import { Graph } from './runtime.js?v=3';
 
 const isRef = (v) => v && typeof v === 'object' && '__ref' in v;
 const isField = (v) => v && typeof v === 'object' && '__field' in v;

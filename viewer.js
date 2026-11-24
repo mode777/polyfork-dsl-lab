@@ -1,8 +1,8 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
-import { parseText } from './runtime/format.js';
-import { evaluate } from './runtime/runtime.js';
+import { parseText } from './runtime/format.js?v=3';
+import { evaluate } from './runtime/runtime.js?v=3';
 
 const $ = (s) => document.querySelector(s);
 const listEl = $('#list');
@@ -350,7 +350,8 @@ async function loadExample(id, push = true) {
   current = meta;
   document.querySelectorAll('.item').forEach((b) => b.classList.toggle('active', b.dataset.id === meta.id));
   if (push) history.replaceState(null, '', `#${meta.id}`);
-  badgeEl.textContent = `${meta.title} — drag to orbit · scroll to zoom`;
+  const statusLabel = { port: 'geometric port', close: 'close', approx: 'approximation', study: 'original study' }[meta.status];
+  badgeEl.textContent = `${meta.title}${statusLabel ? ' · ' + statusLabel : ''} — drag to orbit · scroll to zoom`;
   fileEl.textContent = `${meta.id}.pfn`;
   downloadEl.href = `examples/${meta.file}`;
   downloadEl.setAttribute('download', downloadName(meta.id));
@@ -371,7 +372,8 @@ async function loadExample(id, push = true) {
 }
 
 function itemHTML(m) {
-  return `<button class="item" data-id="${m.id}"><strong>${m.title}</strong><span>${m.description}</span></button>`;
+  const statusLabel = { port: 'port', close: 'close', approx: 'approx', study: 'study' }[m.status];
+  return `<button class="item" data-id="${m.id}"><strong>${m.title}${statusLabel ? ` <em class="tag ${m.status}">${statusLabel}</em>` : ''}</strong><span>${m.description}</span></button>`;
 }
 
 async function boot() {

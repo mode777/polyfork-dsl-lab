@@ -12,11 +12,13 @@ browser viewer. Public repo, published with GitHub Pages.
 1. **Never commit Polyfork source.** No `.mjs`/`-params.json`/GLB/USD/FBX downloads, no
    copied code, no original hero renders. The reference files live under `study/scripts*/` and are **gitignored**;
    they are for local comparison only and must never be force-added.
-2. **The examples in `examples/*.pfn` are original DSL constructions.** Do not describe
-   them as byte-identical Polyfork ports. See `NOTICE`.
+2. **Examples may be geometric ports, not source copies.** `examples/*.pfn` are our own
+   DSL graphs. Some are ports of Polyfork constructions for demonstration/interop; only
+   call one exact when `t-all.mjs` reports PASS at the documented tolerance. See `NOTICE`.
 3. **Respect the licence.** Polyfork's `.mjs` source may not be redistributed or used to
    build/sell a commercial asset generator. Linking to `/cdn` is allowed; hosting their
-   modules is not. See https://polyfork.dev/licensing and `NOTICE`.
+   modules is not. Our example graphs are independent re-expressions for demo/research,
+   not redistributed Polyfork source. See https://polyfork.dev/licensing and `NOTICE`.
 4. **Do not break Pages.** No build step. Use relative paths, ES modules with `.js`
    extensions, and keep `.nojekyll`. GitHub Pages serves `main` / root.
 5. **Cache-bust viewer assets when changing them.** Pages caches for ~10 minutes:
@@ -28,7 +30,7 @@ browser viewer. Public repo, published with GitHub Pages.
 index.html            split code/result viewer
 viewer.js             viewer: scene, examples, params, live cook
 style.css
-runtime/runtime.js    55-node typed graph runtime + evaluator
+runtime/runtime.js    57-node typed graph runtime + evaluator, Three bridge
 runtime/format.js     .pfn parser/serializer
 runtime/dsl.js        JS authoring DSL (for building ports)
 runtime/cache.js      content-addressed array pool / Float32 cache
@@ -64,7 +66,8 @@ study/
   prototype/v2/ports/*.mjs        ports that generate examples/*.pfn
   prototype/v2/make-examples.mjs  writes examples/*.pfn + manifest.json
   prototype/v2/t-examples.mjs     parse + cook all pfn examples
-  prototype/v2/t-all.mjs          sample-2 parity harness (imports Polyfork modules)
+  prototype/v2/t-all.mjs          order-independent geometric parity harness
+  prototype/v2/t-code.mjs         Three BufferGeometry/object + random-stream smoke test
   prototype/v2/t-sample3.mjs      sample-3 template harness
   scripts/ scripts2/ scripts3/    downloaded Polyfork assets (NEVER copy here)
 ```
@@ -73,10 +76,11 @@ To change a published example:
 
 1. Edit the port in `study/prototype/v2/ports/<name>.mjs`.
 2. Run `node make-examples.mjs` in `study/prototype/v2`.
-3. Copy `study/prototype/v2/examples/<name>.pfn` and `manifest.json` into `examples/`.
-4. If runtime changed, copy `runtime.mjs` to `runtime/runtime.js` (keep the `.js` rename).
-5. Test with `node t-examples.mjs`, then serve this repo and check the viewer.
-6. Bump `viewer.js?v=N` in `index.html` if viewer code changed; commit and push.
+3. Run `node sync-public.mjs` — it copies the runtime with the `.js` import rewrite and
+   the generated examples into the public tree.
+4. Test with `node t-examples.mjs` and `node t-all.mjs`, then serve this repo and check
+   the viewer.
+5. Bump `viewer.js?v=N` in `index.html` if viewer code changed; commit and push.
 
 The study workspace is documented in `study/AGENTS.md`; its downloaded Polyfork
 sources are ignored by `.gitignore` and are not part of the published tree.
@@ -86,26 +90,27 @@ The viewer `frame()` uses `current.cam` = `[azimuthDeg, elevationDeg]` and
 
 ## Current status (24 Nov 2026)
 
-- 55 node types; 12 examples; all 12 parse and cook.
-- `cookie` was rebuilt from the reference construction (174 tris) but still differs in
-  presentation (thickness/chunk silhouette); see `docs/STATUS.md`.
-- `sapphire` (48), `tire` (520) are close/faithful constructions; `pumpkin` is close.
-- `rock`, `armchair`, `clam`, `basket` are hand approximations.
-- `hair`, `jacket`, `sign`, `creature` are **original stylized studies, not ports** of
-  valet / taxiway-sign / goat. Do not compare them as if they were.
-- The gallery was generated before the last few geometry tweaks; treat it as indicative,
-  not current. Regenerate if precision matters.
+- 57 node types; 12 examples; all 12 parse and cook.
+- **Geometric parity:** `cookie` (174), `sapphire` (48), `tire` (520) pass the strict
+  order-independent comparison at 1e-4, plus the six `module` wrappers. The other public
+  examples are still approximations/studies.
+- The runtime now has a first-class Three bridge (`geometry`/`mesh` accept
+  `BufferGeometry`/`Mesh`/`Group`), a consumable `random` stream, non-uniform
+  `instance` scale, `loft.diagonal`/`bandZones`/`flip`, and script scope `THREE`,
+  `ADDONS`, `H`.
+- `hair`, `jacket`, `sign`, `creature` are **original studies, not ports** of
+  valet / taxiway-sign / goat. They remain labelled as such.
+- The gallery predates the cookie/sapphire/tire parity pass; regenerate it.
 
 ## Next tasks (priority)
 
-1. Decide the public example policy: keep studies labelled, or replace them with exact
-   ports of the actual reference assets (taxiway sign ~400 lines, goat ~2.4k, valet ~31k).
-2. For parity work, compare **original module vs `.pfn` in the same renderer**, not
-   hero render vs viewer. The reference modules are under `study/scripts*` (gitignored).
-3. Improve the remaining props: cookie thickness/chunks, clam two-valve shell, armchair
-   upholstery, rock facet cuts, basket weave.
-4. Add a `sign` with the stroke-font/SDF contour pipeline rather than segment letters.
-5. If adding booleans to examples, verify `manifold-3d` WASM loads from the import map and
+1. Port the remaining reference props with the new low-level ops (rock, armchair, clam,
+   basket) and replace the four original studies with real ports or clearly labelled
+   demo variants.
+2. Keep `t-all.mjs` as the only parity claim: it compares triangle sets, vertex sets and
+   bbox order-independently. Counts alone are not parity.
+3. Regenerate the gallery after the next geometry pass.
+4. If adding booleans to examples, verify `manifold-3d` WASM loads from the import map and
    gate it behind `await initManifold()`.
 
 ## Tests / checks
@@ -114,7 +119,9 @@ From `study/prototype/v2`:
 
 ```bash
 node t-examples.mjs        # parses/cooks every published pfn
-node t-all.mjs             # sample-2 ports vs original modules
+node t-all.mjs             # order-independent geometric parity vs original modules
+node t-cookie.mjs          # cookie at default / 3-chip / 14-chip
+node t-code.mjs            # Three object/BufferGeometry + random-stream bridge
 node t-sample3.mjs         # sample-3 template ports
 node t-bool.mjs            # Manifold boolean smoke test
 node t-cache.mjs           # cache round-trip / size
@@ -138,8 +145,15 @@ gh api repos/mode777/polyfork-dsl-lab/pages/builds/latest --jq '.status,.commit'
 
 - `.pfn` backtick expressions are single-line; newlines are escaped as `\n`. Multi-line
   code goes in a `script` heredoc.
-- `instance` scales the prototype uniformly by point size now. Real-sized protos must use
-  size 1; unit protos use point size.
+- `instance` accepts a scalar or a per-point `[sx,sy,sz]` scale. `yawSign: -1` matches
+  reference helpers that use `x=cos(yaw), z=sin(yaw)`; Three's +Y rotation has the
+  opposite handedness.
+- `scatter.lazy=true` draws size/yaw only after a point is accepted. `yawScale` defaults
+  to `TAU`; cookie uses `PI`.
+- `geometry`/`mesh` accept `THREE.BufferGeometry`, `Mesh`, `Group` or `__kind:'geom'`.
+  A script can return any of them; `geometry` makes it composable with `join`/modifiers.
+- `loft.diagonal='ba'` flips the quad diagonal; `loft.bandZones` is a per-band zone array;
+  `loft.flip` reverses winding.
 - `mesh` zones must match part zone names; a mismatch silently uses fallback colours.
-- `loft` cap winding is orientation-corrected; don't reintroduce fan caps without a hint.
-- GitHub Pages caches assets; bump `?v=` after viewer/style changes.
+- GitHub Pages caches assets; bump `?v=` after viewer/style changes. The public runtime
+  files must import each other with `.js`, unlike the study `.mjs` sources.

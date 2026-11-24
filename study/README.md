@@ -38,17 +38,20 @@ prototype/
   models/area-rug.mjs v1 port: 260 -> 77 lines, exact topology/bounds
   bench.mjs / bench-rug.mjs / parity.mjs
   v2/
-    runtime.mjs     32-node typed runtime + fields + clip/revolve/skin hooks
+    runtime.mjs     57-node typed runtime + Three bridge + code/random ops
     dsl.mjs         builder DSL
     format.mjs      .pfn text + canonical JSON, round-trip tested
-    GRAPH_API.md    API, 20-asset port table, gap analysis, format spec
+    GRAPH_API.md    API, port table, gap analysis, format spec
     SAMPLE3.md      third sample, filled gaps, ring-array optimisation
     IMPROVEMENTS.md mature features implemented + research decisions
     cache.mjs       content-addressed array pool + Float32 base64
     templates.mjs   creature/boat/building/... archetype graphs
-    templates.mjs   creature/boat/building/... archetype graphs
     ports/          40 ports across samples 2 and 3
-    t-all.mjs       run sample-2 ports; t-sample3.mjs runs sample 3
+    make-examples.mjs writes examples/*.pfn + manifest.json
+    sync-public.mjs   copies runtime + examples to the public tree (.js rewrite)
+    t-all.mjs       order-independent geometric parity; t-sample3.mjs runs sample 3
+    t-cookie.mjs    cookie default / thin / thick parity
+    t-code.mjs      Three object/BufferGeometry + random stream smoke test
 ```
 
 ## Reproduce

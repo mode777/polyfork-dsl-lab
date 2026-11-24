@@ -8,10 +8,11 @@ n n1 fanRing r=0.1512 y=-0.10849999999999999 n=14 phase=-1.3463968515384828 apex
 n n2 fanRing r=0.135 y=0.03850000000000001 n=14 phase=-1.3463968515384828 apex=[0,0,0.03850000000000001] axis=z zone=rim
 n n3 revolve profile=[[0.135,0.03850000000000001],[0.118,0.09450000000000001],[0.066,0.12450000000000001]] seg=14 phase=-1.3463968515384828 zone=chrome axis=z
 n n4 fanRing r=0.066 y=0.12450000000000001 n=14 phase=-1.3463968515384828 apex=[0,0,0.1385] axis=z zone=chrome
-n n5 cone n=6 r=0.023 h=0.018 x=0.105 y=0 z=0.03850000000000001 axis=z zone=chrome
-n n6 arrayPolar geom=@n5 count=5 axis=z start=1.5707963267948966
+n n5 cone n=6 r=0.023 h=0.019999999999999997 x=0.105 y=0 z=0.03650000000000001 axis=z zone=chrome
+n n6 arrayPolar geom=@n5 count=5 axis=z start=1.5707963267948966 spin=false
 n n7 join geoms=[@n0,@n1,@n2,@n3,@n4,@n6]
 n n8 center geom=@n7 y=false
-n n9 mesh geom=@n8 zones={rub:#2a2d35,ww:#f1f2ef,rim:#999ca3,chrome:#c2c7cd}
-out mesh=@n9
+n n9 transform geom=@n8 ty=0.34122476926363826
+n n10 mesh geom=@n9 zones={rub:#2a2d35,ww:#f1f2ef,rim:#999ca3,chrome:#c2c7cd}
+out mesh=@n10
 end

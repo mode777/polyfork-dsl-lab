@@ -1,6 +1,6 @@
 // Cache form: canonical JSON with numeric arrays pooled and packed as base64 Float32.
 // Content-addressed: identical arrays are stored once. Text remains the authoring form.
-import { toJSON, fromJSON } from './format.mjs';
+import { toJSON, fromJSON } from './format.js?v=3';
 
 const hasBuf = typeof Buffer !== 'undefined';
 const b64 = (arr) => {

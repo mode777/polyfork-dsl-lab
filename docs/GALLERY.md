@@ -1,7 +1,8 @@
 # Gallery
 
 Clean 900×900 renders of the 12 example graphs (inspector lighting, per-example camera).
-These are the screenshots used to check the examples against the Polyfork reference renders.
+These are indicative screenshots; the cookie/sapphire/tire images predate the geometric
+parity pass and should be regenerated. See `STATUS.md` for the current port status.
 
 | | |
 |---|---|

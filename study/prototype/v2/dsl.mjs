@@ -37,7 +37,7 @@ class Builder {
   chamferBox(p = {}) { return this.add('chamferBox', {}, p); }
   spline(p) { return this.add('spline', {}, p); }
   scatterSurface(p) { return this.add('scatterSurface', { geom: p.geom }, { count: p.count, minDist: p.minDist, seed: p.seed, size: p.size !== undefined ? F(p.size) : undefined }); }
-  instancedMesh(p) { return this.add('instancedMesh', { geom: p.geom, points: p.points }, { color: p.color }); }
+  instancedMesh(p) { return this.add('instancedMesh', { geom: p.geom, points: p.points }, { color: p.color, yawSign: p.yawSign }); }
   cavity(p) { return this.add('cavity', { geom: p.geom }, strip(p, ['geom'])); }
   skeleton(p) { return this.add('skeleton', {}, p); }
   skin(p) { return this.add('skin', { geom: p.geom, skeleton: p.skeleton }, { soft: p.soft, zones: p.zones }); }
@@ -46,10 +46,10 @@ class Builder {
   sphere(p = {}) { return this.add('sphere', {}, p); }
 
   // surfaces
-  loft(o) { return this.add('loft', { rings: o.rings, capTop: o.capTop, capBottom: o.capBottom }, { zones: o.zones }); }
+  loft(o) { return this.add('loft', { rings: o.rings, capTop: o.capTop, capBottom: o.capBottom }, strip(o, ['rings', 'capTop', 'capBottom'])); }
   extrude(o) { return this.add('extrude', { profile: o.profile }, { depth: o.depth, z0: o.z0, cap: o.cap }); }
   bevelProfile(o) { return this.add('bevelProfile', { profile: o.profile }, { dist: o.dist }); }
-  loftProfile(o) { return this.add('loftProfile', { profile: o.profile, capTop: o.capTop, capBottom: o.capBottom }, { stations: o.stations, zones: o.zones }); }
+  loftProfile(o) { return this.add('loftProfile', { profile: o.profile, capTop: o.capTop, capBottom: o.capBottom }, strip(o, ['profile', 'capTop', 'capBottom'])); }
   fanRing(o) { return this.add('fanRing', {}, o); }
   revolve(o) { return this.add('revolve', { profile: o.profile }, { seg: o.seg, phase: o.phase, inRadius: o.inRadius, zone: o.zone, axis: o.axis, mod: o.mod !== undefined ? F(o.mod) : undefined }); }
   sweep(o) { return this.add('sweep', { path: o.path, section: o.section }, { twist: o.twist, scale: o.scale, caps: o.caps, zone: o.zone }); }
@@ -71,21 +71,23 @@ class Builder {
   deform(o) { return this.add('deform', { geom: o.geom }, { expr: F(o.expr) }); }
   join(list) { return this.add('join', { geoms: list }, {}); }
   scatter(o) {
-    return this.add('scatter', {}, {
+    return this.add('scatter', o.rng ? { rng: o.rng } : {}, {
       ...o,
       sample: F(o.sample),
       height: o.height !== undefined ? F(o.height) : undefined,
       size: o.size !== undefined ? F(o.size) : undefined,
     });
   }
-  instance(o) { return this.add('instance', { points: o.points, proto: o.proto }, { orient: o.orient, scale: o.scale }); }
+  instance(o) { return this.add('instance', { points: o.points, proto: o.proto }, { orient: o.orient, scale: o.scale, yawSign: o.yawSign }); }
+  geometry(o) { return this.add('geometry', { object: o.object }, { zone: o.zone }); }
+  random(o = {}) { return this.add('random', {}, o); }
   arrayPolar(o) { return this.add('arrayPolar', { geom: o.geom }, strip(o, ['geom'])); }
   arrayLinear(o) { return this.add('arrayLinear', { geom: o.geom }, strip(o, ['geom'])); }
   switch(o) { return this.add('switch', { cases: o.cases }, { on: o.on }); }
 
   // outputs
   mesh(geom, o = {}) {
-    return this.add('mesh', { geom }, { zones: o.zones, materials: o.materials, flat: o.flat, name: o.name });
+    return this.add('mesh', { geom }, { zones: o.zones, materials: o.materials, flat: o.flat, crease: o.crease, name: o.name });
   }
   group(children, o = {}) { return this.add('group', { children }, o); }
   script(o) { return this.add('script', o.inputs ?? {}, { src: o.src, lang: 'js' }); }

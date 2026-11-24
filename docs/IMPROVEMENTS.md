@@ -1,7 +1,14 @@
 # Mature improvements + research notes
 
 This pass implemented only the changes that are clearly mature, and investigated the
-topics that were still unclear. Runtime is now **55 node types**.
+topics that were still unclear. Runtime is now **57 node types**.
+
+> **Parity pass (24 Nov 2026):** the runtime now has a first-class Three bridge
+> (`geometry`/`mesh` accept `BufferGeometry`/`Mesh`/`Group`), a consumable `random`
+> stream, non-uniform `instance` scale, `loft.diagonal`/`bandZones`/`flip`,
+> `scatter.lazy`/`yawScale`/`rng`, `arrayPolar.spin`, `cone.flip` and `mesh.crease`.
+> `cookie`, `sapphire` and `tire` pass an order-independent geometric parity check at
+> `1e-4`; see `docs/STATUS.md` and `t-all.mjs`.
 
 Run: `node t-sample3.mjs`, `node t-cheese2.mjs`, `node t-cookie2.mjs`, `node t-cache.mjs`,
 `node t-bool.mjs`.

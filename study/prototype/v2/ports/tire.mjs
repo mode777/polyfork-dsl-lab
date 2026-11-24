@@ -31,10 +31,12 @@ export default function build(g, P = {}) {
   const dome = g.revolve({ profile: CAP.map(([r, z]) => [r, z * W + ZOFF]), seg: N, axis: 'z', phase: -PI / 2 + PI / N, zone: 'chrome' });
   const domeCap = g.fanRing({ r: 0.066 * RS, y: 0.128 * W + ZOFF, n: N, phase: -PI / 2 + PI / N, apex: [0, 0, APEX_Z * W + ZOFF], axis: 'z', zone: 'chrome' });
 
-  const lug = g.cone({ n: 6, r: 0.023 * RS, h: 0.018 * W, x: LUG_R, y: 0, z: DISH_Z * W + ZOFF, axis: 'z', zone: 'chrome' });
-  const lugs = g.arrayPolar({ geom: lug, count: 5, axis: 'z', start: PI / 2 });
+  const lug = g.cone({ n: 6, r: 0.023 * RS, h: 0.018 * W + 0.002, x: LUG_R, y: 0, z: DISH_Z * W + ZOFF - 0.002, axis: 'z', zone: 'chrome' });
+  const lugs = g.arrayPolar({ geom: lug, count: 5, axis: 'z', start: PI / 2, spin: false });
 
   const geo = g.join([shell, backCap, dishCap, dome, domeCap, lugs]);
-  const body = g.center({ geom: geo, y: false });
+  const centered = g.center({ geom: geo, y: false });
+  // The reference tire sits on y=0 with its axle at CY, not centred on the origin.
+  const body = g.transform({ geom: centered, ty: CY });
   return g.mesh(body, { zones: { rub: P.rubber ?? '#2a2d35', ww: P.sidewall ?? '#f1f2ef', rim: P.rim ?? '#999ca3', chrome: P.chrome ?? '#c2c7cd' } });
 }

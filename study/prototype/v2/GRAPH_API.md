@@ -4,8 +4,14 @@
 three.js-native node graph, the gaps those ports exposed, the nodes added to close them,
 and a compact declarative storage format.
 
-**Code:** `runtime.mjs` (48 node types after the mature-improvement pass), `dsl.mjs`, `format.mjs`, `cache.mjs`,
-`ports/` (20 ports), `templates.mjs` (20 more). See `SAMPLE3.md` for the third sample. Run `node t-all.mjs` for the port table.
+> **Update (24 Nov 2026):** the tables below are historical. The current parity contract is
+> order-independent triangle/vertex/bbox comparison in `t-all.mjs` at `1e-4`. Only
+> `cookie`, `sapphire`, `tire` and the six `module` wrappers pass; see
+> `docs/PARITY.md`. The runtime now has a first-class Three bridge and the low-level
+> controls listed there.
+
+**Code:** `runtime.mjs` (57 node types after the Three-bridge/parity pass), `dsl.mjs`, `format.mjs`, `cache.mjs`,
+`ports/` (20 ports), `templates.mjs` (20 more). See `SAMPLE3.md` for the third sample. Run `node t-all.mjs` for the order-independent geometric parity table.
 
 ---
 
@@ -22,13 +28,14 @@ and a compact declarative storage format.
 | `path` | `[[x,y,z], …]`, optional closed |
 | `field` | JS expression string; evaluated per vertex/index |
 | `number/int/bool/string/color/enum/vec3` | scalars |
+| `random` | deterministic `{values,next}` stream |
 | `object` | a `THREE.Object3D` output |
 
-### Nodes (32)
+### Nodes (57)
 
 | group | nodes |
 |---|---|
-| sources | `ring`, `profile`, `path`, `grid`, `box`, `cylinder`, `sphere` |
+| sources | `ring`, `profile`, `path`, `grid`, `box`, `cylinder`, `sphere`, `geometry`, `random` |
 | surfaces | `loft`, `cap`, `extrude`, `revolve`, `sweep`, `inset`, `pocket`, `solidify` |
 | modifiers | `transform`, `center`, `mirror`, `deform`, `clip`, `join` |
 | distribution | `scatter`, `instance`, `arrayPolar`, `arrayLinear` |
@@ -41,19 +48,21 @@ Key signatures:
 ```
 ring      n r y sx sz phase radius(field)
 grid      nx nz w d position(field -> [x,y,z])
-loft      rings[] capTop? capBottom? zones{band,capTop,capBottom}
+loft      rings[] capTop? capBottom? zones{band,capTop,capBottom} diagonal bandZones flip
 revolve   profile[[r,y]] seg phase inRadius axis('y'|'z') zone(k)|zones mod(field i,k)
 sweep     path section twist caps
 inset     profile dist -> profile
 pocket    profile depth bevel -> geometry (walls + floor, no CSG)
 solidify  grid topZone botZone wallZone
 clip      geom nx ny nz d cap -> geometry (plane split + capped cut)
-scatter   count minDist seed tries sample(field) height(field) size(field) -> points
-instance  points proto -> geometry
-arrayPolar geom count radius start arc
+scatter   count minDist seed tries sample(field) height(field) size(field|vec3) yawScale lazy rng -> points
+instance  points proto [sx,sy,sz] scale yawSign -> geometry
+arrayPolar geom count radius start arc spin
+geometry  object(THREE.BufferGeometry|Mesh|Group) zone -> geometry
+random    seed count -> stream
 switch    on cases{a:ref,b:ref}
-mesh      geom zones{zone:hex} materials{zone:{slot,roughness,metalness,opacity}}
-script    inputs{...} src  (JS, `return` any value)
+mesh      geom zones{zone:hex} materials{zone:{slot,roughness,metalness,opacity}} crease
+script    inputs{...} src  (JS: THREE, ADDONS, H; `return` any value)
 module    params  (wraps an existing createAsset)
 ```
 

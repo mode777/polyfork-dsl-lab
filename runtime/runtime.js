@@ -1,14 +1,20 @@
 // v2 graph runtime: registry-based DAG, typed values, fields, groups, escape hatches.
 // Research code for the Polyfork feasibility study.
 import * as THREE from 'three';
-import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { mergeGeometries, toCreasedNormals } from 'three/addons/utils/BufferGeometryUtils.js';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 
 export const TAU = Math.PI * 2;
+export const ADDONS = { mergeGeometries, toCreasedNormals, RoundedBoxGeometry };
 export const V = {
   geom: 'geometry', points: 'points', field: 'field', profile: 'profile', path: 'path',
   number: 'number', int: 'int', bool: 'bool', string: 'string', color: 'color',
-  vec3: 'vec3', enum: 'enum', any: 'any', mesh: 'mesh', object: 'object',
+  vec3: 'vec3', enum: 'enum', any: 'any', mesh: 'mesh', object: 'object', random: 'random',
+};
+
+export const makePrng = (seed = 1) => {
+  let s = seed >>> 0;
+  return () => (s = (s * 16807) % 2147483647) / 2147483647;
 };
 
 // ---------------------------------------------------------------- graph model
@@ -138,7 +144,7 @@ export function evaluate(graph, values = {}, opts = {}) {
         const r = new Function('s', `const {sin,cos,sqrt,abs,min,max,floor,round,pow,PI}=Math; const TAU=Math.PI*2; const clamp=(v,a,b)=>Math.min(b,Math.max(a,v)); const lerp=(a,b,t)=>a+(b-a)*t; return (${v.__expr});`)(params);
         return typeof r === 'function' ? r(params) : r;
       }
-      if ('__field' in v || v.__kind || v.isObject3D) return v;
+      if ('__field' in v || v.__kind || v.isObject3D || v.isBufferGeometry || v.isMaterial || v.isBufferAttribute) return v;
       if (Array.isArray(v)) return v.map(paramValue);
       const o = {};
       for (const [k, x] of Object.entries(v)) o[k] = paramValue(x);
@@ -168,7 +174,7 @@ export function evaluate(graph, values = {}, opts = {}) {
     }
     if (Array.isArray(v)) return v.map((x) => resolve(x, ctx));
     if (v && typeof v === 'object') {
-      if (v.__field || v.__kind || v.isObject3D || v.isMaterial) return v;
+      if (v.__field || v.__kind || v.isObject3D || v.isBufferGeometry || v.isMaterial || v.isBufferAttribute) return v;
       const out = {};
       for (const [k, x] of Object.entries(v)) out[k] = resolve(x, ctx);
       return out;
@@ -188,19 +194,39 @@ export function fieldValue(v, ctx) {
 }
 
 // ---------------------------------------------------------------- geometry API
-export function toGeometry(obj) {
+// First-class bridge: accept the runtime's geom, a THREE.BufferGeometry, or a
+// THREE.Mesh/Group. This is the layer that lets a code node call the same
+// three.js constructors and addons as the reference modules.
+export function bufferToGeom(obj, zone = 'a') {
+  let geo = obj?.isBufferGeometry ? obj : obj?.geometry;
+  if (!geo) throw new Error('bufferToGeom: not a BufferGeometry/Mesh');
+  if (geo.index) geo = geo.toNonIndexed();
+  const attr = geo.getAttribute('position');
+  if (!attr) throw new Error('bufferToGeom: no position attribute');
+  return geom(part(Array.from(attr.array), zone));
+}
+export function objectToGeom(obj, zone = 'a') {
+  if (obj?.__kind === 'geom') return obj;
+  if (obj?.isBufferGeometry || obj?.isMesh) return bufferToGeom(obj, zone);
+  if (obj?.isObject3D) {
+    const parts = [];
+    obj.traverse((o) => { if (o.isMesh) parts.push(...bufferToGeom(o, zone).parts); });
+    return geom(parts);
+  }
+  throw new Error('objectToGeom: not a THREE object');
+}
+export function toGeometry(obj, zone = 'a') {
   if (!obj) throw new Error('toGeometry: empty');
   if (obj.__kind === 'geom') return obj;
   if (obj.__kind === 'points') {
-    const g = new THREE.BufferGeometry();
-    g.setAttribute('position', new THREE.Float32BufferAttribute(obj.pts.flat(), 3));
-    return { __kind: 'geom', parts: [{ pos: obj.pts.flat(), zone: 'a' }] };
+    const pts = obj.pts.flatMap((q) => [q[0], q[1], q[2]]);
+    return { __kind: 'geom', parts: [{ pos: pts, zone: 'a' }] };
   }
-  if (obj.isObject3D) return obj;
+  if (obj.isObject3D || obj.isBufferGeometry) return objectToGeom(obj, zone);
   throw new Error('toGeometry: not geometry');
 }
 
-export function emitMesh(g, { zones = {}, materials = {}, flat = true, name = 'mesh' } = {}) {
+export function emitMesh(g, { zones = {}, materials = {}, flat = true, crease, name = 'mesh' } = {}) {
   const parts = g.parts.filter((p) => p.pos.length);
   const byMat = new Map();
   for (const p of parts) {
@@ -220,8 +246,9 @@ export function emitMesh(g, { zones = {}, materials = {}, flat = true, name = 'm
       geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
       return geo;
     });
-    const merged = mergeGeometries(geos, false);
-    merged.computeVertexNormals();
+    let merged = mergeGeometries(geos, false);
+    if (crease !== undefined) merged = toCreasedNormals(merged, crease);
+    else merged.computeVertexNormals();
     const material = md.material ?? new THREE.MeshStandardMaterial({
       vertexColors: true, flatShading: flat,
       roughness: md.roughness ?? 0.85, metalness: md.metalness ?? 0,
@@ -335,6 +362,8 @@ node('sphere', { in: { r: V.number, seg: V.int, rings: V.int }, out: V.geom }, (
 
 // ---------------------------------------------------------------- nodes: surfaces
 node('bevelProfile', { in: { profile: V.profile, dist: V.number }, out: V.profile }, ({ p }) => {
+  // Walk along the two adjacent edges from each corner. This is the formula
+  // used by the reference crystal/wedge profiles.
   const P = asArray(p.profile), c = p.dist ?? 0.01, out = [];
   for (let i = 0; i < P.length; i++) {
     const a = P[(i - 1 + P.length) % P.length], b = P[i], d = P[(i + 1) % P.length];
@@ -346,10 +375,10 @@ node('bevelProfile', { in: { profile: V.profile, dist: V.number }, out: V.profil
   return profile(out);
 });
 
-node('loftProfile', { in: { profile: V.profile, capTop: V.any, capBottom: V.any, zones: V.any }, out: V.geom }, ({ p }) => {
+node('loftProfile', { in: { profile: V.profile, capTop: V.any, capBottom: V.any, zones: V.any, diagonal: V.string, bandZones: V.any, flip: V.bool }, out: V.geom }, ({ p }) => {
   const P = asArray(p.profile), stations = p.stations ?? [[0, 1, 0]];
   const rings = stations.map(([x, s = 1, dz = 0]) => P.map(([z, y]) => [x, y * s, z * s + dz]));
-  return NODES.get('loft').fn({ p: { rings, capTop: p.capTop, capBottom: p.capBottom, zones: p.zones ?? {} } });
+  return NODES.get('loft').fn({ p: { rings, capTop: p.capTop, capBottom: p.capBottom, zones: p.zones ?? {}, diagonal: p.diagonal, bandZones: p.bandZones, flip: p.flip } });
 });
 
 node('fanRing', { in: { r: V.number, y: V.number, n: V.int, phase: V.number, apex: V.any, axis: V.string, zone: V.string, flip: V.bool }, out: V.geom }, ({ p }) => {
@@ -364,15 +393,27 @@ node('fanRing', { in: { r: V.number, y: V.number, n: V.int, phase: V.number, ape
   return geom(part(out, p.zone ?? 'a'));
 });
 
-node('loft', { in: { rings: V.any, capTop: V.any, capBottom: V.any, zones: V.any }, out: V.geom }, ({ p }) => {
+node('loft', { in: { rings: V.any, capTop: V.any, capBottom: V.any, zones: V.any, diagonal: V.string, bandZones: V.any, flip: V.bool }, out: V.geom }, ({ p }) => {
   const rings = p.rings.map(asArray);
   const zones = p.zones ?? {};
   const out = {};
   const put = (z, pos) => (out[z] ??= []).push(...pos);
+  const emitQuad = (pos, a, b, c, d) => {
+    if (p.flip) { tri(pos, a, c, b); tri(pos, a, d, c); }
+    else quad(pos, a, b, c, d);
+  };
   for (let k = 0; k < rings.length - 1; k++) {
     const A = rings[k], B = rings[k + 1], n = A.length, pos = [];
-    for (let i = 0; i < n; i++) { const j = (i + 1) % n; quad(pos, A[i], A[j], B[j], B[i]); }
-    put(typeof zones.band === 'function' ? zones.band(k) : (zones.band ?? 'a'), pos);
+    for (let i = 0; i < n; i++) {
+      const j = (i + 1) % n;
+      // 'ab' is the historical runtime diagonal; 'ba' matches the common
+      // Polyfork loft helper (A[j]-B[i] diagonal) used by cookie/rug.
+      if (p.diagonal === 'ba') emitQuad(pos, A[j], A[i], B[i], B[j]);
+      else emitQuad(pos, A[i], A[j], B[j], B[i]);
+    }
+    const zone = Array.isArray(p.bandZones) ? (p.bandZones[k] ?? 'a')
+      : (typeof zones.band === 'function' ? zones.band(k) : (zones.band ?? 'a'));
+    put(zone, pos);
   }
   const triOut = (out, a, b, c, hint) => {
     const n = cross3(sub3(b, a), sub3(c, a));
@@ -531,12 +572,13 @@ node('solidify', { in: { grid: V.any, topZone: V.any, botZone: V.any, wallZone: 
 });
 
 // ---------------------------------------------------------------- nodes: modifiers
-node('transform', { in: { geom: V.geom, tx: V.number, ty: V.number, tz: V.number, rx: V.number, ry: V.number, rz: V.number, s: V.number }, out: V.geom }, ({ p }) => {
-  const g = p.geom, m = new THREE.Matrix4();
+node('transform', { in: { geom: V.any, tx: V.number, ty: V.number, tz: V.number, rx: V.number, ry: V.number, rz: V.number, s: V.any }, out: V.geom }, ({ p }) => {
+  const g = toGeometry(p.geom), m = new THREE.Matrix4();
   m.compose(
     new THREE.Vector3(p.tx ?? 0, p.ty ?? 0, p.tz ?? 0),
     new THREE.Quaternion().setFromEuler(new THREE.Euler(p.rx ?? 0, p.ry ?? 0, p.rz ?? 0, 'XYZ')),
-    new THREE.Vector3(p.s ?? 1, p.s ?? 1, p.s ?? 1),
+    Array.isArray(p.s) ? new THREE.Vector3(p.s[0] ?? 1, p.s[1] ?? 1, p.s[2] ?? 1)
+      : new THREE.Vector3(p.s ?? 1, p.s ?? 1, p.s ?? 1),
   );
   return geom(g.parts.map(({ pos, zone }) => {
     const out = new Array(pos.length);
@@ -548,11 +590,12 @@ node('transform', { in: { geom: V.geom, tx: V.number, ty: V.number, tz: V.number
   }));
 });
 
-node('clip', { in: { geom: V.geom, nx: V.number, ny: V.number, nz: V.number, d: V.number, cap: V.bool, zone: V.string }, out: V.geom }, ({ p }) => {
+node('clip', { in: { geom: V.any, nx: V.number, ny: V.number, nz: V.number, d: V.number, cap: V.bool, zone: V.string }, out: V.geom }, ({ p }) => {
   const n = norm([p.nx ?? 0, p.ny ?? 1, p.nz ?? 0]), d = p.d ?? 0;
   const out = [], cut = [];
+  const src = toGeometry(p.geom);
   const dist = (v) => v[0] * n[0] + v[1] * n[1] + v[2] * n[2] - d;
-  for (const { pos, zone } of p.geom.parts) {
+  for (const { pos, zone } of src.parts) {
     for (let t = 0; t < pos.length; t += 9) {
       const V0 = [pos[t], pos[t + 1], pos[t + 2]], V1 = [pos[t + 3], pos[t + 4], pos[t + 5]], V2 = [pos[t + 6], pos[t + 7], pos[t + 8]];
       const ds = [dist(V0), dist(V1), dist(V2)];
@@ -571,7 +614,7 @@ node('clip', { in: { geom: V.geom, nx: V.number, ny: V.number, nz: V.number, d: 
       if (uniq.length >= 3) for (let i = 1; i < uniq.length - 1; i++) tri(out, uniq[0], uniq[i], uniq[i + 1]);
     }
   }
-  const parts = out.length ? [part(out, p.zone ?? p.geom.parts[0]?.zone ?? 'a')] : [];
+  const parts = out.length ? [part(out, p.zone ?? src.parts[0]?.zone ?? 'a')] : [];
   if (p.cap !== false && cut.length >= 3) {
     const c = [0, 0, 0];
     for (const q of cut) { c[0] += q[0] / cut.length; c[1] += q[1] / cut.length; c[2] += q[2] / cut.length; }
@@ -596,14 +639,17 @@ node('fan', { in: { ring: V.profile, apex: V.vec3, zone: V.string, flip: V.bool 
   return geom(part(out, p.zone ?? 'a'));
 });
 
-node('cone', { in: { n: V.int, r: V.number, h: V.number, x: V.number, y: V.number, z: V.number, axis: V.string, zone: V.string }, out: V.geom }, ({ p }) => {
+node('cone', { in: { n: V.int, r: V.number, h: V.number, x: V.number, y: V.number, z: V.number, axis: V.string, zone: V.string, flip: V.bool }, out: V.geom }, ({ p }) => {
   const n = Math.max(3, Math.round(p.n ?? 6)), out = [], apex = p.axis === 'z' ? [p.x ?? 0, p.y ?? 0, (p.z ?? 0) + (p.h ?? 1)] : [p.x ?? 0, (p.y ?? 0) + (p.h ?? 1), p.z ?? 0];
   const ring = [];
   for (let i = 0; i < n; i++) {
     const a = (i / n) * TAU, r = p.r ?? 1;
     ring.push(p.axis === 'z' ? [(p.x ?? 0) + r * Math.cos(a), (p.y ?? 0) + r * Math.sin(a), p.z ?? 0] : [(p.x ?? 0) + r * Math.cos(a), p.y ?? 0, (p.z ?? 0) + r * Math.sin(a)]);
   }
-  for (let i = 0; i < n; i++) tri(out, apex, ring[i], ring[(i + 1) % n]);
+  for (let i = 0; i < n; i++) {
+    const j = (i + 1) % n;
+    p.flip ? tri(out, apex, ring[j], ring[i]) : tri(out, apex, ring[i], ring[j]);
+  }
   return geom(part(out, p.zone ?? 'a'));
 });
 
@@ -652,40 +698,75 @@ node('deform', { in: { geom: V.geom, expr: V.field }, out: V.geom }, ({ p }) => 
   }));
 });
 
-node('join', { in: { geoms: V.any }, out: V.geom }, ({ p }) => geom(p.geoms.flatMap((g) => (g.__kind === 'geom' ? g.parts : []))));
+node('join', { in: { geoms: V.any }, out: V.geom }, ({ p }) => geom(p.geoms.flatMap((g) => toGeometry(g).parts)));
 
-node('scatter', { in: { count: V.int, minDist: V.number, seed: V.int, tries: V.int, sample: V.field, height: V.field, size: V.field, prng: V.bool }, out: V.points }, ({ p, ctx }) => {
+// Expose a THREE.BufferGeometry/Mesh/Group coming out of a code node as a
+// normal graph geometry value. The mesh node also accepts objects directly,
+// but this node makes them composable with join/transform/etc.
+node('geometry', { in: { object: V.any, zone: V.string }, out: V.geom }, ({ p }) => objectToGeom(p.object, p.zone ?? 'a'));
+
+// A deterministic, consumable random stream. Passing the same node into
+// scatter (or any future consumer) gives one shared sequence, which is what
+// the reference modules do with their local prng(seed) closure.
+node('random', { in: { seed: V.int, count: V.int }, out: V.random }, ({ p }) => {
+  const n = Math.max(0, Math.round(p.count ?? 4096));
+  const rnd = makePrng(p.seed ?? 1);
+  const values = [];
+  for (let i = 0; i < n; i++) values.push(rnd());
+  return { __kind: 'random', seed: p.seed ?? 1, values, next: 0 };
+});
+
+node('scatter', { in: { count: V.int, minDist: V.number, seed: V.int, tries: V.int, sample: V.field, height: V.field, size: V.field, yawScale: V.number, prng: V.bool, lazy: V.bool, rng: V.any }, out: V.points }, ({ p, ctx }) => {
   let s = (p.seed ?? 1) >>> 0;
-  const rnd = () => (s = (s * 16807) % 2147483647) / 2147483647;
+  const fallback = () => (s = (s * 16807) % 2147483647) / 2147483647;
+  const rnd = p.rng ? () => {
+    const r = p.rng;
+    if (r.next >= r.values.length) {
+      // A finite stream is deliberately finite; extend deterministically only
+      // when the caller asked for more than it allocated.
+      const more = makePrng((r.seed ?? 1) + r.values.length + 1);
+      while (r.values.length <= r.next) r.values.push(more());
+    }
+    return r.values[r.next++];
+  } : fallback;
   const out = [];
   for (let t = 0; t < (p.tries ?? 800) && out.length < (p.count ?? 1); t++) {
-    if (p.prng) { var r0 = rnd(), r1 = rnd(); }
-    const q = p.prng
+    let r0, r1;
+    if (p.prng || p.rng) { r0 = rnd(); r1 = rnd(); }
+    const q = (p.prng || p.rng)
       ? (fieldValue(p.sample, { i: t, s: ctx.params, r0, r1 }) ?? [0, 0])
       : (fieldValue(p.sample, { i: t, s: ctx.params }) ?? [0, 0]);
     const [x, z] = q;
     if (out.some((r) => Math.hypot(r[0] - x, r[2] - z) < (p.minDist ?? 0))) continue;
-    const y = p.height ? fieldValue(p.height, { x, z, s: ctx.params, r2: 0 }) : 0;
-    if (p.prng) { var r2 = rnd(); }
-    const sz = p.size ? fieldValue(p.size, { x, z, i: out.length, s: ctx.params, r2: r2 ?? 0 }) : 1;
-    if (p.prng) { var r3 = rnd(); }
-    out.push([x, y, z, sz, p.prng ? r3 * TAU : hash01(t, 4, p.seed ?? 1) * TAU]);
+    // lazy=true matches the reference modules: draw size/yaw only after the
+    // candidate has passed the separation test.
+    let r2 = 0, r3;
+    if ((p.prng || p.rng) && p.lazy) { r2 = rnd(); r3 = rnd(); }
+    const y = p.height ? fieldValue(p.height, { x, z, s: ctx.params, r2 }) : 0;
+    if ((p.prng || p.rng) && !p.lazy) r2 = rnd();
+    const sz = p.size ? fieldValue(p.size, { x, z, i: out.length, s: ctx.params, r2 }) : 1;
+    if ((p.prng || p.rng) && !p.lazy) r3 = rnd();
+    const yawStep = p.yawScale ?? TAU;
+    out.push([x, y, z, sz, (p.prng || p.rng) ? r3 * yawStep : hash01(t, 4, p.seed ?? 1) * yawStep]);
   }
   return pts(out);
 });
 
-node('instance', { in: { points: V.points, proto: V.geom, orient: V.bool, scale: V.number }, out: V.geom }, ({ p }) => {
+node('instance', { in: { points: V.points, proto: V.any, orient: V.bool, scale: V.any, yawSign: V.number }, out: V.geom }, ({ p }) => {
   const out = [];
   const up = new THREE.Vector3(0, 1, 0);
+  const proto = toGeometry(p.proto);
+  const gs = Array.isArray(p.scale) ? p.scale : [p.scale ?? 1, p.scale ?? 1, p.scale ?? 1];
   for (const [x, y, z, sz = 1, yaw = 0, nx, ny, nz] of p.points.pts) {
     const n = (nx !== undefined && p.orient !== false) ? new THREE.Vector3(nx, ny, nz).normalize() : null;
     const q0 = n ? new THREE.Quaternion().setFromUnitVectors(up, n) : new THREE.Quaternion();
-    const qy = new THREE.Quaternion().setFromAxisAngle(n ?? up, yaw);
+    const qy = new THREE.Quaternion().setFromAxisAngle(n ?? up, (p.yawSign ?? 1) * yaw);
     const Q = q0.clone().multiply(qy);
-    for (const { pos, zone } of p.proto.parts) {
+    const s = Array.isArray(sz) ? sz : [sz, sz, sz];
+    for (const { pos, zone } of proto.parts) {
       const q = new Array(pos.length);
       for (let i = 0; i < pos.length; i += 3) {
-        const v = new THREE.Vector3(pos[i] * sz * (p.scale ?? 1), pos[i + 1] * sz * (p.scale ?? 1), pos[i + 2] * sz * (p.scale ?? 1)).applyQuaternion(Q);
+        const v = new THREE.Vector3(pos[i] * s[0] * gs[0], pos[i + 1] * s[1] * gs[1], pos[i + 2] * s[2] * gs[2]).applyQuaternion(Q);
         q[i] = v.x + x; q[i + 1] = v.y + y; q[i + 2] = v.z + z;
       }
       out.push(part(q, zone));
@@ -694,19 +775,32 @@ node('instance', { in: { points: V.points, proto: V.geom, orient: V.bool, scale:
   return geom(out);
 });
 
-node('arrayPolar', { in: { geom: V.geom, count: V.int, radius: V.number, axis: V.string, start: V.number, arc: V.number }, out: V.geom }, ({ p }) => {
-  const out = [], n = Math.max(1, Math.round(p.count ?? 1));
+node('arrayPolar', { in: { geom: V.any, count: V.int, radius: V.number, axis: V.string, start: V.number, arc: V.number, spin: V.bool }, out: V.geom }, ({ p }) => {
+  const out = [], n = Math.max(1, Math.round(p.count ?? 1)), g0 = toGeometry(p.geom);
+  // spin=false keeps each copy's local orientation and only moves its centroid
+  // around the circle. This matches reference helpers that place radial bolts
+  // with a fixed world-space hexagon orientation.
+  const all = g0.parts.flatMap((q) => q.pos);
+  const c = [0, 0, 0];
+  for (let i = 0; i < all.length; i += 3) { c[0] += all[i] / (all.length / 3); c[1] += all[i + 1] / (all.length / 3); c[2] += all[i + 2] / (all.length / 3); }
   for (let k = 0; k < n; k++) {
     const a = (p.start ?? 0) + (p.arc ?? TAU) * (k / n);
-    for (const { pos, zone } of p.geom.parts) {
+    const ca = Math.cos(a), sa = Math.sin(a);
+    let t = null;
+    if (p.spin === false) {
+      const rc = p.axis === 'z' ? [c[0] * ca - c[1] * sa, c[0] * sa + c[1] * ca, c[2]] : rotY(c, a);
+      t = [rc[0] - c[0], rc[1] - c[1], rc[2] - c[2]];
+    }
+    for (const { pos, zone } of g0.parts) {
       const q = new Array(pos.length);
       for (let i = 0; i < pos.length; i += 3) {
         const src = p.axis === 'z'
           ? [pos[i], pos[i + 1], pos[i + 2]]
           : [pos[i], pos[i + 1], pos[i + 2] + (p.radius ?? 0)];
-        const v = p.axis === 'z'
-          ? (() => { const c = Math.cos(a), s2 = Math.sin(a); return [src[0] * c - src[1] * s2, src[0] * s2 + src[1] * c, src[2]]; })()
-          : rotY(src, a);
+        const v = t ? [src[0] + t[0], src[1] + t[1], src[2] + t[2]]
+          : (p.axis === 'z'
+            ? [src[0] * ca - src[1] * sa, src[0] * sa + src[1] * ca, src[2]]
+            : rotY(src, a));
         q[i] = v[0]; q[i + 1] = v[1]; q[i + 2] = v[2];
       }
       out.push(part(q, zone));
@@ -715,11 +809,11 @@ node('arrayPolar', { in: { geom: V.geom, count: V.int, radius: V.number, axis: V
   return geom(out);
 });
 
-node('arrayLinear', { in: { geom: V.geom, count: V.int, dx: V.number, dy: V.number, dz: V.number }, out: V.geom }, ({ p }) => {
-  const out = [], n = Math.max(1, Math.round(p.count ?? 1));
+node('arrayLinear', { in: { geom: V.any, count: V.int, dx: V.number, dy: V.number, dz: V.number }, out: V.geom }, ({ p }) => {
+  const out = [], n = Math.max(1, Math.round(p.count ?? 1)), g0 = toGeometry(p.geom);
   for (let k = 0; k < n; k++) {
     const t = k * (p.step ?? 1);
-    for (const { pos, zone } of p.geom.parts) {
+    for (const { pos, zone } of g0.parts) {
       const q = new Array(pos.length);
       for (let i = 0; i < pos.length; i += 3) {
         q[i] = pos[i] + (p.dx ?? 0) * t; q[i + 1] = pos[i + 1] + (p.dy ?? 0) * t; q[i + 2] = pos[i + 2] + (p.dz ?? 0) * t;
@@ -736,9 +830,14 @@ node('switch', { in: { on: V.string, cases: V.any }, out: V.any }, ({ p }) => {
   return p.cases[k];
 });
 
-node('mesh', { in: { geom: V.geom, zones: V.any, materials: V.any, flat: V.bool }, out: V.object }, ({ p }) => emitMesh(p.geom, {
-  zones: p.zones ?? {}, materials: p.materials ?? {}, flat: p.flat !== false,
-}));
+node('mesh', { in: { geom: V.any, zones: V.any, materials: V.any, flat: V.bool, crease: V.number }, out: V.object }, ({ p }) => {
+  if (p.geom?.isObject3D) return p.geom;
+  const g = toGeometry(p.geom);
+  if (g?.isObject3D) return g;
+  return emitMesh(g, {
+    zones: p.zones ?? {}, materials: p.materials ?? {}, flat: p.flat !== false, crease: p.crease,
+  });
+});
 
 node('group', { in: { children: V.any }, out: V.object }, ({ p }) => {
   const g = new THREE.Group();
@@ -808,8 +907,8 @@ node('spline', { in: { pts: V.any, closed: V.bool, samples: V.int, tension: V.nu
   return path(out, !!p.closed);
 });
 
-node('scatterSurface', { in: { geom: V.geom, count: V.int, minDist: V.number, seed: V.int, size: V.field }, out: V.points }, ({ p }) => {
-  const g = p.geom, tris = [];
+node('scatterSurface', { in: { geom: V.any, count: V.int, minDist: V.number, seed: V.int, size: V.field }, out: V.points }, ({ p }) => {
+  const g = toGeometry(p.geom), tris = [];
   for (const { pos } of g.parts) {
     for (let i = 0; i < pos.length; i += 9) {
       const a = [pos[i], pos[i + 1], pos[i + 2]], b = [pos[i + 3], pos[i + 4], pos[i + 5]], c = [pos[i + 6], pos[i + 7], pos[i + 8]];
@@ -830,8 +929,8 @@ node('scatterSurface', { in: { geom: V.geom, count: V.int, minDist: V.number, se
   return pts(out);
 });
 
-node('instancedMesh', { in: { geom: V.geom, points: V.points, color: V.color }, out: V.object }, ({ p }) => {
-  const src = p.geom.parts[0]; if (!src) throw new Error('instancedMesh: empty geometry');
+node('instancedMesh', { in: { geom: V.any, points: V.points, color: V.color, yawSign: V.number }, out: V.object }, ({ p }) => {
+  const src = toGeometry(p.geom).parts[0]; if (!src) throw new Error('instancedMesh: empty geometry');
   const geo = new THREE.BufferGeometry();
   geo.setAttribute('position', new THREE.Float32BufferAttribute(src.pos, 3));
   geo.computeVertexNormals();
@@ -839,8 +938,8 @@ node('instancedMesh', { in: { geom: V.geom, points: V.points, color: V.color }, 
   const up = new THREE.Vector3(0, 1, 0), m = new THREE.Matrix4(), q = new THREE.Quaternion(), s = new THREE.Vector3();
   p.points.pts.forEach(([x, y, z, sz = 1, yaw = 0, nx, ny, nz], i) => {
     const n = new THREE.Vector3(nx ?? 0, ny ?? 1, nz ?? 0).normalize();
-    q.setFromUnitVectors(up, n).multiply(new THREE.Quaternion().setFromAxisAngle(n, yaw));
-    s.set(sz, sz, sz);
+    q.setFromUnitVectors(up, n).multiply(new THREE.Quaternion().setFromAxisAngle(n, (p.yawSign ?? 1) * yaw));
+    if (Array.isArray(sz)) s.set(sz[0], sz[1], sz[2]); else s.set(sz, sz, sz);
     m.compose(new THREE.Vector3(x, y, z), q, s);
     mesh.setMatrixAt(i, m);
   });
@@ -849,9 +948,9 @@ node('instancedMesh', { in: { geom: V.geom, points: V.points, color: V.color }, 
 });
 
 // ---------------------------------------------------------------- cavity (approximate subtraction)
-node('cavity', { in: { geom: V.geom, cx: V.number, cy: V.number, cz: V.number, r: V.number, depth: V.number, zone: V.string }, out: V.geom }, ({ p }) => {
+node('cavity', { in: { geom: V.any, cx: V.number, cy: V.number, cz: V.number, r: V.number, depth: V.number, zone: V.string }, out: V.geom }, ({ p }) => {
   const c = [p.cx ?? 0, p.cy ?? 0, p.cz ?? 0], r = p.r ?? 0.1, d = p.depth ?? 0.6;
-  return geom(p.geom.parts.map(({ pos, zone }) => {
+  return geom(toGeometry(p.geom).parts.map(({ pos, zone }) => {
     const q = new Array(pos.length);
     for (let i = 0; i < pos.length; i += 3) {
       const v = [pos[i], pos[i + 1], pos[i + 2]], dir = sub3(v, c), len = Math.hypot(...dir);
@@ -877,8 +976,8 @@ node('skeleton', { in: { bones: V.any }, out: V.any }, ({ p }) => {
   return { __kind: 'skeleton', root, list, byName, defs };
 });
 
-node('skin', { in: { geom: V.geom, skeleton: V.any, soft: V.bool, zones: V.any }, out: V.object }, ({ p }) => {
-  const sk = p.skeleton, parts = p.geom.parts;
+node('skin', { in: { geom: V.any, skeleton: V.any, soft: V.bool, zones: V.any }, out: V.object }, ({ p }) => {
+  const sk = p.skeleton, parts = toGeometry(p.geom).parts;
   const pos = [], col = [];
   for (const { pos: pp, zone } of parts) {
     const c = new THREE.Color(p.zones?.[zone] ?? zoneColor(zone));
@@ -1244,13 +1343,32 @@ node('pointsGrid', { in: { nx: V.int, nz: V.int, w: V.number, d: V.number, y: V.
   return pts(out);
 });
 
-// script escape hatch: receives resolved inputs, returns any value
+// script escape hatch: receives resolved inputs, returns any value. The scope
+// intentionally matches the reference modules: THREE, the BufferGeometryUtils
+// addons, raw tri/quad/part/geom, ring and the same LCG. A script can return a
+// BufferGeometry/Mesh directly; mesh/geometry accept it.
+const SCRIPT_HELPERS = {
+  tri, quad, part, geom, profile, path, pts,
+  ring: (n, fn) => {
+    const out = [];
+    for (let i = 0; i < n; i++) {
+      const a = (i / n) * TAU;
+      const q = typeof fn === 'function' ? fn(i, a) : [Math.cos(a), Math.sin(a)];
+      out.push(Array.isArray(q) ? q : [Math.cos(a) * q, 0, Math.sin(a) * q]);
+    }
+    return out;
+  },
+  prng: makePrng,
+  clamp: (v, a, b) => Math.min(b, Math.max(a, v)),
+  lerp: (a, b, t) => a + (b - a) * t,
+  TAU,
+};
 node('script', { in: { inputs: V.any }, out: V.any }, ({ p, inputs }) => {
-  const fn = new Function('inputs', 'p', 'THREE', `
+  const fn = new Function('inputs', 'p', 'THREE', 'ADDONS', 'H', `
     "use strict";
     ${p.src}
   `);
-  return fn(inputs, p, THREE);
+  return fn(inputs, p, THREE, ADDONS, SCRIPT_HELPERS);
 });
 
 // opaque module escape hatch: wraps an existing Polyfork module

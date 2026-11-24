@@ -2,19 +2,19 @@ Polyfork DSL Lab
 ================
 
 This repository contains an independent declarative DSL, its runtime, a viewer,
-and original example graphs. It does not contain, link to, download, or
-redistribute any Polyfork source code, asset files, GLB/USD/FBX conversions, or
-kit archives.
+and example graphs. It does not contain, link to, download, or redistribute any
+Polyfork source code, asset files, GLB/USD/FBX conversions, or kit archives.
 
 Polyfork and its catalogue are the work of their author and are governed by
 https://polyfork.dev/licensing. No affiliation with or endorsement by Polyfork
 is claimed.
 
-The example graphs were written for this project as original DSL constructions.
-They explore publicly observable construction techniques (lofted shells, solid
-curl primitives, segment/stroke lettering, revolved treads, clipped rocks) so
-that the DSL can be evaluated against stylized low-poly assets. They are not
-copied files and are not byte-identical reproductions.
+Some example graphs are independent re-expressions/ports of publicly observable
+Polyfork constructions, included for demonstration and interoperability testing
+(fair-use research/demo). They are written in this project's DSL, contain no
+Polyfork source text, and are not redistributed Polyfork files. Geometric parity
+is measured order-independently and is not a byte-identical reproduction claim.
+Other examples are clearly marked original studies.
 
 If you use Polyfork assets, obtain them from Polyfork under their terms. Do not
 use this repository to redistribute their source or as a commercial asset
