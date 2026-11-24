@@ -13,15 +13,12 @@ const GRID_SRC = `
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 const SIZES = { small: { W: 2.00, D: 1.50, NX: 10, NZ: 8 }, large: { W: 3.00, D: 2.00, NX: 15, NZ: 10 } };
 const RC = 0.30, CH = 0.07, WOB = 0.024, KRUCK = 3;
-const { W, D, NX, NZ } = SIZES[inputs.size] || SIZES.small;
-const pile = clamp(inputs.pile, 0, 1), lived = clamp(inputs.lived_in, 0, 1);
+const { W, D, NX, NZ } = SIZES[size] || SIZES.small;
+const pileAmt = clamp(pile, 0, 1), lived = clamp(lived_in, 0, 1);
 const px = W / NX, pz = D / NZ;
-const TH = 0.014 + pile * 0.024;
-const AMP = pile * 0.011;
-let seed = 7681;
-const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
-const wob = [];
-for (let i = 0; i <= NX; i++) { wob.push([]); for (let j = 0; j <= NZ; j++) wob[i].push(rnd()); }
+const TH = 0.014 + pileAmt * 0.024;
+const AMP = pileAmt * 0.011;
+const wob = rng(7681).grid(NX + 1, NZ + 1);
 
 const top = [], bot = [];
 for (let i = 0; i <= NX; i++) {
@@ -42,41 +39,57 @@ for (let i = 0; i <= NX; i++) {
     const cn = Math.exp(-Math.pow(z / 0.32, 2));
     const rel = AMP * (0.55 * Math.sin(x * 11.3 + z * 4.1) + 0.45 * Math.sin(x * 5.7 - z * 13.9 + 2.1));
     const y = TH + rel * (1 - 0.7 * cn) - lived * 0.006 * cn;
-    top[i].push(new THREE.Vector3(x, y, z));
-    bot[i].push(new THREE.Vector3(x, 0, z));
+    top[i].push([x, y, z]);
+    bot[i].push([x, 0, z]);
   }
 }
+
+const vsub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+const vadd = (a, b) => [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
+const vcross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+const vdot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+const vnorm = (a) => { const l = Math.hypot(...a) || 1; return [a[0] / l, a[1] / l, a[2] / l]; };
+const vrot = (p, pivot, axis, phi) => {
+  const v = vsub(p, pivot), k = vcross(axis, v), d = vdot(axis, v);
+  const c = Math.cos(phi), s = Math.sin(phi);
+  return vadd(pivot, [v[0] * c + k[0] * s + axis[0] * d * (1 - c),
+                      v[1] * c + k[1] * s + axis[1] * d * (1 - c),
+                      v[2] * c + k[2] * s + axis[2] * d * (1 - c)]);
+};
 
 const foldV = (m) => [NX - KRUCK + m, NZ - m];
 {
   const [a0, b0] = foldV(0), [a1, b1] = foldV(KRUCK);
-  const y0 = top[a0][b0].y, y1 = top[a1][b1].y;
+  const y0 = top[a0][b0][1], y1 = top[a1][b1][1];
   for (let m = 1; m < KRUCK; m++) {
     const [a, b] = foldV(m);
-    top[a][b].y = y0 + (y1 - y0) * (m / KRUCK);
+    top[a][b][1] = y0 + (y1 - y0) * (m / KRUCK);
   }
 }
 
 if (lived > 0) {
   const PHI = lived * (95 * Math.PI / 180);
   const [a0, b0] = foldV(0), [a1, b1] = foldV(KRUCK);
-  const axis = new THREE.Vector3().subVectors(top[a1][b1], top[a0][b0]).setY(0).normalize();
+  const d = vsub(top[a1][b1], top[a0][b0]); d[1] = 0;
+  const axis = vnorm(d);
   for (let m = 1; m <= KRUCK; m++) {
     const phi = -PHI * Math.pow(m / KRUCK, 1.5);
     const hs = KRUCK - m + 1;
-    const pivot = top[NX - hs][NZ].clone();
+    const pivot = top[NX - hs][NZ];
     for (let i = 0; i <= NX; i++) for (let j = 0; j <= NZ; j++) {
       if ((NX - i) + (NZ - j) > KRUCK - m) continue;
-      for (const v of [top[i][j], bot[i][j]]) {
-        v.sub(pivot).applyAxisAngle(axis, phi).add(pivot);
-      }
+      top[i][j] = vrot(top[i][j], pivot, axis, phi);
+      bot[i][j] = vrot(bot[i][j], pivot, axis, phi);
     }
   }
 }
-
-const toA = (v) => [v.x, v.y, v.z];
-return { top: top.map((row) => row.map(toA)), bot: bot.map((row) => row.map(toA)), NX, NZ };
 `;
+const GRID_OUTS = [
+  { name: 'top', expr: 'top' },
+  { name: 'bot', expr: 'bot' },
+  { name: 'NX', expr: 'NX' },
+  { name: 'NZ', expr: 'NZ' },
+];
 
 export default function build(g, P = {}) {
   const colorway = g.input('colorway', 'enum', 'linen-sage', { options: Object.keys(PALETTE), label: 'Colorway' });
@@ -89,8 +102,14 @@ export default function build(g, P = {}) {
   const pile = g.input('pile', 'float', 0.25, { min: 0, max: 1, step: 0.05, label: 'Pile' });
   const livedIn = g.input('lived_in', 'float', 0.35, { min: 0, max: 1, step: 0.05, label: 'Lived in' });
 
-  const data = g.script({ inputs: { size, pile, lived_in: livedIn }, src: GRID_SRC });
-  const get = (key) => g.get({ object: data, key });
+  const layoutInputs = [
+    { name: 'size', type: 'enum', default: 'small' },
+    { name: 'pile', type: 'float', default: 0.25 },
+    { name: 'lived_in', type: 'float', default: 0.35 },
+  ];
+  g.defineLayout('rug-grid', { inputs: layoutInputs, src: GRID_SRC, outs: GRID_OUTS });
+  const data = g.layoutNode('rug-grid', { size, pile, lived_in: livedIn });
+  const get = (key) => ({ __ref: `${data.__ref}.${key}` });
   const slab = g.solidify({
     grid: data,
     NX: get('NX'), NZ: get('NZ'), pattern,

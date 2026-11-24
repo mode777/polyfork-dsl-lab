@@ -96,9 +96,11 @@ The viewer `frame()` uses `current.cam` = `[azimuthDeg, elevationDeg]` and
 - Sapphire had an inverted bottom cap; `loft.orient`/`orientCenter` and `reverse` fixed it.
   Sapphire is now fully parametric (all reference params live, including pointed/
   truncated/broken terminations).
-- New nodes/controls: `get` (structured code output), `prim` (exact Three geometry),
-  `reverse`, `revolve.ringMode`/`zoneField`/caps, `solidify.diagonal`/`wallOrder`/zone
-  fields, input `label`/`step`.
+- New: pure `layout` blocks (`in`/`let`/`fn`/`out`, deterministic `rng`, multi-output
+  `@node.field` refs), `prim` (exact Three geometry), `reverse`,
+  `revolve.ringMode`/`zoneField`/caps, `solidify.diagonal`/`wallOrder`/zone fields,
+  input `label`/`step`.
+- Sapphire/tire/rug no longer use `script`; the showcase has zero script nodes.
 - The previous approximations/studies were removed from the published manifest while
   they are replaced with real ports. The gallery is stale.
 - `t-all.mjs` is count-independent and winding-aware; counts alone are not parity.
@@ -125,6 +127,7 @@ node t-tire.mjs             # 8 tire variants
 node t-sapphire.mjs        # 13 sapphire param variants
 node t-pumpkin.mjs         # 6 pumpkin variants
 node t-rug.mjs             # 9 rug variants
+node t-layout.mjs          # layout block, fn/rng, multi-output, round-trip
 node t-code.mjs            # Three object/BufferGeometry + random-stream bridge
 node t-sample3.mjs         # sample-3 template ports
 node t-bool.mjs            # Manifold boolean smoke test
@@ -161,5 +164,5 @@ gh api repos/mode777/polyfork-dsl-lab/pages/builds/latest --jq '.status,.commit'
 - `mesh` zones must match part zone names; a mismatch silently uses fallback colours.
 - GitHub Pages caches assets; bump `?v=` after viewer/style/runtime changes. The public
   runtime files must import each other with `.js`, unlike the study `.mjs` sources.
-  `sync-public.mjs` uses `PUBLIC_ASSET_VERSION` (default `4`); keep it in step with
+  `sync-public.mjs` uses `PUBLIC_ASSET_VERSION` (default `5`); keep it in step with
   `index.html` and `viewer.js`.

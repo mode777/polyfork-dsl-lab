@@ -88,6 +88,7 @@ node t-tire.mjs             # 8 tire variants
 node t-sapphire.mjs                 # 13 sapphire variants
 node t-pumpkin.mjs                  # 6 pumpkin variants
 node t-rug.mjs                      # 9 rug variants
+node t-layout.mjs                   # layout block, fn/rng, multi-output, round-trip
 node t-code.mjs                     # Three object/BufferGeometry + random stream
 node t-sample3.mjs                  # sample-3 templates
 node t-bool.mjs && node t-cache.mjs
@@ -112,8 +113,10 @@ Commit/push the public repo, check
   `module` wrappers.
 - Sapphire is fully parametric (colorway, gem, length, barrel, ends, chamfer, irregularity)
   and its bottom-cap inversion is fixed with `loft.orient` + `reverse`.
-- New: `get`, `prim`, `reverse`, `revolve.ringMode`/`zoneField`/caps,
-  `solidify.diagonal`/`wallOrder`/zone fields, input `label`/`step`.
+- New: pure `layout` blocks (`in`/`let`/`fn`/`out`, `rng`, multi-output refs), `prim`,
+  `reverse`, `revolve.ringMode`/`zoneField`/caps, `solidify.diagonal`/`wallOrder`/zone
+  fields, input `label`/`step`.
+- Sapphire/tire/rug are script-free; the showcase has no script or get nodes.
 - Approximations/studies were removed from the published manifest; do not re-add them
   until they are real ports.
 - Gallery is older than the last geometry pass; regenerate if precise.

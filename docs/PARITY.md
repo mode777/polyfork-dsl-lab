@@ -68,7 +68,9 @@ node option per asset:
 | `solidify` | `topZoneField` / `botZoneField` | per-cell colour zones |
 | `reverse` | — | flip every triangle winding (dished caps) |
 | `prim` | `type`, `args` | call a real `THREE.*Geometry` constructor |
-| `get` | `object`, `key` | turn structured code output into graph values |
+| `layout` | `in`/`let`/`fn`/`out` | pure layout math with typed inputs and named outputs |
+| layout `rng` | `next`/`take`/`grid` | deterministic random values without hand-rolled LCGs |
+| `@node.field` | — | read a named layout output directly |
 | `scatter` | `lazy: true` | draw size/yaw only after a candidate passes min-distance |
 | `scatter` | `yawScale` | reference helpers use `PI`, not `TAU` |
 | `scatter` | `rng` | consume a shared `random` stream |

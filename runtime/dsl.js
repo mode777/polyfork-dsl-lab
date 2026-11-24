@@ -1,6 +1,6 @@
 // Compact authoring DSL over the v2 IR. Every call records a node; scalars,
 // refs, arrays and field expressions all serialise (fields as source strings).
-import { Graph, field, isField, expr } from './runtime.js?v=4';
+import { Graph, field, isField, expr } from './runtime.js?v=5';
 
 const F = (v) => (isField(v) || typeof v !== 'string' && typeof v !== 'function' ? v : field(v));
 const strip = (o, ks) => { const q = { ...o }; for (const k of ks) delete q[k]; return q; };
@@ -11,6 +11,8 @@ class Builder {
   constructor(g) { this.g = g; }
   input(name, type, def, extra = {}) { return this.g.input(name, type, def, extra); }
   define(name, fn) { const sg = new Graph(name, { group: true }); fn(new Builder(sg)); this.g.groups.set(name, sg); return name; }
+  defineLayout(name, { inputs = [], src = '', outs = [] } = {}) { this.g.layouts.set(name, { name, inputs, src, outs }); return name; }
+  layoutNode(name, inputs = {}) { return this.add('layout', inputs, { graph: name }); }
   groupNode(name, inputs = {}) { return this.add('group', inputs, { graph: name }); }
   repeatNode(name, count, inputs = {}) { return this.add('repeat', { ...inputs, count }, { graph: name }); }
   add(type, inputs = {}, params = {}) { return this.g.add(type, inputs, params); }
@@ -85,7 +87,6 @@ class Builder {
   }
   instance(o) { return this.add('instance', { points: o.points, proto: o.proto }, { orient: o.orient, scale: o.scale, yawSign: o.yawSign }); }
   geometry(o) { return this.add('geometry', { object: o.object }, { zone: o.zone }); }
-  get(o) { return this.add('get', { object: o.object }, { key: o.key }); }
   random(o = {}) { return this.add('random', {}, o); }
   arrayPolar(o) { return this.add('arrayPolar', { geom: o.geom }, strip(o, ['geom'])); }
   arrayLinear(o) { return this.add('arrayLinear', { geom: o.geom }, strip(o, ['geom'])); }

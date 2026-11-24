@@ -72,6 +72,8 @@ end
 - `` `expr` `` — field expression, evaluated per vertex/index
 - `` ~`expr` `` — parameter expression, evaluated once per cook (`s` = inputs)
 - `group … end` — subgraph · `repeat count= graph=` — repeated subgraph
+- `layout … end` — pure layout data (`in`/`let`/`fn`/`out`, deterministic `rng`); read
+  outputs with `@id.field`
 - `script` and `module` — explicit escape hatches (marked, never implicit)
 - `geometry`/`mesh` also accept a `THREE.BufferGeometry`, `Mesh` or `Group`; a `script`
   can return one and the rest of the graph can join/transform it.
@@ -85,13 +87,13 @@ The parser, serializer and evaluator are in `runtime/`. `.pfn` is the authoring 
 
 | group | nodes |
 |---|---|
-| sources | `ring profile path grid box chamferBox cylinder sphere plane card cone curl pointsGrid geometry prim random get` |
+| sources | `ring profile path grid box chamferBox cylinder sphere plane card cone curl pointsGrid geometry prim random` |
 | surfaces | `loft loftProfile cap extrude revolve sweep inset pocket solidify bevelProfile fan fanRing wrapShell` |
 | modifiers | `transform center mirror reverse deform clip join cavity` |
 | distribution | `scatter scatterSurface scatterVolume instance instancedMesh arrayPolar arrayLinear` |
 | character | `skeleton skin pose` |
 | surface-relative | `pathOnSurface bandOnSurface ribbon` |
-| control / text | `switch text boolean` |
+| control / text | `switch text boolean layout` |
 | output | `mesh group` |
 | escape hatches | `script module` |
 
@@ -100,7 +102,7 @@ Low-level controls are first-class: `loft` has `diagonal`, `bandZones`, `flip`,
 `solidify` has reference diagonals, wall order and zone fields; `scatter` has `lazy`,
 `yawScale`, `rng`; `instance` has per-point `[sx,sy,sz]` scale and `yawSign`; `arrayPolar`
 has `spin`; `reverse` flips winding; `prim` calls a real Three geometry constructor;
-`get` pulls fields out of structured code output. A `script` node sees `THREE`, `ADDONS`
+A `script` node sees `THREE`, `ADDONS`
 (`mergeGeometries`, `toCreasedNormals`, `RoundedBoxGeometry`) and `H` (`tri`, `quad`,
 `part`, `geom`, `ring`, `prng`, `clamp`, `lerp`).
 
@@ -126,6 +128,7 @@ vertex set and bbox, and no winding mismatches. It is not a byte/vertex-order cl
 - [docs/STATUS.md](docs/STATUS.md) — current example status, verified work, next tasks
 - [study/AGENTS.md](study/AGENTS.md) — authoring/porting workspace; downloaded assets are gitignored
 - [docs/PARITY.md](docs/PARITY.md) — geometric parity contract and Three.js bridge
+- [docs/DSL_GAPS.md](docs/DSL_GAPS.md) — script-node audit and the pure layout layer
 - [docs/DESIGN.md](docs/DESIGN.md) — API, node signatures, format
 - [docs/TECHNIQUES.md](docs/TECHNIQUES.md) — how the studied assets build hair, clothes, text
 - [docs/STUDY.md](docs/STUDY.md) — three random samples, gap analysis, ring-array optimisation

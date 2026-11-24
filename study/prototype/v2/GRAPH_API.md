@@ -35,11 +35,11 @@ and a compact declarative storage format.
 
 | group | nodes |
 |---|---|
-| sources | `ring`, `profile`, `path`, `grid`, `box`, `cylinder`, `sphere`, `geometry`, `prim`, `random`, `get` |
+| sources | `ring`, `profile`, `path`, `grid`, `box`, `cylinder`, `sphere`, `geometry`, `prim`, `random` |
 | surfaces | `loft`, `cap`, `extrude`, `revolve`, `sweep`, `inset`, `pocket`, `solidify` |
 | modifiers | `transform`, `center`, `mirror`, `reverse`, `deform`, `clip`, `join` |
 | distribution | `scatter`, `instance`, `arrayPolar`, `arrayLinear` |
-| control | `switch`, `fan`, `cone` |
+| control | `switch`, `fan`, `cone`, `layout` |
 | output | `mesh`, `group` |
 | escape hatches | `script`, `module` |
 
@@ -62,10 +62,10 @@ arrayPolar geom count radius start arc spin
 geometry  object(THREE.BufferGeometry|Mesh|Group) zone -> geometry
 prim      type(THREE geometry) args[] transform -> geometry
 reverse   geom -> geometry with opposite winding
-get       object key -> any
 random    seed count -> stream
 switch    on cases{a:ref,b:ref}
 mesh      geom zones{zone:hex} materials{zone:{slot,roughness,metalness,opacity}} crease
+layout    name + in... let/fn... out name=expr (pure, deterministic rng)
 script    inputs{...} src  (JS: THREE, ADDONS, H; `return` any value)
 module    params  (wraps an existing createAsset)
 ```

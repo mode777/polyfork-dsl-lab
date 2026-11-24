@@ -43,3 +43,10 @@ g3.out('pts', pts);
 const a = evaluate(g3.ir).outputs.pts.pts;
 const b = evaluate(g3.ir).outputs.pts.pts;
 console.log('random stream', JSON.stringify(a), JSON.stringify(a) === JSON.stringify(b) ? 'deterministic' : 'NONDETERMINISTIC');
+
+// A grid value can be deformed before solidify.
+const g4 = graph('grid-deform');
+const grid = g4.grid({ nx: 2, nz: 2, w: 1, d: 1, position: '[x, 1, z]' });
+const moved = g4.deform({ geom: grid, expr: '[x, y + 0.5, z]' });
+g4.out('mesh', g4.mesh(g4.solidify({ grid: moved, topZone: 'a', botZone: 'a', wallZone: 'a' }), { zones: { a: '#888888' } }));
+console.log('grid deform', stats(evaluate(g4.ir).outputs.mesh));

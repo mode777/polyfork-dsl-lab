@@ -55,6 +55,7 @@ prototype/
     t-sapphire.mjs  sapphire 13-variant parity
     t-pumpkin.mjs   pumpkin 6-variant parity
     t-rug.mjs       rug 9-variant parity
+    t-layout.mjs    layout block, fn/rng, multi-output, format round-trip
     t-code.mjs      Three object/BufferGeometry + random stream smoke test
 ```
 

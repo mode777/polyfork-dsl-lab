@@ -14,10 +14,10 @@ const GEM = {
 const DATA_SRC = `
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 const R = 0.034, Hh = 0.023, PT = 0.033;
-const PL = 0.074 * clamp(inputs.length, 0.5, 1.8);
-const irr = clamp(inputs.irregularity, 0, 1);
-const bar = clamp(inputs.barrel, 0, 1);
-const ch = clamp(inputs.chamfer, 0, 1);
+const PL = 0.074 * clamp(length, 0.5, 1.8);
+const irr = clamp(irregularity, 0, 1);
+const bar = clamp(barrel, 0, 1);
+const ch = clamp(chamfer, 0, 1);
 let seed = 20261103;
 const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
 const j = () => rnd() * 2 - 1;
@@ -48,7 +48,7 @@ const centroid = (pts) => pts.reduce((a, p) => [a[0] + p[0] / pts.length, a[1] +
 const rings = st.map(([x, s, dz]) => ring2d.map(([z, y]) => [x, y * s, z * s + dz]));
 const ringsBroken = rings.map((r) => r.map((p) => [p[0], p[1], p[2]]));
 
-if (inputs.ends === 'broken') {
+if (ends === 'broken') {
   const r0 = rings[0], r1 = rings[1];
   const yc = centroid(r0)[1];
   const xc = r0[0][0] + 0.3 * (r1[0][0] - r0[0][0]);
@@ -90,16 +90,25 @@ const brokenBottomRing = ringsBroken[0];
 const bc = centroid(brokenBottomRing);
 const brokenDent = [bc[0] - 0.3 * PT, bc[1] + 0.2 * Hh, bc[2] - 0.2 * R];
 
-return {
-  profile: ring2d,
-  stations: st,
-  rings,
-  ringsBroken,
-  pointedTop, pointedBottom,
-  truncTopRing, truncBottomRing, truncTopCap, truncBottomCap, truncTopFan, truncBottomFan,
-  brokenTopRing: ringsBroken[ringsBroken.length - 1], brokenTopApex, brokenBottomRing, brokenDent,
-};
 `;
+const DATA_OUTS = [
+  { name: 'profile', expr: 'ring2d' },
+  { name: 'stations', expr: 'st' },
+  { name: 'rings', expr: 'rings' },
+  { name: 'ringsBroken', expr: 'ringsBroken' },
+  { name: 'pointedTop', expr: 'pointedTop' },
+  { name: 'pointedBottom', expr: 'pointedBottom' },
+  { name: 'truncTopRing', expr: 'truncTopRing' },
+  { name: 'truncBottomRing', expr: 'truncBottomRing' },
+  { name: 'truncTopCap', expr: 'truncTopCap' },
+  { name: 'truncBottomCap', expr: 'truncBottomCap' },
+  { name: 'truncTopFan', expr: 'truncTopFan' },
+  { name: 'truncBottomFan', expr: 'truncBottomFan' },
+  { name: 'brokenTopRing', expr: 'ringsBroken[ringsBroken.length - 1]' },
+  { name: 'brokenTopApex', expr: 'brokenTopApex' },
+  { name: 'brokenBottomRing', expr: 'brokenBottomRing' },
+  { name: 'brokenDent', expr: 'brokenDent' },
+];
 
 export default function build(g, P = {}) {
   const colorway = g.input('colorway', 'enum', 'royal-blue', { options: Object.keys(GEM), label: 'Colorway' });
@@ -110,8 +119,16 @@ export default function build(g, P = {}) {
   const chamfer = g.input('chamfer', 'float', 0.3, { min: 0, max: 1, step: 0.05, label: 'Edge bevel' });
   const irregularity = g.input('irregularity', 'float', 0.0, { min: 0, max: 1, step: 0.05, label: 'Natural irregularity' });
 
-  const data = g.script({ inputs: { length, barrel, ends, chamfer, irregularity }, src: DATA_SRC });
-  const pick = (key) => g.get({ object: data, key });
+  const layoutInputs = [
+    { name: 'length', type: 'float', default: 1.0 },
+    { name: 'barrel', type: 'float', default: 0.0 },
+    { name: 'ends', type: 'enum', default: 'pointed' },
+    { name: 'chamfer', type: 'float', default: 0.3 },
+    { name: 'irregularity', type: 'float', default: 0.0 },
+  ];
+  g.defineLayout('sapphire-data', { inputs: layoutInputs, src: DATA_SRC, outs: DATA_OUTS });
+  const data = g.layoutNode('sapphire-data', { length, barrel, ends, chamfer, irregularity });
+  const pick = (key) => ({ __ref: `${data.__ref}.${key}` });
   const zones = { band: 'gem', capTop: 'gem', capBottom: 'gem' };
 
   const pointed = g.loftProfile({

@@ -34,6 +34,7 @@ export class Graph {
     this.byId = new Map();
     this.outputs = {};         // {name: ref}
     this.groups = new Map();   // name -> Graph
+    this.layouts = new Map();  // name -> {name, inputs, src, outs}
     this._seq = 0;
   }
   input(name, type, def, extra = {}) {
@@ -162,6 +163,13 @@ export function evaluate(graph, values = {}, opts = {}) {
     if (isRef(v)) {
       const key = v.__ref;
       if (key.startsWith('$')) return params[key.slice(1)];
+      // Multi-output refs: @node.field or @node.a.b. The base node is evaluated
+      // once and memoised; the path is then read from its object value.
+      const dot = key.indexOf('.');
+      if (dot > 0) {
+        const base = resolve({ __ref: key.slice(0, dot) }, ctx);
+        return key.slice(dot + 1).split('.').reduce((o, k) => o?.[k], base);
+      }
       if (memo.has(key)) return memo.get(key);
       const n = graph.byId.get(key);
       if (!n) throw new Error(`unknown node ${key}`);
@@ -781,9 +789,16 @@ node('mirror', { in: { geom: V.geom, axis: V.string, weld: V.bool }, out: V.geom
   return geom(out);
 });
 
-node('deform', { in: { geom: V.geom, expr: V.field }, out: V.geom }, ({ p }) => {
+node('deform', { in: { geom: V.any, expr: V.field }, out: V.any }, ({ p }) => {
   const g = p.geom;
-  return geom(g.parts.map(({ pos, zone }) => {
+  if (g?.__kind === 'grid') {
+    const map = (lattice) => lattice.map((row, i) => row.map((q, k) => {
+      const r = fieldValue(p.expr, { x: q[0], y: q[1], z: q[2], i, k, j: k, p: q }) ?? q;
+      return Array.isArray(r) ? r : [q[0], r, q[2]];
+    }));
+    return { ...g, top: map(g.top), bot: map(g.bot) };
+  }
+  return geom(toGeometry(g).parts.map(({ pos, zone }) => {
     const out = new Array(pos.length);
     for (let i = 0; i < pos.length; i += 3) {
       const x = pos[i], y = pos[i + 1], z = pos[i + 2];
@@ -801,14 +816,6 @@ node('join', { in: { geoms: V.any }, out: V.geom }, ({ p }) => geom(p.geoms.flat
 // but this node makes them composable with join/transform/etc.
 node('geometry', { in: { object: V.any, zone: V.string }, out: V.geom }, ({ p }) => objectToGeom(p.object, p.zone ?? 'a'));
 
-// Pull a named field out of a code node's structured output. This lets a
-// script compute layout data (profiles, stations, tip points) while the graph
-// still builds the surfaces with loft/join/mesh nodes.
-node('get', { in: { object: V.any, key: V.string }, out: V.any }, ({ p }) => p.object?.[p.key]);
-
-// A deterministic, consumable random stream. Passing the same node into
-// scatter (or any future consumer) gives one shared sequence, which is what
-// the reference modules do with their local prng(seed) closure.
 node('random', { in: { seed: V.int, count: V.int }, out: V.random }, ({ p }) => {
   const n = Math.max(0, Math.round(p.count ?? 4096));
   const rnd = makePrng(p.seed ?? 1);
@@ -1442,6 +1449,44 @@ node('pointsGrid', { in: { nx: V.int, nz: V.int, w: V.number, d: V.number, y: V.
     out.push([-(p.w ?? 1) / 2 + (i + 0.5) * (p.w ?? 1) / nx, p.y ?? 0, -(p.d ?? 1) / 2 + (j + 0.5) * (p.d ?? 1) / nz, 1, 0, n[0], n[1], n[2]]);
   }
   return pts(out);
+});
+
+// ---------------------------------------------------------------- pure layout blocks
+// A layout block is a restricted, pure value/layout function. It has typed
+// inputs and named outputs, no THREE/imports/DOM, and is the supported home
+// for profile/table/grid layout math. script remains the geometry escape hatch.
+function layoutRng(seed = 1) {
+  const next = makePrng(seed);
+  return {
+    next,
+    take: (n) => Array.from({ length: Math.max(0, Math.round(n)) }, next),
+    grid: (nx, nz) => Array.from({ length: Math.round(nx) }, () =>
+      Array.from({ length: Math.round(nz) }, next)),
+  };
+}
+const LAYOUT_FORBIDDEN = /\b(THREE|ADDONS|import\s*\(|require\s*\(|globalThis|window|document|process|fetch|XMLHttpRequest|eval\s*\(|Function\s*\()/;
+function compileLayout(def) {
+  // Small sugar: `fn name(args) { ... }` and `fn name(args) = expr` are
+  // layout-only spellings of a function declaration/arrow.
+  const layoutSrc = String(def.src ?? '')
+    .replace(/^[ \t]*fn[ \t]+([A-Za-z_$][\w$]*)[ \t]*\(([^)]*)\)[ \t]*=/gm, 'const $1 = ($2) =>')
+    .replace(/^[ \t]*fn[ \t]+([A-Za-z_$][\w$]*)[ \t]*\(([^)]*)\)[ \t]*\{/gm, 'function $1($2) {');
+  const src = `${layoutSrc}\n${(def.outs ?? []).map((o) => o.expr).join('\n')}`;
+  if (LAYOUT_FORBIDDEN.test(src)) throw new Error(`layout ${def.name}: impure source`);
+  const names = (def.inputs ?? []).map((i) => i.name);
+  const body = `"use strict";
+const {${names.join(',')}} = inputs;
+${layoutSrc}
+return {
+${(def.outs ?? []).map((o) => `${JSON.stringify(o.name)}: (${o.expr})`).join(',\n')}
+};`;
+  return new Function('inputs', 'rng', body);
+}
+node('layout', { in: {}, out: V.any }, ({ p, inputs, graph }) => {
+  const def = graph.layouts.get(p.graph);
+  if (!def) throw new Error(`layout: ${p.graph} not found`);
+  const values = { ...Object.fromEntries(def.inputs.map((i) => [i.name, i.default])), ...inputs };
+  return compileLayout(def)(values, layoutRng);
 });
 
 // script escape hatch: receives resolved inputs, returns any value. The scope
