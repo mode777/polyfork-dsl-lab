@@ -5,80 +5,65 @@ example policy changes.
 
 ## Headline
 
-The DSL now has the right layer boundary: it is a compact graph/code layer over the same
-three.js primitives and addons, not a replacement geometry kernel. Three simple props are
-geometric ports verified against the reference modules. The remaining content is still a
-mix of approximations and original studies.
+The showcase is **ports only** while the remaining approximations and studies are
+replaced with real ports. Five reference assets pass the order-independent geometric
+parity check at `1e-4`: cookie, rough sapphire, tire, pumpkin and area rug.
 
 ## Example status
 
-Verified with `t-all.mjs` (order-independent triangle/vertex/bbox comparison at `1e-4`):
+| example | tris | status | notes |
+|---|---:|---|---|
+| **cookie** | 174 | **geometric port** | exact vertices/bbox at default, 3-chip/thin and 14-chip/thick. |
+| **sapphire** | 48 | **geometric port** | all reference params live: colorway, gem, length, barrel, ends (pointed/truncated/broken), chamfer, irregularity. Winding verified. |
+| **tire** | 520 | **geometric port** | tread, caps, hub and lug ring; seated at `y=CY`; colorway/facets/width/rimSize live. |
+| **pumpkin** | 120 | **geometric port** | alternating lobe/groove revolve; real `THREE.CylinderGeometry` stem; squash/ribs live. |
+| **area rug** | 392 / 700 | **geometric port** | small/large, pile, lived-in fold, plain/bordered/geometric patterns, per-cell zones. |
 
-| example | status | notes |
-|---|---|---|
-| **cookie** | **geometric parity** | 174 tris; exact vertex/bbox match at default, 3-chip/thin and 14-chip/thick settings. |
-| **sapphire** | **geometric parity** | 48 tris; default chamfer/profile corrected; exact vertex/bbox match. |
-| **tire** | **geometric parity** | 520 tris; tread, caps, hub and lug ring match; the reference sits at `y=CY`, not on the origin. |
-| **rock** | approximation | 106 tris vs 188; low-poly deformed sphere + capped plane cuts, more symmetric than the reference. |
-| **armchair** | approximation | 424 tris vs 460; curved back band, cushions, base, legs; thinner than the reference. |
-| **clam** | approximation | 992 tris vs 792; closed ribbed shell + groove seam, not the reference two-valve opening. |
-| **pumpkin** | close | 412 tris; deep 8-rib revolve + stem. |
-| **basket** | approximation | 1,390 tris; corrugated wall, rim, side handles, not a woven coil pattern. |
-| **hair** | original study | cap + ponytail + scattered 6-tri curls; not the valet's hair. |
-| **jacket** | original study | closed zip jacket on a mannequin; not the valet's tailored vest. |
-| **sign** | original study | taxiway-style panel with segment letters; not the reference stroke-font sign. |
-| **creature** | original study | stylized quadruped with skin; not the goat. |
+The previous rock/armchair/clam/basket approximations and the hair/jacket/sign/creature
+studies were removed from the published manifest. They are not shown as ports.
 
 ## What changed in this pass
 
-- Cookie is now a real port: `loft.diagonal='ba'`, lazy PRNG draws, `yawScale=PI`,
-  non-uniform instance scale, `yawSign=-1`, 6-sided cone with flipped winding.
-- Sapphire's default chamfer is `0.3` and its bevel profile follows the reference
-  edge-walk formula; the previous `0.18` default produced a different crystal.
-- Tire is no longer centred on the origin. It is translated to the reference's
-  `y=CY` seating, the lug bases get the `-0.002` offset, and `arrayPolar.spin=false`
-  keeps the hexagon orientation fixed while placing the lugs radially.
-- The runtime now has a first-class Three bridge: `geometry`/`mesh` accept
-  `BufferGeometry`/`Mesh`/`Group`; scripts see `THREE`, `ADDONS` and `H`.
-- Parity is no longer counts-only. `t-all.mjs` compares triangle sets, vertex sets and
-  bbox with a tolerance; `t-code.mjs` covers the Three bridge and random stream.
+- Fixed the sapphire inversion: the runtime's bottom-cap hint pointed inward; `loft` now
+  has `orient`/`orientCenter` and the broken dished cap uses `reverse`.
+- Sapphire is fully parametric. A code node computes the reference layout data using one
+  PRNG stream; `get` feeds `loftProfile`/`loft`; `switch` selects the termination; mesh
+  colours come from `colorway`/`gem`.
+- Added first-class `get` (structured code output → graph values), `prim` (exact Three
+  geometry constructors), `reverse` (face winding), `revolve.ringMode`/`zoneField`/caps,
+  `solidify.diagonal`/`wallOrder`/zone fields, and input `label`/`step` metadata.
+- Added exact **pumpkin** (alternating lobe/groove revolve, real Three cylinder stem) and
+  **area rug** (deformed lattice, folded corner, per-cell zones) ports.
+- Tire is fully parametric now (colorway, rubber/sidewall/rim/chrome, facets, width, rim
+  size) with a code node for the profile/modulation data.
+- Parity now checks **winding** as well as vertices/bbox. This is what caught sapphire.
+- Showcase tags and manifest now contain ports only; the old studies are removed.
 
 ## What was verified
 
-- All 12 graphs parse and cook (`t-examples.mjs`).
-- `cookie`, `sapphire`, `tire` and the six `module` wrappers pass `t-all.mjs`.
-  Cookie is parametric; sapphire/tire are verified at default and still bake some
-  profile/station arrays, so their non-default sliders are not yet live.
-- Manifold booleans, group/repeat, skinning, surface scatter, text and clipping are
-  exercised by tests in the study workspace.
-- Public runtime/examples cook under the `.js` import layout.
-
-## What is not achieved
-
-- Pixel/hero parity for the remaining examples. Geometry parity is only claimed for the
-  three props above.
-- Exact ports of the character/sign assets. Hair, jacket, sign and creature are still
-  original studies.
+- `t-all.mjs`: cookie, sapphire, tire, pumpkin, rug + six `module` wrappers pass at
+  default; the per-port tests cover parameter variants.
+- `t-cookie.mjs`: 3/3 variants.
+- `t-tire.mjs`: 8/8 variants.
+- `t-sapphire.mjs`: 13/13 variants (all params, including broken/truncated/irregular).
+- `t-pumpkin.mjs`: 6/6 variants.
+- `t-rug.mjs`: 9/9 variants (both sizes, pile, lived-in extremes, all patterns).
+- All five showcase graphs parse and cook (`t-examples.mjs`).
+- `t-code.mjs`, `t-bool.mjs`, `t-cache.mjs`, `t-sample3.mjs` pass.
 
 ## How to compare correctly
 
-Comparing the published viewer against Polyfork `hero.png` conflates **geometry**,
-**camera**, **lighting**, **background** and **tone mapping**. For parity work:
-
 1. Compare the reference `.mjs` module and the `.pfn` graph order-independently:
-   vertex set and bbox (`t-all.mjs`), not just triangle counts.
+   vertex set, bbox and winding (`t-all.mjs` / per-port tests), not just counts.
 2. For visual checks, use the same renderer, camera, lighting and background.
 3. Keep the reference modules outside this repo; never commit them.
 
 ## Next
 
-1. Port the remaining public props (rock, armchair, clam, basket) with the new low-level
-   ops, then decide whether to replace the four studies with actual ports.
-2. Make sapphire/tire fully parametric (their generated `.pfn` currently bakes some
-   profile/station arrays at default).
-3. Regenerate the gallery after the next geometry pass.
-3. Keep exact ports labelled as such; do not mix “original study” and “port” in the same
-   claim.
+1. Port more reference props with the new ops and add them to the showcase.
+2. Exposed but not yet filled: polygon faces with holes / craters (cheese wedge), fused
+   clipped lumps (small rock), and more cloth/rigged families.
+3. Regenerate the gallery for the five ports; the old images are stale.
 
 ## Workspace
 

@@ -1,6 +1,6 @@
 // Compact authoring DSL over the v2 IR. Every call records a node; scalars,
 // refs, arrays and field expressions all serialise (fields as source strings).
-import { Graph, field, isField, expr } from './runtime.js?v=3';
+import { Graph, field, isField, expr } from './runtime.js?v=4';
 
 const F = (v) => (isField(v) || typeof v !== 'string' && typeof v !== 'function' ? v : field(v));
 const strip = (o, ks) => { const q = { ...o }; for (const k of ks) delete q[k]; return q; };
@@ -42,6 +42,7 @@ class Builder {
   skeleton(p) { return this.add('skeleton', {}, p); }
   skin(p) { return this.add('skin', { geom: p.geom, skeleton: p.skeleton }, { soft: p.soft, zones: p.zones }); }
   pose(p) { return this.add('pose', { object: p.object }, { poses: p.poses }); }
+  prim(p = {}) { return this.add('prim', {}, p); }
   cylinder(p = {}) { return this.add('cylinder', {}, p); }
   sphere(p = {}) { return this.add('sphere', {}, p); }
 
@@ -51,13 +52,16 @@ class Builder {
   bevelProfile(o) { return this.add('bevelProfile', { profile: o.profile }, { dist: o.dist }); }
   loftProfile(o) { return this.add('loftProfile', { profile: o.profile, capTop: o.capTop, capBottom: o.capBottom }, strip(o, ['profile', 'capTop', 'capBottom'])); }
   fanRing(o) { return this.add('fanRing', {}, o); }
-  revolve(o) { return this.add('revolve', { profile: o.profile }, { seg: o.seg, phase: o.phase, inRadius: o.inRadius, zone: o.zone, axis: o.axis, mod: o.mod !== undefined ? F(o.mod) : undefined }); }
+  revolve(o) { return this.add('revolve', { profile: o.profile, capTop: o.capTop, capBottom: o.capBottom }, strip({ ...o, mod: o.mod !== undefined ? F(o.mod) : undefined, zoneField: o.zoneField !== undefined ? F(o.zoneField) : undefined, capZoneField: o.capZoneField !== undefined ? F(o.capZoneField) : undefined }, ['profile', 'capTop', 'capBottom'])); }
   sweep(o) { return this.add('sweep', { path: o.path, section: o.section }, { twist: o.twist, scale: o.scale, caps: o.caps, zone: o.zone }); }
   inset(o) { return this.add('inset', { profile: o.profile }, { dist: o.dist }); }
   pocket(o) { return this.add('pocket', { profile: o.profile }, { depth: o.depth, bevel: o.bevel, zone: o.zone }); }
   solidify(o) {
-    const tz = typeof o.topZone === 'function' ? o.topZone : o.topZone;
-    return this.add('solidify', { grid: o.grid }, { topZone: tz, botZone: o.botZone, wallZone: o.wallZone });
+    return this.add('solidify', { grid: o.grid }, strip({
+      ...o,
+      topZoneField: o.topZoneField !== undefined ? F(o.topZoneField) : undefined,
+      botZoneField: o.botZoneField !== undefined ? F(o.botZoneField) : undefined,
+    }, ['grid']));
   }
 
   // modifiers
@@ -68,6 +72,7 @@ class Builder {
   cap(o) { return this.add('cap', { profile: o.profile, holes: o.holes }, strip(o, ['profile', 'holes'])); }
   center(o) { return this.add('center', { geom: o.geom }, { x: o.x, y: o.y, z: o.z }); }
   mirror(o) { return this.add('mirror', { geom: o.geom }, { axis: o.axis, weld: o.weld }); }
+  reverse(o) { return this.add('reverse', { geom: o.geom }, {}); }
   deform(o) { return this.add('deform', { geom: o.geom }, { expr: F(o.expr) }); }
   join(list) { return this.add('join', { geoms: list }, {}); }
   scatter(o) {
@@ -80,6 +85,7 @@ class Builder {
   }
   instance(o) { return this.add('instance', { points: o.points, proto: o.proto }, { orient: o.orient, scale: o.scale, yawSign: o.yawSign }); }
   geometry(o) { return this.add('geometry', { object: o.object }, { zone: o.zone }); }
+  get(o) { return this.add('get', { object: o.object }, { key: o.key }); }
   random(o = {}) { return this.add('random', {}, o); }
   arrayPolar(o) { return this.add('arrayPolar', { geom: o.geom }, strip(o, ['geom'])); }
   arrayLinear(o) { return this.add('arrayLinear', { geom: o.geom }, strip(o, ['geom'])); }

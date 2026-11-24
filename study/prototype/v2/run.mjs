@@ -96,6 +96,36 @@ function centroidList(pos) {
   }
   return out;
 }
+function triangleKeys(pos) {
+  const out = [];
+  const r = (v) => Math.round(v * 1e6) / 1e6;
+  for (let i = 0; i < pos.length; i += 9) {
+    const v = [];
+    for (let k = 0; k < 9; k += 3) v.push([r(pos[i + k]), r(pos[i + k + 1]), r(pos[i + k + 2])]);
+    const ks = v.map((q) => q.join(','));
+    let m = 0; for (let k = 1; k < 3; k++) if (ks[k] < ks[m]) m = k;
+    const signed = [0, 1, 2].map((k) => ks[(m + k) % 3]).join('|');
+    const unordered = [...ks].sort().join('|');
+    out.push({ signed, unordered });
+  }
+  return out;
+}
+function windingMismatches(a, b) {
+  const map = new Map();
+  for (const t of a) {
+    if (!map.has(t.unordered)) map.set(t.unordered, []);
+    map.get(t.unordered).push(t.signed);
+  }
+  let matched = 0, mismatch = 0;
+  for (const t of b) {
+    const list = map.get(t.unordered);
+    if (!list || !list.length) continue;
+    const i = list.indexOf(t.signed);
+    if (i >= 0) { list.splice(i, 1); matched++; }
+    else { list.pop(); mismatch++; }
+  }
+  return { matched, mismatch };
+}
 function nearestDistances(a, b, cell) {
   const grid = new Map();
   const key = (x, y, z) => `${Math.floor(x / cell)},${Math.floor(y / cell)},${Math.floor(z / cell)}`;
@@ -142,12 +172,14 @@ export function compareGeometry(orig, port, { tol = 1e-4 } = {}) {
   const meanVertexError = all.length ? all.reduce((s, v) => s + v, 0) / all.length : 0;
   const cd = nearestDistances(ca, cb, cell);
   const maxCentroidError = cd.length ? Math.max(...cd) : 0;
+  const winding = windingMismatches(triangleKeys(a), triangleKeys(b));
   const trisA = a.length / 9, trisB = b.length / 9;
-  // The user-facing contract is the same vertices in roughly the same place.
-  // Triangle count/centroids are reported for diagnosis, but a different quad
-  // diagonal (same four vertices) is not a parity failure.
+  // The user-facing contract is the same vertices in roughly the same place,
+  // with the same face orientation. Triangle count/centroids are reported for
+  // diagnosis, but a different quad diagonal (same four vertices) is not a
+  // parity failure.
   return {
-    ok: va.length === vb.length && maxVertexError <= tol && bboxDelta <= tol,
+    ok: va.length === vb.length && maxVertexError <= tol && bboxDelta <= tol && winding.mismatch === 0,
     tris: [trisA, trisB],
     verts: [va.length, vb.length],
     bbox: [ba, bb],
@@ -155,6 +187,7 @@ export function compareGeometry(orig, port, { tol = 1e-4 } = {}) {
     maxVertexError,
     meanVertexError,
     maxCentroidError,
+    winding,
     tol,
   };
 }
@@ -162,5 +195,6 @@ export function parityLine(name, result) {
   const p = result;
   return `${name.padEnd(10)} ${p.ok ? 'PASS' : 'FAIL'} tris ${p.tris[0]}/${p.tris[1]} ` +
     `vtxErr ${p.maxVertexError.toExponential(2)} mean ${p.meanVertexError.toExponential(2)} ` +
+    `winding ${p.winding.mismatch}/${p.winding.matched + p.winding.mismatch} ` +
     `centroidErr ${p.maxCentroidError.toExponential(2)} bbox ${p.bboxDelta.toExponential(2)}`;
 }

@@ -42,7 +42,7 @@ prototype/
   models/*.mjs          v1 exact ports (cookie, rug)
   bench*.mjs            v1 parity benches
   v2/
-    runtime.mjs         57-node typed runtime + Three bridge (source of public runtime.js)
+    runtime.mjs         60-node typed runtime + Three bridge (source of public runtime.js)
     dsl.mjs             authoring DSL
     format.mjs          .pfn text + JSON (source of public format.js)
     cache.mjs           content-addressed array cache
@@ -84,6 +84,10 @@ node make-examples.mjs              # writes examples/*.pfn + manifest
 node t-examples.mjs                 # parse + cook all published examples
 node t-all.mjs                      # order-independent geometric parity
 node t-cookie.mjs                   # cookie default / 3-chip / 14-chip
+node t-tire.mjs             # 8 tire variants
+node t-sapphire.mjs                 # 13 sapphire variants
+node t-pumpkin.mjs                  # 6 pumpkin variants
+node t-rug.mjs                      # 9 rug variants
 node t-code.mjs                     # Three object/BufferGeometry + random stream
 node t-sample3.mjs                  # sample-3 templates
 node t-bool.mjs && node t-cache.mjs
@@ -102,30 +106,28 @@ Commit/push the public repo, check
 
 ## Current state (24 Nov 2026)
 
-- Runtime: 57 nodes; all 12 published examples cook.
-- **Geometric parity**: `cookie` (174), `sapphire` (48), `tire` (520) pass the strict
-  order-independent comparison at 1e-4, plus the six `module` wrappers.
-- The runtime has a first-class Three bridge, consumable `random` stream, non-uniform
-  `instance` scale, `loft` diagonal/band-zone/flip controls, and script scope
-  `THREE`/`ADDONS`/`H`.
-- Approximations: `rock`, `armchair`, `clam`, `basket`; `pumpkin` is visually close.
-- **Not ports**: `hair`, `jacket`, `sign`, `creature`. They are original studies; do not
-  compare them to valet/taxiway-sign/goat as if equal.
+- Runtime: 60 nodes; **5 published examples, all geometric ports**.
+- **Geometric parity** (vertices, bbox and winding at 1e-4): `cookie` (174),
+  `sapphire` (48), `tire` (520), `pumpkin` (120), `area rug` (392/700), plus the six
+  `module` wrappers.
+- Sapphire is fully parametric (colorway, gem, length, barrel, ends, chamfer, irregularity)
+  and its bottom-cap inversion is fixed with `loft.orient` + `reverse`.
+- New: `get`, `prim`, `reverse`, `revolve.ringMode`/`zoneField`/caps,
+  `solidify.diagonal`/`wallOrder`/zone fields, input `label`/`step`.
+- Approximations/studies were removed from the published manifest; do not re-add them
+  until they are real ports.
 - Gallery is older than the last geometry pass; regenerate if precise.
 
 ## Known issues / next
 
-1. Decide policy for the four studies: label as original designs, or replace with exact
-   ports of the reference assets.
-2. Exact parity workflow: render the reference module and the pfn in the **same**
-   renderer/camera/lighting; do not compare hero images to the viewer.
-3. Cookie: thicker puck, chunkier chips. Clam: two-valve shell. Armchair: thicker
-   upholstery. Rock: facet cuts. Basket: woven coils. Sign: stroke/SDF glyphs.
-4. The public repo must stay source-free; keep the reference modules here.
-5. If a study stays, add an "original design" badge in the public viewer.
+1. Port more reference props. Exposed gaps: polygon faces with holes/craters (cheese
+   wedge), fused clipped lumps (small rock), cloth/rigged families.
+2. Exact parity workflow: compare order-independently (vertices, bbox, winding) against
+   the reference module; do not compare hero images to the viewer.
+3. The public repo must stay source-free; keep the reference modules here.
+4. Regenerate the gallery for the five ports.
 
 ## Why this matters
 
-The current public gallery mixes verified ports, approximations and original studies.
-That is why it "looks nothing like" the catalogue when viewed as a whole. The fix is a
-content-policy decision plus exact ports, not more tweaking of the studies.
+The showcase is now ports only; every card is a verified geometric port. Adding more
+ports is the way to prove the DSL's versatility, not adding approximations or studies.

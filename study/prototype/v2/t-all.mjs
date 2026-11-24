@@ -3,6 +3,8 @@ const cases = [
   ['cookie2','../../scripts/cookie-2016bb','cookie'],
   ['sapphire','../../scripts2/rough-sapphire-fb25c7','sapphire'],
   ['tire','../../scripts2/tire-ccf0eb','tire'],
+  ['pumpkin','../../scripts3/pumpkin-5f977e','pumpkin'],
+  ['rug','../../scripts/area-rug-5c56e2','rug'],
   ['armchair','../../scripts2/lounge-armchair-5a72ca','armchair'],
   ['clam','../../scripts2/maxima-clam-429c17','clam'],
   ['quiver','../../scripts2/quiver-722a40','quiver'],

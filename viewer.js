@@ -1,8 +1,8 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
-import { parseText } from './runtime/format.js?v=3';
-import { evaluate } from './runtime/runtime.js?v=3';
+import { parseText } from './runtime/format.js?v=4';
+import { evaluate } from './runtime/runtime.js?v=4';
 
 const $ = (s) => document.querySelector(s);
 const listEl = $('#list');
@@ -250,7 +250,7 @@ function buildControls(inputs) {
     row.className = 'ctrl';
     const label = document.createElement('label');
     const name = document.createElement('span');
-    name.textContent = inp.name;
+    name.textContent = inp.label ?? inp.name;
     const val = document.createElement('b');
     val.textContent = String(values[inp.name] ?? inp.default ?? '');
     label.append(name, val);

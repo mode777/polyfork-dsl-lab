@@ -9,10 +9,11 @@ Order does not matter. A port is geometrically faithful when:
 
 - the vertex count is identical;
 - the vertex set matches within `1e-4`;
-- the bounding box matches within `1e-4`.
+- the bounding box matches within `1e-4`;
+- matched faces have the same winding.
 
 Triangle count/centroid distance is reported for diagnosis. A different quad diagonal over
-the same four vertices is not a failure; a different set of vertices is.
+the same four vertices is not a failure; a different set of vertices or a reversed face is.
 
 Run `node t-all.mjs`. It compares the reference `createAsset()` with the graph result
 using a nearest-vertex check in world space. A count-only match is **not** parity; the old
@@ -22,9 +23,11 @@ Current hand-port results:
 
 | port | tris | result |
 |---|---:|---|
-| cookie | 174 | PASS at 0 error |
-| sapphire | 48 | PASS at 0 error |
-| tire | 520 | PASS at 0 error |
+| cookie | 174 | PASS at 0 error, 3 variants |
+| sapphire | 48 | PASS at 0 error, 13 variants |
+| tire | 520 | PASS at ~1e-18 |
+| pumpkin | 120 | PASS, 6 variants |
+| area rug | 392/700 | PASS, 9 variants |
 
 The six `module` wrappers also pass because they call the reference `createAsset()`
 directly.
@@ -57,6 +60,15 @@ node option per asset:
 | `loft` | `diagonal: 'ab'|'ba'` | choose the quad diagonal; `ba` matches cookie/rug helpers |
 | `loft` | `bandZones: [...]` | per-band zone names |
 | `loft` | `flip` | reverse winding |
+| `loft` | `orient` | flip each band/cap triangle away from the ring centroid |
+| `revolve` | `ringMode: 'xz'` | use `x=cos(a), z=sin(a)` like the reference rings |
+| `revolve` | `zoneField` / `capZoneField` | per-column/per-cap zone names |
+| `revolve` | `orient`, `capTop`, `capBottom` | outward winding and exact caps |
+| `solidify` | `diagonal: 'ref'`, `wallOrder: 'ref'` | match reference top/bottom/wall triangulation |
+| `solidify` | `topZoneField` / `botZoneField` | per-cell colour zones |
+| `reverse` | — | flip every triangle winding (dished caps) |
+| `prim` | `type`, `args` | call a real `THREE.*Geometry` constructor |
+| `get` | `object`, `key` | turn structured code output into graph values |
 | `scatter` | `lazy: true` | draw size/yaw only after a candidate passes min-distance |
 | `scatter` | `yawScale` | reference helpers use `PI`, not `TAU` |
 | `scatter` | `rng` | consume a shared `random` stream |

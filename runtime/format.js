@@ -1,6 +1,6 @@
 // Compact text + canonical JSON storage for v2 graphs.
 // Text is line-oriented, diffable, and keeps all wiring explicit.
-import { Graph } from './runtime.js?v=3';
+import { Graph } from './runtime.js?v=4';
 
 const isRef = (v) => v && typeof v === 'object' && '__ref' in v;
 const isField = (v) => v && typeof v === 'object' && '__field' in v;
@@ -119,7 +119,9 @@ export function toText(g) {
       let line = `in ${i.name} ${i.type} ${ser(i.default)}`;
       if (i.min !== undefined) line += ` min=${i.min}`;
       if (i.max !== undefined) line += ` max=${i.max}`;
+      if (i.step !== undefined) line += ` step=${i.step}`;
       if (i.options) line += ` options=${i.options.join('|')}`;
+      if (i.label) line += ` label=${ser(i.label)}`;
       L.push(line);
     }
   };
@@ -143,7 +145,9 @@ export function toText(g) {
     let line = `in ${i.name} ${i.type} ${ser(i.default)}`;
     if (i.min !== undefined) line += ` min=${i.min}`;
     if (i.max !== undefined) line += ` max=${i.max}`;
+    if (i.step !== undefined) line += ` step=${i.step}`;
     if (i.options) line += ` options=${i.options.join('|')}`;
+    if (i.label) line += ` label=${ser(i.label)}`;
     L.push(line);
   }
   emitNodes(g);
@@ -183,6 +187,8 @@ export function parseText(src) {
         const k = t.slice(0, t.indexOf('=')), v = t.slice(t.indexOf('=') + 1);
         if (k === 'min') i.min = Number(v); else if (k === 'max') i.max = Number(v);
         else if (k === 'options') i.options = v.split('|');
+        else if (k === 'step') i.step = Number(v);
+        else if (k === 'label') i.label = parseVal(v);
       }
       cur.inputs.push(i);
       continue;

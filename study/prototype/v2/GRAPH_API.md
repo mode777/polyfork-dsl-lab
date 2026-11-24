@@ -31,13 +31,13 @@ and a compact declarative storage format.
 | `random` | deterministic `{values,next}` stream |
 | `object` | a `THREE.Object3D` output |
 
-### Nodes (57)
+### Nodes (60)
 
 | group | nodes |
 |---|---|
-| sources | `ring`, `profile`, `path`, `grid`, `box`, `cylinder`, `sphere`, `geometry`, `random` |
+| sources | `ring`, `profile`, `path`, `grid`, `box`, `cylinder`, `sphere`, `geometry`, `prim`, `random`, `get` |
 | surfaces | `loft`, `cap`, `extrude`, `revolve`, `sweep`, `inset`, `pocket`, `solidify` |
-| modifiers | `transform`, `center`, `mirror`, `deform`, `clip`, `join` |
+| modifiers | `transform`, `center`, `mirror`, `reverse`, `deform`, `clip`, `join` |
 | distribution | `scatter`, `instance`, `arrayPolar`, `arrayLinear` |
 | control | `switch`, `fan`, `cone` |
 | output | `mesh`, `group` |
@@ -49,16 +49,20 @@ Key signatures:
 ring      n r y sx sz phase radius(field)
 grid      nx nz w d position(field -> [x,y,z])
 loft      rings[] capTop? capBottom? zones{band,capTop,capBottom} diagonal bandZones flip
-revolve   profile[[r,y]] seg phase inRadius axis('y'|'z') zone(k)|zones mod(field i,k)
+revolve   profile[[r,y]] seg phase inRadius axis('y'|'z') ringMode('zx'|'xz')
+          zone/zoneField mod(field i,k) orient caps capZoneField
 sweep     path section twist caps
 inset     profile dist -> profile
 pocket    profile depth bevel -> geometry (walls + floor, no CSG)
-solidify  grid topZone botZone wallZone
+solidify  grid topZone/botZone/wallZone zoneFields diagonal('ref') wallOrder('ref')
 clip      geom nx ny nz d cap -> geometry (plane split + capped cut)
 scatter   count minDist seed tries sample(field) height(field) size(field|vec3) yawScale lazy rng -> points
 instance  points proto [sx,sy,sz] scale yawSign -> geometry
 arrayPolar geom count radius start arc spin
 geometry  object(THREE.BufferGeometry|Mesh|Group) zone -> geometry
+prim      type(THREE geometry) args[] transform -> geometry
+reverse   geom -> geometry with opposite winding
+get       object key -> any
 random    seed count -> stream
 switch    on cases{a:ref,b:ref}
 mesh      geom zones{zone:hex} materials{zone:{slot,roughness,metalness,opacity}} crease

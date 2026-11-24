@@ -30,7 +30,7 @@ browser viewer. Public repo, published with GitHub Pages.
 index.html            split code/result viewer
 viewer.js             viewer: scene, examples, params, live cook
 style.css
-runtime/runtime.js    57-node typed graph runtime + evaluator, Three bridge
+runtime/runtime.js    60-node typed graph runtime + evaluator, Three bridge
 runtime/format.js     .pfn parser/serializer
 runtime/dsl.js        JS authoring DSL (for building ports)
 runtime/cache.js      content-addressed array pool / Float32 cache
@@ -90,26 +90,26 @@ The viewer `frame()` uses `current.cam` = `[azimuthDeg, elevationDeg]` and
 
 ## Current status (24 Nov 2026)
 
-- 57 node types; 12 examples; all 12 parse and cook.
-- **Geometric parity:** `cookie` (174), `sapphire` (48), `tire` (520) pass the strict
-  order-independent comparison at 1e-4, plus the six `module` wrappers. The other public
-  examples are still approximations/studies.
-- The runtime now has a first-class Three bridge (`geometry`/`mesh` accept
-  `BufferGeometry`/`Mesh`/`Group`), a consumable `random` stream, non-uniform
-  `instance` scale, `loft.diagonal`/`bandZones`/`flip`, and script scope `THREE`,
-  `ADDONS`, `H`.
-- `hair`, `jacket`, `sign`, `creature` are **original studies, not ports** of
-  valet / taxiway-sign / goat. They remain labelled as such.
-- The gallery predates the cookie/sapphire/tire parity pass; regenerate it.
+- 60 node types; **5 published examples, all geometric ports**.
+- **Geometric parity (vertices, bbox and winding at 1e-4):** `cookie` (174),
+  `sapphire` (48), `tire` (520), `pumpkin` (120), `area rug` (392/700).
+- Sapphire had an inverted bottom cap; `loft.orient`/`orientCenter` and `reverse` fixed it.
+  Sapphire is now fully parametric (all reference params live, including pointed/
+  truncated/broken terminations).
+- New nodes/controls: `get` (structured code output), `prim` (exact Three geometry),
+  `reverse`, `revolve.ringMode`/`zoneField`/caps, `solidify.diagonal`/`wallOrder`/zone
+  fields, input `label`/`step`.
+- The previous approximations/studies were removed from the published manifest while
+  they are replaced with real ports. The gallery is stale.
+- `t-all.mjs` is count-independent and winding-aware; counts alone are not parity.
 
 ## Next tasks (priority)
 
-1. Port the remaining reference props with the new low-level ops (rock, armchair, clam,
-   basket) and replace the four original studies with real ports or clearly labelled
-   demo variants.
-2. Keep `t-all.mjs` as the only parity claim: it compares triangle sets, vertex sets and
-   bbox order-independently. Counts alone are not parity.
-3. Regenerate the gallery after the next geometry pass.
+1. Port more reference props and add them to the showcase. The current gaps are polygon
+   faces with holes / craters (cheese wedge), fused clipped lumps (small rock), and
+   cloth/rigged families.
+2. Keep every published example a verified port; do not re-add labelled approximations.
+3. Regenerate the gallery for the five ports.
 4. If adding booleans to examples, verify `manifold-3d` WASM loads from the import map and
    gate it behind `await initManifold()`.
 
@@ -119,8 +119,12 @@ From `study/prototype/v2`:
 
 ```bash
 node t-examples.mjs        # parses/cooks every published pfn
-node t-all.mjs             # order-independent geometric parity vs original modules
-node t-cookie.mjs          # cookie at default / 3-chip / 14-chip
+node t-all.mjs             # order-independent vertex/bbox/winding parity
+node t-cookie.mjs          # cookie default / 3-chip / 14-chip
+node t-tire.mjs             # 8 tire variants
+node t-sapphire.mjs        # 13 sapphire param variants
+node t-pumpkin.mjs         # 6 pumpkin variants
+node t-rug.mjs             # 9 rug variants
 node t-code.mjs            # Three object/BufferGeometry + random-stream bridge
 node t-sample3.mjs         # sample-3 template ports
 node t-bool.mjs            # Manifold boolean smoke test
@@ -157,5 +161,5 @@ gh api repos/mode777/polyfork-dsl-lab/pages/builds/latest --jq '.status,.commit'
 - `mesh` zones must match part zone names; a mismatch silently uses fallback colours.
 - GitHub Pages caches assets; bump `?v=` after viewer/style/runtime changes. The public
   runtime files must import each other with `.js`, unlike the study `.mjs` sources.
-  `sync-public.mjs` uses `PUBLIC_ASSET_VERSION` (default `3`); keep it in step with
+  `sync-public.mjs` uses `PUBLIC_ASSET_VERSION` (default `4`); keep it in step with
   `index.html` and `viewer.js`.

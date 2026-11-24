@@ -8,7 +8,7 @@ import { fileURLToPath } from 'node:url';
 const here = path.dirname(fileURLToPath(import.meta.url));
 const repo = path.resolve(here, '../../..');
 const out = (p) => path.join(repo, p);
-const V = process.env.PUBLIC_ASSET_VERSION ?? '3';
+const V = process.env.PUBLIC_ASSET_VERSION ?? '4';
 const rewrite = (src) => src
   .replaceAll("from './runtime.mjs'", `from './runtime.js?v=${V}'`)
   .replaceAll("from './format.mjs'", `from './format.js?v=${V}'`)

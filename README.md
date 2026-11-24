@@ -18,11 +18,11 @@ geometry only.
 ```
 index.html            the split code / result viewer
 app.js                viewer (three.js scene, params, live cook)
-runtime/runtime.js    57-node typed graph runtime + evaluator, Three bridge
+runtime/runtime.js    60-node typed graph runtime + evaluator, Three bridge
 runtime/format.js     .pfn text parser and serializer
 runtime/dsl.js        JavaScript authoring DSL
 runtime/cache.js      content-addressed array pool + Float32 cache
-examples/*.pfn        12 example graphs
+examples/*.pfn        5 ported example graphs (showcase is ports only)
 docs/                 design notes, parity status, techniques
 study/                authoring/porting workspace (reference assets gitignored)
 ```
@@ -81,13 +81,13 @@ The parser, serializer and evaluator are in `runtime/`. `.pfn` is the authoring 
 `cache.js` shows a compact content-addressed JSON cache (arrays pooled and base64-encoded,
 ≈84% smaller on graphs with repeated rings).
 
-## Node set (57)
+## Node set (60)
 
 | group | nodes |
 |---|---|
-| sources | `ring profile path grid box chamferBox cylinder sphere plane card cone curl pointsGrid geometry random` |
+| sources | `ring profile path grid box chamferBox cylinder sphere plane card cone curl pointsGrid geometry prim random get` |
 | surfaces | `loft loftProfile cap extrude revolve sweep inset pocket solidify bevelProfile fan fanRing wrapShell` |
-| modifiers | `transform center mirror deform clip join cavity` |
+| modifiers | `transform center mirror reverse deform clip join cavity` |
 | distribution | `scatter scatterSurface scatterVolume instance instancedMesh arrayPolar arrayLinear` |
 | character | `skeleton skin pose` |
 | surface-relative | `pathOnSurface bandOnSurface ribbon` |
@@ -95,31 +95,30 @@ The parser, serializer and evaluator are in `runtime/`. `.pfn` is the authoring 
 | output | `mesh group` |
 | escape hatches | `script module` |
 
-Low-level controls are first-class: `loft` has `diagonal`, `bandZones`, `flip`;
-`scatter` has `lazy`, `yawScale`, `rng`; `instance` has per-point `[sx,sy,sz]` scale and
-`yawSign`; `arrayPolar` has `spin`; `mesh` has `crease`. A `script` node sees `THREE`,
-`ADDONS` (`mergeGeometries`, `toCreasedNormals`, `RoundedBoxGeometry`) and `H`
-(`tri`, `quad`, `part`, `geom`, `ring`, `prng`, `clamp`, `lerp`).
+Low-level controls are first-class: `loft` has `diagonal`, `bandZones`, `flip`,
+`orient`; `revolve` has `ringMode`, `zoneField`, `orient`, caps and per-cap zones;
+`solidify` has reference diagonals, wall order and zone fields; `scatter` has `lazy`,
+`yawScale`, `rng`; `instance` has per-point `[sx,sy,sz]` scale and `yawSign`; `arrayPolar`
+has `spin`; `reverse` flips winding; `prim` calls a real Three geometry constructor;
+`get` pulls fields out of structured code output. A `script` node sees `THREE`, `ADDONS`
+(`mergeGeometries`, `toCreasedNormals`, `RoundedBoxGeometry`) and `H` (`tri`, `quad`,
+`part`, `geom`, `ring`, `prng`, `clamp`, `lerp`).
 
 ## Examples
 
-| example | status | what it shows |
-|---|---|---|
-| Cookie | **geometric parity** | parametric loft, lazy PRNG scatter, non-uniform chip instances |
-| Rough sapphire | **geometric parity** | chamfered profile, loft along stations, pointed ends |
-| Tire | **geometric parity** | revolved tread with per-facet modulation, caps, hub, lug ring |
-| Small rock | approximation | deformed sphere clipped by capped planes |
-| Lounge armchair | approximation | loft shell, cylinder legs, bevel box cushion |
-| Maxima clam | approximation | ribbed shell bands and hinge cap |
-| Stylized hair | original study | 6-triangle curl primitives scattered on a head volume |
-| Stylized jacket | original study | wrapped shell with a front gap, lining, lapels, collar |
-| Sign | original study | extruded segment letters on a panel |
-| Creature (skinned) | original study | lofted body, bone tree and soft skin weights |
-| Storage basket | approximation | revolved weave bands and handle |
-| Pumpkin | close | lobed revolve with stem |
+The showcase currently contains **ports only**. Approximations and original studies were
+removed from the published manifest while they are replaced with real ports.
+
+| example | what it shows |
+|---|---|
+| Cookie | parametric loft, lazy PRNG scatter, non-uniform chip instances |
+| Rough sapphire | bevel profile, full parameter set, all three terminations |
+| Tire | revolved tread with per-facet modulation, caps, hub, lug ring |
+| Pumpkin | alternating lobe/groove revolve, real `THREE.CylinderGeometry` stem |
+| Area rug | deformed lattice, folded corner, per-cell weave zones |
 
 Parity means the order-independent `t-all.mjs` check passes at `1e-4`: same vertex count,
-vertex set and bbox. It is not a byte/vertex-order or same-triangulation claim.
+vertex set and bbox, and no winding mismatches. It is not a byte/vertex-order claim.
 
 ## Project docs
 
@@ -137,8 +136,8 @@ vertex set and bbox. It is not a byte/vertex-order or same-triangulation claim.
 ## Scope and limitations
 
 This is a **stylized geometry DSL**, not a full DCC. It has no node editor, no textures, no
-UVs, no cloth simulation and no general grooming. Some examples are geometric ports for
-demo/interop; parity is order-independent, not byte-identical. Booleans use `manifold-3d`
+UVs, no cloth simulation and no general grooming. The showcase examples are geometric ports for demo/interop; parity is
+order-independent, not byte-identical. Booleans use `manifold-3d`
 (WASM, loaded lazily; no example needs it).
 
 ## Licence

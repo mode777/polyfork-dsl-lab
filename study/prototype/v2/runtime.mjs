@@ -114,10 +114,11 @@ const asArray = (v) => (v && typeof v === 'object' && Array.isArray(v.pts) ? v.p
 const hash01 = (a, b = 0, c = 0) => { const h = Math.sin(a * 127.1 + b * 311.7 + c * 74.7) * 43758.5453; return h - Math.floor(h); };
 function xf(pos, p) {
   if (!p.x && !p.y && !p.z && !p.rx && !p.ry && !p.rz && !p.s) return pos;
+  const sc = Array.isArray(p.s) ? [p.s[0] ?? 1, p.s[1] ?? 1, p.s[2] ?? 1] : [p.s ?? 1, p.s ?? 1, p.s ?? 1];
   const m = new THREE.Matrix4().compose(
     new THREE.Vector3(p.x ?? 0, p.y ?? 0, p.z ?? 0),
     new THREE.Quaternion().setFromEuler(new THREE.Euler(p.rx ?? 0, p.ry ?? 0, p.rz ?? 0, 'XYZ')),
-    new THREE.Vector3(p.s ?? 1, p.s ?? 1, p.s ?? 1),
+    new THREE.Vector3(sc[0], sc[1], sc[2]),
   );
   const out = new Array(pos.length);
   for (let i = 0; i < pos.length; i += 3) {
@@ -331,6 +332,17 @@ node('box', { in: { w: V.number, h: V.number, d: V.number, x: V.number, y: V.num
   return geom(part(xf([...geo.attributes.position.array], p), p.zone ?? 'box'));
 });
 
+// Generic escape hatch for Three's own geometry constructors. This keeps the
+// exact constructor/triangulation the reference module used.
+node('prim', { in: { type: V.string, args: V.any, x: V.number, y: V.number, z: V.number, rx: V.number, ry: V.number, rz: V.number, s: V.any, zone: V.string }, out: V.geom }, ({ p }) => {
+  const Ctor = THREE[p.type];
+  if (typeof Ctor !== 'function') throw new Error(`prim: unknown THREE.${p.type}`);
+  let geo = new Ctor(...(p.args ?? []));
+  if (geo.index) geo = geo.toNonIndexed();
+  const pos = Array.from(geo.attributes.position.array);
+  return geom(part(xf(pos, p), p.zone ?? 'a'));
+});
+
 node('cylinder', { in: { r1: V.number, r2: V.number, h: V.number, seg: V.int, phase: V.number, caps: V.bool }, out: V.geom }, ({ p }) => {
   const n = Math.max(3, Math.round(p.seg ?? 12)), out = [];
   const r1 = p.r1 ?? 0.5, r2 = p.r2 ?? r1, h = p.h ?? 1;
@@ -375,10 +387,10 @@ node('bevelProfile', { in: { profile: V.profile, dist: V.number }, out: V.profil
   return profile(out);
 });
 
-node('loftProfile', { in: { profile: V.profile, capTop: V.any, capBottom: V.any, zones: V.any, diagonal: V.string, bandZones: V.any, flip: V.bool }, out: V.geom }, ({ p }) => {
+node('loftProfile', { in: { profile: V.profile, capTop: V.any, capBottom: V.any, zones: V.any, diagonal: V.string, bandZones: V.any, flip: V.bool, orient: V.bool, orientCenter: V.vec3 }, out: V.geom }, ({ p }) => {
   const P = asArray(p.profile), stations = p.stations ?? [[0, 1, 0]];
   const rings = stations.map(([x, s = 1, dz = 0]) => P.map(([z, y]) => [x, y * s, z * s + dz]));
-  return NODES.get('loft').fn({ p: { rings, capTop: p.capTop, capBottom: p.capBottom, zones: p.zones ?? {}, diagonal: p.diagonal, bandZones: p.bandZones, flip: p.flip } });
+  return NODES.get('loft').fn({ p: { rings, capTop: p.capTop, capBottom: p.capBottom, zones: p.zones ?? {}, diagonal: p.diagonal, bandZones: p.bandZones, flip: p.flip, orient: p.orient, orientCenter: p.orientCenter } });
 });
 
 node('fanRing', { in: { r: V.number, y: V.number, n: V.int, phase: V.number, apex: V.any, axis: V.string, zone: V.string, flip: V.bool }, out: V.geom }, ({ p }) => {
@@ -393,14 +405,28 @@ node('fanRing', { in: { r: V.number, y: V.number, n: V.int, phase: V.number, ape
   return geom(part(out, p.zone ?? 'a'));
 });
 
-node('loft', { in: { rings: V.any, capTop: V.any, capBottom: V.any, zones: V.any, diagonal: V.string, bandZones: V.any, flip: V.bool }, out: V.geom }, ({ p }) => {
+node('loft', { in: { rings: V.any, capTop: V.any, capBottom: V.any, zones: V.any, diagonal: V.string, bandZones: V.any, flip: V.bool, orient: V.bool, orientCenter: V.vec3 }, out: V.geom }, ({ p }) => {
   const rings = p.rings.map(asArray);
   const zones = p.zones ?? {};
   const out = {};
   const put = (z, pos) => (out[z] ??= []).push(...pos);
+  // A closed profile can wind either way around the loft axis. `orient` flips
+  // each band triangle to point away from the ring centroid, which is what the
+  // reference crystal/rug helpers do explicitly.
+  const all = rings.flat();
+  const oc = p.orientCenter ?? (all.length ? all.reduce((a, q) => [a[0] + q[0] / all.length, a[1] + q[1] / all.length, a[2] + q[2] / all.length], [0, 0, 0]) : [0, 0, 0]);
+  const emitTri = (pos, a, b, c) => {
+    if (p.orient) {
+      const n = cross3(sub3(b, a), sub3(c, a));
+      const cen = [(a[0] + b[0] + c[0]) / 3 - oc[0], (a[1] + b[1] + c[1]) / 3 - oc[1], (a[2] + b[2] + c[2]) / 3 - oc[2]];
+      if (dot3(n, cen) < 0) tri(pos, a, c, b); else tri(pos, a, b, c);
+      return;
+    }
+    tri(pos, a, b, c);
+  };
   const emitQuad = (pos, a, b, c, d) => {
-    if (p.flip) { tri(pos, a, c, b); tri(pos, a, d, c); }
-    else quad(pos, a, b, c, d);
+    if (p.flip) { emitTri(pos, a, c, b); emitTri(pos, a, d, c); }
+    else { emitTri(pos, a, b, c); emitTri(pos, a, c, d); }
   };
   for (let k = 0; k < rings.length - 1; k++) {
     const A = rings[k], B = rings[k + 1], n = A.length, pos = [];
@@ -423,14 +449,20 @@ node('loft', { in: { rings: V.any, capTop: V.any, capBottom: V.any, zones: V.any
     const A = rings[rings.length - 1], n = A.length, pos = [];
     const c = A.reduce((q, r) => add3(q, mul3(r, 1 / n)), [0, 0, 0]);
     const hint = norm(sub3(p.capTop, c));
-    for (let i = 0; i < n; i++) triOut(pos, p.capTop, A[(i + 1) % n], A[i], hint);
+    for (let i = 0; i < n; i++) {
+      if (p.orient) emitTri(pos, p.capTop, A[(i + 1) % n], A[i]);
+      else triOut(pos, p.capTop, A[(i + 1) % n], A[i], hint);
+    }
     put(zones.capTop ?? 'a', pos);
   }
   if (p.capBottom) {
     const A = rings[0], n = A.length, pos = [];
     const c = A.reduce((q, r) => add3(q, mul3(r, 1 / n)), [0, 0, 0]);
     const hint = norm(sub3(c, p.capBottom));
-    for (let i = 0; i < n; i++) triOut(pos, p.capBottom, A[i], A[(i + 1) % n], hint);
+    for (let i = 0; i < n; i++) {
+      if (p.orient) emitTri(pos, p.capBottom, A[i], A[(i + 1) % n]);
+      else triOut(pos, p.capBottom, A[i], A[(i + 1) % n], hint);
+    }
     put(zones.capBottom ?? 'a', pos);
   }
   return geom(Object.entries(out).map(([z, pos]) => part(pos, z)));
@@ -468,25 +500,61 @@ node('extrude', { in: { profile: V.profile, depth: V.number, z0: V.number, cap: 
   return geom(part(out, 'a'));
 });
 
-node('revolve', { in: { profile: V.any, seg: V.int, phase: V.number, inRadius: V.bool, zone: V.any, mod: V.field, axis: V.string }, out: V.geom }, ({ p }) => {
+node('revolve', { in: { profile: V.any, seg: V.int, phase: V.number, inRadius: V.bool, zone: V.any, zoneField: V.field, mod: V.field, axis: V.string, ringMode: V.string, orient: V.bool, orientCenter: V.vec3, capTop: V.any, capBottom: V.any, capZone: V.any, capZoneField: V.field, flip: V.bool }, out: V.geom }, ({ p }) => {
   const P = asArray(p.profile), n = Math.max(3, Math.round(p.seg ?? 12)), buckets = new Map();
   const step = TAU / n, cosH = Math.cos(step / 2);
   const axis = p.axis ?? 'y';
+  const asF = (v) => (typeof v === 'string' ? field(v) : v);
+  const modField = asF(p.mod), zoneField = asF(p.zoneField), capZoneField = asF(p.capZoneField);
   const ringAt = (k, r, y) => {
     const R = p.inRadius ? r / cosH : r, q = [];
     for (let i = 0; i < n; i++) {
       const a = (p.phase ?? 0) + ((i + (p.inRadius ? 0.5 : 0)) / n) * TAU;
-      const rr = p.mod ? fieldValue(p.mod, { i, k, x: r, y, s: p }) : R;
-      q.push(axis === 'z' ? [rr * Math.cos(a), rr * Math.sin(a), y] : [rr * Math.sin(a), y, rr * Math.cos(a)]);
+      const rr = modField ? fieldValue(modField, { i, k, x: r, y, s: p }) : R;
+      const xz = p.ringMode === 'xz';
+      q.push(axis === 'z' ? [rr * Math.cos(a), rr * Math.sin(a), y]
+        : (xz ? [rr * Math.cos(a), y, rr * Math.sin(a)] : [rr * Math.sin(a), y, rr * Math.cos(a)]));
     }
     return q;
   };
+  const rings = [];
+  for (let k = 0; k < P.length; k++) rings.push(ringAt(k, P[k][0], P[k][1]));
+  const all = rings.flat();
+  const oc = p.orientCenter ?? (all.length ? all.reduce((a, q) => [a[0] + q[0] / all.length, a[1] + q[1] / all.length, a[2] + q[2] / all.length], [0, 0, 0]) : [0, 0, 0]);
+  const put = (z, pos) => { if (!buckets.has(z)) buckets.set(z, []); buckets.get(z).push(...pos); };
+  const emitTri = (pos, a, b, c) => {
+    if (p.flip) [b, c] = [c, b];
+    if (p.orient) {
+      const nrm = cross3(sub3(b, a), sub3(c, a));
+      const cen = [(a[0] + b[0] + c[0]) / 3 - oc[0], (a[1] + b[1] + c[1]) / 3 - oc[1], (a[2] + b[2] + c[2]) / 3 - oc[2]];
+      if (dot3(nrm, cen) < 0) tri(pos, a, c, b); else tri(pos, a, b, c);
+    } else tri(pos, a, b, c);
+  };
+  const zoneAt = (i, k) => {
+    if (zoneField) return fieldValue(zoneField, { i, k, s: p });
+    return typeof p.zone === 'function' ? p.zone(i, k) : (Array.isArray(p.zone) ? (p.zone[k] ?? 'a') : (p.zone ?? 'a'));
+  };
   for (let k = 0; k < P.length - 1; k++) {
-    const A = ringAt(k, P[k][0], P[k][1]), B = ringAt(k + 1, P[k + 1][0], P[k + 1][1]);
-    const z = typeof p.zone === 'function' ? p.zone(k) : (Array.isArray(p.zone) ? p.zone[k] : (p.zone ?? 'a'));
-    if (!buckets.has(z)) buckets.set(z, []);
-    const out = buckets.get(z);
-    for (let i = 0; i < n; i++) { const j = (i + 1) % n; quad(out, A[i], A[j], B[j], B[i]); }
+    const A = rings[k], B = rings[k + 1];
+    for (let i = 0; i < n; i++) {
+      const j = (i + 1) % n, pos = [];
+      emitTri(pos, A[i], A[j], B[j]); emitTri(pos, A[i], B[j], B[i]);
+      put(zoneAt(i, k), pos);
+    }
+  }
+  const capZoneAt = (i) => capZoneField ? fieldValue(capZoneField, { i, s: p })
+    : (typeof p.capZone === 'function' ? p.capZone(i) : (p.capZone ?? 'a'));
+  if (p.capTop) {
+    const A = rings[rings.length - 1];
+    for (let i = 0; i < n; i++) {
+      const pos = []; emitTri(pos, p.capTop, A[(i + 1) % n], A[i]); put(capZoneAt(i), pos);
+    }
+  }
+  if (p.capBottom) {
+    const A = rings[0];
+    for (let i = 0; i < n; i++) {
+      const pos = []; emitTri(pos, p.capBottom, A[i], A[(i + 1) % n]); put(capZoneAt(i), pos);
+    }
   }
   return geom([...buckets.entries()].map(([z, pos]) => part(pos, z)));
 });
@@ -546,25 +614,42 @@ node('pocket', { in: { profile: V.profile, depth: V.number, bevel: V.number, zon
   return geom(part(out, p.zone ?? 'a'));
 });
 
-node('solidify', { in: { grid: V.any, topZone: V.any, botZone: V.any, wallZone: V.any }, out: V.geom }, ({ p }) => {
+node('solidify', { in: { grid: V.any, topZone: V.any, botZone: V.any, wallZone: V.any, topZoneField: V.field, botZoneField: V.field, diagonal: V.string, wallOrder: V.string }, out: V.geom }, ({ p }) => {
   const { top, bot } = p.grid, nx = top.length - 1, nz = top[0].length - 1;
-  const zo = (z, i, j) => (typeof z === 'function' ? z(i, j) : (z ?? 'a'));
+  const zo = (z, field, i, j) => field ? fieldValue(field, { i, k: j, j, s: p })
+    : (typeof z === 'function' ? z(i, j) : (z ?? 'a'));
   const buckets = new Map();
   const put = (z, pos) => { if (!buckets.has(z)) buckets.set(z, []); buckets.get(z).push(...pos); };
+  const ref = p.diagonal === 'ref';
   for (let i = 0; i < nx; i++) for (let j = 0; j < nz; j++) {
     const a = top[i][j], b = top[i + 1][j], c = top[i + 1][j + 1], d = top[i][j + 1];
-    const t = [], zt = zo(p.topZone, i, j); quad(t, a, b, c, d); put(zt, t);
+    const t = [], zt = zo(p.topZone, p.topZoneField, i, j);
+    if (ref) { tri(t, a, d, b); tri(t, b, d, c); } else quad(t, a, b, c, d);
+    put(zt, t);
     const e = bot[i][j], f = bot[i + 1][j], g2 = bot[i + 1][j + 1], h = bot[i][j + 1];
-    const u = [], zb = zo(p.botZone, i, j); quad(u, e, h, g2, f); put(zb, u);
+    const u = [], zb = zo(p.botZone, p.botZoneField, i, j);
+    if (ref) { tri(u, e, f, h); tri(u, f, g2, h); } else quad(u, e, h, g2, f);
+    put(zb, u);
   }
   const wall = [];
-  for (let i = 0; i < nx; i++) for (const [j, flip] of [[0, true], [nz, false]]) {
-    const a = top[i][j], b = top[i + 1][j], c = bot[i + 1][j], d = bot[i][j];
-    flip ? quad(wall, a, b, c, d) : quad(wall, d, c, b, a);
-  }
-  for (let j = 0; j < nz; j++) for (const [i, flip] of [[0, false], [nx, true]]) {
-    const a = top[i][j], b = top[i][j + 1], c = bot[i][j + 1], d = bot[i][j];
-    flip ? quad(wall, a, b, c, d) : quad(wall, d, c, b, a);
+  if (p.wallOrder === 'ref') {
+    for (let j = 0; j < nz; j++) {
+      quad(wall, top[nx][j], top[nx][j + 1], bot[nx][j + 1], bot[nx][j]);
+      quad(wall, top[0][j + 1], top[0][j], bot[0][j], bot[0][j + 1]);
+    }
+    for (let i = 0; i < nx; i++) {
+      quad(wall, top[i + 1][nz], top[i][nz], bot[i][nz], bot[i + 1][nz]);
+      quad(wall, top[i][0], top[i + 1][0], bot[i + 1][0], bot[i][0]);
+    }
+  } else {
+    for (let i = 0; i < nx; i++) for (const [j, flip] of [[0, true], [nz, false]]) {
+      const a = top[i][j], b = top[i + 1][j], c = bot[i + 1][j], d = bot[i][j];
+      flip ? quad(wall, a, b, c, d) : quad(wall, d, c, b, a);
+    }
+    for (let j = 0; j < nz; j++) for (const [i, flip] of [[0, false], [nx, true]]) {
+      const a = top[i][j], b = top[i][j + 1], c = bot[i][j + 1], d = bot[i][j];
+      flip ? quad(wall, a, b, c, d) : quad(wall, d, c, b, a);
+    }
   }
   const parts = [...buckets.entries()].map(([z, pos]) => part(pos, z));
   if (wall.length) parts.push(part(wall, typeof p.wallZone === 'function' ? p.wallZone() : (p.wallZone ?? 'a')));
@@ -667,6 +752,17 @@ node('center', { in: { geom: V.geom, x: V.bool, y: V.bool, z: V.bool }, out: V.g
   }));
 });
 
+node('reverse', { in: { geom: V.any }, out: V.geom }, ({ p }) => {
+  const g = toGeometry(p.geom);
+  return geom(g.parts.map(({ pos, zone }) => {
+    const q = [];
+    for (let i = 0; i < pos.length; i += 9) {
+      tri(q, [pos[i], pos[i + 1], pos[i + 2]], [pos[i + 6], pos[i + 7], pos[i + 8]], [pos[i + 3], pos[i + 4], pos[i + 5]]);
+    }
+    return part(q, zone);
+  }));
+});
+
 node('mirror', { in: { geom: V.geom, axis: V.string, weld: V.bool }, out: V.geom }, ({ p }) => {
   const g = p.geom, axis = p.axis ?? 'x';
   const flip = (q) => (axis === 'x' ? [-q[0], q[1], q[2]] : axis === 'y' ? [q[0], -q[1], q[2]] : [q[0], q[1], -q[2]]);
@@ -704,6 +800,11 @@ node('join', { in: { geoms: V.any }, out: V.geom }, ({ p }) => geom(p.geoms.flat
 // normal graph geometry value. The mesh node also accepts objects directly,
 // but this node makes them composable with join/transform/etc.
 node('geometry', { in: { object: V.any, zone: V.string }, out: V.geom }, ({ p }) => objectToGeom(p.object, p.zone ?? 'a'));
+
+// Pull a named field out of a code node's structured output. This lets a
+// script compute layout data (profiles, stations, tip points) while the graph
+// still builds the surfaces with loft/join/mesh nodes.
+node('get', { in: { object: V.any, key: V.string }, out: V.any }, ({ p }) => p.object?.[p.key]);
 
 // A deterministic, consumable random stream. Passing the same node into
 // scatter (or any future consumer) gives one shared sequence, which is what

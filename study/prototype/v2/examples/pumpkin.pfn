@@ -1,8 +1,16 @@
 # polyfork graph v2 — pumpkin
 graph pumpkin
-n n0 revolve profile=[[0.008,0],[0.1,0.01],[0.16,0.06],[0.185,0.13],[0.17,0.21],[0.11,0.27],[0.035,0.29]] seg=32 zone=rind mod=`(x,y,z,i,k)=>x*(1+0.095*Math.cos(i*8))*(1+0.02*Math.sin(y*40))`
-n n1 cylinder r1=0.032 r2=0.018 h=0.11 seg=7 y=0.28 zone=stem
-n n2 join geoms=[@n0,@n1]
-n n3 mesh geom=@n2 zones={rind:#df7b24,stem:#4d6b32}
-out mesh=@n3
+in colorway enum field options=field|ghost|heirloom-blue|unripe label=Colorway
+in squash float 1 min=0.7 max=1.1 step=0.05 label=Squash
+in ribs float 1 min=0 max=2 step=0.25 label="Rib depth"
+in lobe color "" label="Lobe colour"
+in stem color "" label="Stem colour"
+n n0 revolve profile=[[0.07,0],[0.152,0.042],[0.172,0.105],[0.138,0.172],[0.055,0.208]] capTop=[0,0.196,0] capBottom=[0,0,0] ribs=$ribs seg=10 axis=y ringMode=xz mod=`x*(i%2 ? (s.ribs===1 ? 0.92 : 1-0.08*s.ribs) : 1)` zoneField=`i%2 ? 'shade' : 'lobe'` capZoneField=`i%2 ? 'shade' : 'lobe'` orient=true
+n n1 transform geom=@n0 s=~`s => [1, s.squash, 1]`
+n n2 prim type=CylinderGeometry args=[0.036,0.026,0.078,5] zone=stem
+n n3 transform geom=@n2 ty=0.039
+n n4 transform geom=@n3 rz=-0.16 tx=0.006 ty=~`s => 0.192*s.squash`
+n n5 join geoms=[@n1,@n4]
+n n6 mesh geom=@n5 zones={lobe:~`s => {\n    const cw = ({"field":{"lobe":"#f5821f","groove":"#c7530c","stem":"#2f5d29"},"ghost":{"lobe":"#ece5d3","groove":"#c7bb9f","stem":"#5a6338"},"heirloom-blue":{"lobe":"#8fa8b5","groove":"#6a8492","stem":"#414f2c"},"unripe":{"lobe":"#7fa03c","groove":"#5e7b28","stem":"#3c5226"}})[s.colorway] || ({"field":{"lobe":"#f5821f","groove":"#c7530c","stem":"#2f5d29"},"ghost":{"lobe":"#ece5d3","groove":"#c7bb9f","stem":"#5a6338"},"heirloom-blue":{"lobe":"#8fa8b5","groove":"#6a8492","stem":"#414f2c"},"unripe":{"lobe":"#7fa03c","groove":"#5e7b28","stem":"#3c5226"}}).field;\n    return s.lobe || cw.lobe;\n  }`,shade:~`s => {\n    const cw = ({"field":{"lobe":"#f5821f","groove":"#c7530c","stem":"#2f5d29"},"ghost":{"lobe":"#ece5d3","groove":"#c7bb9f","stem":"#5a6338"},"heirloom-blue":{"lobe":"#8fa8b5","groove":"#6a8492","stem":"#414f2c"},"unripe":{"lobe":"#7fa03c","groove":"#5e7b28","stem":"#3c5226"}})[s.colorway] || ({"field":{"lobe":"#f5821f","groove":"#c7530c","stem":"#2f5d29"},"ghost":{"lobe":"#ece5d3","groove":"#c7bb9f","stem":"#5a6338"},"heirloom-blue":{"lobe":"#8fa8b5","groove":"#6a8492","stem":"#414f2c"},"unripe":{"lobe":"#7fa03c","groove":"#5e7b28","stem":"#3c5226"}}).field;\n    if (!s.lobe) return cw.groove;\n    const n = parseInt(s.lobe.slice(1), 16);\n    const f = 0.78;\n    const r = Math.round(((n >> 16) & 255) * f), g = Math.round(((n >> 8) & 255) * f), b = Math.round((n & 255) * f);\n    return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);\n  }`,stem:~`s => {\n    const cw = ({"field":{"lobe":"#f5821f","groove":"#c7530c","stem":"#2f5d29"},"ghost":{"lobe":"#ece5d3","groove":"#c7bb9f","stem":"#5a6338"},"heirloom-blue":{"lobe":"#8fa8b5","groove":"#6a8492","stem":"#414f2c"},"unripe":{"lobe":"#7fa03c","groove":"#5e7b28","stem":"#3c5226"}})[s.colorway] || ({"field":{"lobe":"#f5821f","groove":"#c7530c","stem":"#2f5d29"},"ghost":{"lobe":"#ece5d3","groove":"#c7bb9f","stem":"#5a6338"},"heirloom-blue":{"lobe":"#8fa8b5","groove":"#6a8492","stem":"#414f2c"},"unripe":{"lobe":"#7fa03c","groove":"#5e7b28","stem":"#3c5226"}}).field;\n    return s.stem || cw.stem;\n  }`}
+out mesh=@n6
 end
