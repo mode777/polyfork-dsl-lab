@@ -33,7 +33,7 @@ browser viewer. Public repo, published with GitHub Pages.
 index.html            split code/result viewer
 viewer.js             viewer: scene, examples, params, live cook
 style.css
-runtime/runtime.js    103-node typed graph runtime + evaluator, Three bridge
+runtime/runtime.js    104-node typed graph runtime + evaluator, Three bridge
 runtime/parts.js      graph wrappers for the ported part builders
 runtime/builders.js   pure geometry builders used by those part nodes
 runtime/expr.js       parsed expression language (no eval)
@@ -98,14 +98,17 @@ The viewer `frame()` uses `current.cam` = `[azimuthDeg, elevationDeg]` and
 
 ## Current status (24 Nov 2026)
 
-- 103 node types; **19 published examples, all geometric ports, zero script nodes**.
-- The ten newest ports are dedicated part nodes backed by `builders.mjs`; their `.pfn`
-  files are ~0.7-1.3 KB and expose geometry options as graph inputs.
+- 104 node types; **29 published examples, all geometric ports, zero script nodes**.
+- The ten face-soup ports are dedicated part nodes backed by `builders.mjs`; their `.pfn`
+  files are ~0.7-1.3 KB and expose geometry options as graph inputs. The next ten ports
+  are built only from generic nodes, not per-asset runtime types.
 - **Geometric parity (vertices, bbox and winding at 1e-4):** `cookie` (174),
   `sapphire` (48), `tire` (520), `pumpkin` (120), `area rug` (392/700),
   `chalkboard` (194), `theatre` (667), `wayfinding` (482), `desk` (280),
   `plaza` (292), `clam` (792), `tram` (170), `armchair` (460), `wattle` (802),
-  `quiver` (658), `door` (402), `taxiway` (408), `roof` (712), `carousel` (276).
+  `quiver` (658), `door` (402), `taxiway` (408), `roof` (712), `carousel` (276),
+  `prize` (768), `grass` (660), `coral` (534), `rowboat` (1262), `basket` (672),
+  `contextmenu` (788), `lookout` (962), `cafe` (540), `keyboard` (698), `chair` (848).
 - Sapphire had an inverted bottom cap; `loft.orient`/`orientCenter` and `reverse` fixed it.
   Sapphire is now fully parametric (all reference params live, including pointed/
   truncated/broken terminations).
@@ -121,24 +124,23 @@ The viewer `frame()` uses `current.cam` = `[azimuthDeg, elevationDeg]` and
 - The overhead wayfinding sign adds `pack`, `outlineRect` and `band`; `plate` gained
   cap/wall selection, `chamferBox` face skipping, `prism` cap orientation and `mixColor`
   expression support. The office desk reuses the new outline/band primitives.
-- The ten new ports are dedicated part nodes (`plazaTile`, `clamAnimal`, `tramTile`,
-  `armchair`, `wattleFence`, `quiver`, `doorLeaf`, `taxiwaySign`, `roofGable`,
-  `carousel`) backed by `builders.mjs`; their `.pfn` files are ~0.7-1.3 KB instead of
-  face dumps. `faces` remains the low-level escape hatch. `doorLeaf` keeps its glass in
-  a separate material slot, and its hinge knuckles are baked through the reference's
-  lived-in shear.
+- The ten new ports are generic-node graphs: `loft` gained `zoneField`, `abba`
+  diagonal, raw/flipped caps and degenerate-triangle skipping; `pill` is a reusable
+  rounded UI row; `poly` now skips degenerate triangles. No per-asset node was added.
+  `faces` remains the low-level escape hatch. `doorLeaf` keeps its glass in a separate
+  material slot, and its hinge knuckles are baked through the reference's lived-in shear.
 - The previous approximations/studies were removed from the published manifest while
   they are replaced with real ports. The gallery is stale.
 - `t-all.mjs` is count-independent and winding-aware; counts alone are not parity.
 
 ## Next tasks (priority)
 
-1. Port more reference props and add them to the showcase. The dedicated part nodes plus the
-   signage/furniture primitives cover the remaining face-soup assets; the current gaps
-   are polygon faces with craters (cheese wedge), fused clipped lumps (small rock), and
-   cloth/rigged families.
+1. Port more reference props and add them to the showcase. The generic node set now covers
+   structured furniture, UI, nature and vehicle props; the remaining gaps are polygon faces
+   with craters (cheese wedge), fused clipped lumps (small rock), the core rulebook/marquee
+   letter, and cloth/rigged families.
 2. Keep every published example a verified port; do not re-add labelled approximations.
-3. Regenerate the gallery for the nineteen ports.
+3. Regenerate the gallery for the twenty-nine ports.
 4. If adding booleans to examples, verify `manifold-3d` WASM loads from the import map and
    gate it behind `await initManifold()`.
 
@@ -149,7 +151,8 @@ From `study/prototype/v2`:
 ```bash
 node t-examples.mjs        # parses/cooks every published pfn
 node t-all.mjs             # order-independent vertex/bbox/winding parity
-node t-ports10.mjs         # ten new ports: parity + variants + colourways
+node t-ports10.mjs         # first ten ports: parity + variants + colourways
+node t-ports10b.mjs        # ten generic-node ports: parity + variants
 node t-cookie.mjs          # cookie default / 3-chip / 14-chip
 node t-tire.mjs             # 8 tire variants
 node t-sapphire.mjs        # 13 sapphire param variants

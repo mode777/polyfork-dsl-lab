@@ -1,6 +1,6 @@
 // Compact authoring DSL over the v2 IR. Every call records a node; scalars,
 // refs, arrays and field expressions all serialise (fields as source strings).
-import { Graph, field, isField, expr } from './runtime.js?v=13';
+import { Graph, field, isField, expr } from './runtime.js?v=14';
 
 const F = (v) => (isField(v) || typeof v !== 'string' && typeof v !== 'function' ? v : field(v));
 const strip = (o, ks) => { const q = { ...o }; for (const k of ks) delete q[k]; return q; };
@@ -47,7 +47,7 @@ class Builder {
   sphere(p = {}) { return this.add('sphere', {}, p); }
 
   // surfaces
-  loft(o) { return this.add('loft', { rings: o.rings, capTop: o.capTop, capBottom: o.capBottom }, strip(o, ['rings', 'capTop', 'capBottom'])); }
+  loft(o) { return this.add('loft', { rings: o.rings, capTop: o.capTop, capBottom: o.capBottom }, strip({ ...o, zoneField: o.zoneField !== undefined ? F(o.zoneField) : undefined }, ['rings', 'capTop', 'capBottom'])); }
   extrude(o) { return this.add('extrude', { profile: o.profile }, { depth: o.depth, z0: o.z0, cap: o.cap }); }
   prism(o) { return this.add('prism', { profile: o.profile }, strip(o, ['profile'])); }
   frame(o) { return this.add('frame', { profile: o.profile }, strip(o, ['profile'])); }
@@ -56,6 +56,7 @@ class Builder {
   outlineRect(o = {}) { return this.add('outlineRect', {}, o); }
   band(o = {}) { return this.add('band', { lower: o.lower, upper: o.upper }, strip(o, ['lower', 'upper'])); }
   gem(o = {}) { return this.add('gem', {}, o); }
+  pill(o = {}) { return this.add('pill', {}, o); }
   poly(o = {}) { return this.add('poly', { pts: o.pts }, strip(o, ['pts'])); }
   faces(o = {}) { return this.add('faces', { faces: o.faces }, strip(o, ['faces'])); }
   pack(o = {}) { return this.add('pack', { items: o.items }, strip(o, ['items'])); }

@@ -18,14 +18,14 @@ geometry only.
 ```
 index.html            the split code / result viewer
 app.js                viewer (three.js scene, params, live cook)
-runtime/runtime.js    103-node typed graph runtime + evaluator, Three bridge
+runtime/runtime.js    104-node typed graph runtime + evaluator, Three bridge
 runtime/parts.js      graph wrappers for the ported part builders
 runtime/builders.js   pure geometry builders used by those part nodes
 runtime/expr.js       parsed expression language (no eval)
 runtime/format.js     .pfn text parser and serializer
 runtime/dsl.js        JavaScript authoring DSL
 runtime/cache.js      content-addressed array pool + Float32 cache
-examples/*.pfn        19 ported example graphs (showcase is ports only)
+examples/*.pfn        29 ported example graphs (showcase is ports only)
 docs/                 design notes, parity status, techniques
 study/                authoring/porting workspace (reference assets gitignored)
 ```
@@ -87,14 +87,14 @@ The parser, serializer and evaluator are in `runtime/`. `.pfn` is the authoring 
 `cache.js` shows a compact content-addressed JSON cache (arrays pooled and base64-encoded,
 ≈84% smaller on graphs with repeated rings).
 
-## Node set (103)
+## Node set (104)
 
 | group | nodes |
 |---|---|
 | sources | `ring profile path grid box chamferBox outlineRect cylinder sphere plane card cone curl pointsGrid geometry prim faces random value let list range table preset coalesce draws jitter` |
 | ported parts | `plazaTile clamAnimal tramTile armchair wattleFence quiver doorLeaf taxiwaySign roofGable carousel` |
 | surfaces | `loft loftProfile cap extrude revolve sweep band inset pocket solidify bevelProfile fan fanRing wrapShell` |
-| signage | `prism frame plate block gem poly` |
+| signage | `prism frame plate block gem pill poly` |
 | modifiers | `transform center mirror reverse deform clip join cavity centroid lerpPoint mirrorPoint rotateAbout planeCut gridPoint direction lookup first last slice concat` |
 | distribution | `scatter scatterSurface scatterVolume instance instancedMesh arrayPolar arrayLinear` |
 | character | `skeleton skin pose` |
@@ -103,16 +103,18 @@ The parser, serializer and evaluator are in `runtime/`. `.pfn` is the authoring 
 | output | `mesh group` |
 | escape hatches | `script module` |
 
-Low-level controls are first-class: `loft` has `diagonal`, `bandZones`, `flip`,
-`orient`; `revolve` has `ringMode`, `zoneField`, `orient`, caps and per-cap zones;
+Low-level controls are first-class: `loft` has `diagonal` (`ab`, `ba`, `abba`),
+`bandZones`, `zoneField`, cap flips/raw caps, `flip` and `orient`; `revolve` has `ringMode`, `zoneField`, `orient`, caps and per-cap zones;
 `solidify` has reference diagonals, wall order and zone fields; `scatter` has `lazy`,
 `yawScale`, `rng`; `instance` has per-point `[sx,sy,sz]` scale and `yawSign`; `arrayPolar`
 has `spin`; `reverse` flips winding; `prim` calls a real Three geometry constructor;
-`prism`/`frame`/`plate`/`block`/`gem`/`poly` cover swept frames, holed plates, skipped-face
-blocks, faceted lamps and hand-authored sign polygons. The ten newest ports use dedicated
-part nodes (`plazaTile`, `clamAnimal`, `tramTile`, `armchair`, `wattleFence`, `quiver`,
-`doorLeaf`, `taxiwaySign`, `roofGable`, `carousel`) backed by `builders.mjs`; `faces`
-remains the low-level escape hatch for genuinely irregular face soups. `plate` can emit
+`prism`/`frame`/`plate`/`block`/`gem`/`pill`/`poly` cover swept frames, holed plates,
+skipped-face blocks, faceted lamps, rounded UI pills and hand-authored polygons. The ten face-soup ports use dedicated part nodes
+(`plazaTile`, `clamAnimal`, `tramTile`, `armchair`, `wattleFence`, `quiver`, `doorLeaf`,
+`taxiwaySign`, `roofGable`, `carousel`) backed by `builders.mjs`. The next ten ports are
+expressed entirely with the generic node set (`loft`, `revolve`, `prism`, `block`,
+`plate`, `poly`, `pill`); `faces` remains the low-level escape hatch for genuinely
+irregular face soups. `plate` can emit
 either cap and selected walls, `chamferBox` can skip faces, `prism` can orient its caps,
 `outlineRect` and `band` build chamfered furniture outlines, and `pack` lays out flat
 legend items.
@@ -149,6 +151,16 @@ removed from the published manifest while they are replaced with real ports.
 | Lit taxiway sign | two-panel arrow face, octagonal casing, legs and concrete pad |
 | Tiled roof section | gable kawara roof with four stepped courses and closed verges |
 | Baggage carousel | sloped plate bed, bumper skirt and three riding bags |
+| Prize car turntable | revolved deck/foot ring, live bulb ring, facet count from diameter |
+| Scorched grass tuft | three-sided lofted blades with burn zones and a pebble ring |
+| Pillar coral | integrated fluted columns on a four-ring mound |
+| Wooden rowboat | clinker hull lofted from station sections, ribs, thwarts and oars |
+| Woven storage basket | checkered weave courses, braided bands, rope handles, lid/fill |
+| Context menu list | drafted glass sheet, five pill rows and the accent row |
+| Lookout watchtower | timber trestle, planked shaft, glazed cabin, railing and roof |
+| Cafe table set | faceted table, three chairs and two mugs at the reference term |
+| Keyboard bench | tufted scissor-lift seat, legs, rails and crank |
+| Table game chair | swivel drum seat, tufted back pad, nailheads and footring |
 
 Parity means the order-independent `t-all.mjs` check passes at `1e-4`: same vertex count,
 vertex set and bbox, and no winding mismatches. It is not a byte/vertex-order claim.

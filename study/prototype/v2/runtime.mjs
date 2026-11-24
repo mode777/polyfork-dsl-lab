@@ -416,7 +416,7 @@ node('fanRing', { in: { r: V.number, y: V.number, n: V.int, phase: V.number, ape
   return geom(part(out, p.zone ?? 'a'));
 });
 
-node('loft', { in: { rings: V.any, capTop: V.any, capBottom: V.any, zones: V.any, diagonal: V.string, bandZones: V.any, flip: V.bool, orient: V.bool, orientCenter: V.vec3 }, out: V.geom }, ({ p }) => {
+node('loft', { in: { rings: V.any, capTop: V.any, capBottom: V.any, zones: V.any, diagonal: V.string, bandZones: V.any, zoneField: V.field, values: V.any, flip: V.bool, orient: V.bool, orientCenter: V.vec3, capTopFlip: V.bool, capBottomFlip: V.bool, capTopRaw: V.bool, capBottomRaw: V.bool }, out: V.geom }, ({ p }) => {
   const rings = p.rings.map(asArray);
   const zones = p.zones ?? {};
   const out = {};
@@ -427,8 +427,9 @@ node('loft', { in: { rings: V.any, capTop: V.any, capBottom: V.any, zones: V.any
   const all = rings.flat();
   const oc = p.orientCenter ?? (all.length ? all.reduce((a, q) => [a[0] + q[0] / all.length, a[1] + q[1] / all.length, a[2] + q[2] / all.length], [0, 0, 0]) : [0, 0, 0]);
   const emitTri = (pos, a, b, c) => {
+    const n = cross3(sub3(b, a), sub3(c, a));
+    if (Math.hypot(n[0], n[1], n[2]) < 1e-14) return;
     if (p.orient) {
-      const n = cross3(sub3(b, a), sub3(c, a));
       const cen = [(a[0] + b[0] + c[0]) / 3 - oc[0], (a[1] + b[1] + c[1]) / 3 - oc[1], (a[2] + b[2] + c[2]) / 3 - oc[2]];
       if (dot3(n, cen) < 0) tri(pos, a, c, b); else tri(pos, a, b, c);
       return;
@@ -444,13 +445,26 @@ node('loft', { in: { rings: V.any, capTop: V.any, capBottom: V.any, zones: V.any
     for (let i = 0; i < n; i++) {
       const j = (i + 1) % n;
       // 'ab' is the historical runtime diagonal; 'ba' matches the common
-      // Polyfork loft helper (A[j]-B[i] diagonal) used by cookie/rug.
+      // Polyfork loft helper (A[j]-B[i] diagonal) used by cookie/rug; 'abba'
+      // matches the interleaved reference quad A[i],B[i],B[j],A[j] used by
+      // organic sweeps such as the coral columns.
       if (p.diagonal === 'ba') emitQuad(pos, A[j], A[i], B[i], B[j]);
+      else if (p.diagonal === 'abba') emitQuad(pos, A[i], B[i], B[j], A[j]);
       else emitQuad(pos, A[i], A[j], B[j], B[i]);
     }
-    const zone = Array.isArray(p.bandZones) ? (p.bandZones[k] ?? 'a')
-      : (typeof zones.band === 'function' ? zones.band(k) : (zones.band ?? 'a'));
-    put(zone, pos);
+    const zone = p.zoneField ? fieldValue(p.zoneField, { i: 0, k, vals: p.values, s: p })
+      : Array.isArray(p.bandZones) ? (p.bandZones[k] ?? 'a')
+        : (typeof zones.band === 'function' ? zones.band(k) : (zones.band ?? 'a'));
+    if (p.zoneField) {
+      for (let i = 0; i < n; i++) {
+        const j = (i + 1) % n, one = [];
+        if (p.diagonal === 'ba') emitQuad(one, A[j], A[i], B[i], B[j]);
+        else if (p.diagonal === 'abba') emitQuad(one, A[i], B[i], B[j], A[j]);
+        else emitQuad(one, A[i], A[j], B[j], B[i]);
+        const z = fieldValue(p.zoneField, { i, k, vals: p.values, s: p });
+        put(z, one);
+      }
+    } else put(zone, pos);
   }
   const triOut = (out, a, b, c, hint) => {
     const n = cross3(sub3(b, a), sub3(c, a));
@@ -461,7 +475,9 @@ node('loft', { in: { rings: V.any, capTop: V.any, capBottom: V.any, zones: V.any
     const c = A.reduce((q, r) => add3(q, mul3(r, 1 / n)), [0, 0, 0]);
     const hint = norm(sub3(p.capTop, c));
     for (let i = 0; i < n; i++) {
-      if (p.orient) emitTri(pos, p.capTop, A[(i + 1) % n], A[i]);
+      if (p.capTopRaw) tri(pos, p.capTop, A[(i + 1) % n], A[i]);
+      else if (p.capTopFlip) triOut(pos, A[i], A[(i + 1) % n], p.capTop, hint);
+      else if (p.orient) emitTri(pos, p.capTop, A[(i + 1) % n], A[i]);
       else triOut(pos, p.capTop, A[(i + 1) % n], A[i], hint);
     }
     put(zones.capTop ?? 'a', pos);
@@ -471,7 +487,9 @@ node('loft', { in: { rings: V.any, capTop: V.any, capBottom: V.any, zones: V.any
     const c = A.reduce((q, r) => add3(q, mul3(r, 1 / n)), [0, 0, 0]);
     const hint = norm(sub3(c, p.capBottom));
     for (let i = 0; i < n; i++) {
-      if (p.orient) emitTri(pos, p.capBottom, A[i], A[(i + 1) % n]);
+      if (p.capBottomRaw) tri(pos, p.capBottom, A[i], A[(i + 1) % n]);
+      else if (p.capBottomFlip) triOut(pos, A[(i + 1) % n], A[i], p.capBottom, hint);
+      else if (p.orient) emitTri(pos, p.capBottom, A[i], A[(i + 1) % n]);
       else triOut(pos, p.capBottom, A[i], A[(i + 1) % n], hint);
     }
     put(zones.capBottom ?? 'a', pos);
@@ -632,6 +650,62 @@ node('plate', { in: { profile: V.profile, holes: V.any, z0: V.number, z1: V.numb
   return geom(part(out, p.zone ?? 'a'));
 });
 
+// Rounded slot/row pill: a stadium profile in XY extruded through Z, with the
+// reference's top ring, narrower foot ring and zippered side wall. Used by the
+// UI menu rows and other rounded bars; keeps the cap centres and ring counts
+// exact instead of approximating with a plain loft.
+node('pill', { in: { hx: V.number, cy: V.number, r: V.number, seg: V.int, footSeg: V.int, foot: V.number, th: V.number, under: V.number, zone: V.string }, out: V.geom }, ({ p }) => {
+  const hx = p.hx ?? 0.1, cy = p.cy ?? 0, r = p.r ?? 0.01, seg = Math.max(2, Math.round(p.seg ?? 16)), footSeg = Math.max(2, Math.round(p.footSeg ?? 4));
+  const foot = p.foot ?? 0, th = p.th ?? 0.003, under = Math.min(p.under ?? 0.0014, 0.5 * th), zone = p.zone ?? 'a';
+  const pillRing = (rr, fs) => {
+    const out = [];
+    for (const [cx, a0] of [[hx, -90], [-hx, 90]]) {
+      for (let i = 0; i <= fs; i++) {
+        const a = (a0 + (180 * i) / fs) * Math.PI / 180;
+        out.push({ x: cx + rr * Math.cos(a), y: cy + rr * Math.sin(a), nx: Math.cos(a), ny: Math.sin(a), t: i / fs });
+      }
+    }
+    return out;
+  };
+  const F = pillRing(r, seg), B = pillRing(r - under, footSeg);
+  const top = foot + th, k = seg + 1, nf = seg + 1, nb = footSeg + 1, out = [];
+  const emit = (a, b, c, hint) => {
+    const u = sub3(b, a), v = sub3(c, a), n = cross3(u, v);
+    if (dot3(n, hint) >= 0) tri(out, a, b, c); else tri(out, a, c, b);
+  };
+  const P = (q, z) => [q.x, q.y, z];
+  const cap = (R, fs, z, n) => {
+    const kk = fs + 1, CR = [hx, cy, z], CL = [-hx, cy, z];
+    for (let i = 0; i < fs; i++) emit(CR, P(R[i], z), P(R[i + 1], z), n);
+    for (let i = 0; i < fs; i++) emit(CL, P(R[kk + i], z), P(R[kk + i + 1], z), n);
+    emit(CR, P(R[kk - 1], z), P(R[kk], z), n);
+    emit(CR, P(R[kk], z), CL, n);
+    emit(CL, P(R[2 * kk - 1], z), P(R[0], z), n);
+    emit(CL, P(R[0], z), CR, n);
+  };
+  cap(F, seg, top, [0, 0, 1]);
+  cap(B, footSeg, foot, [0, 0, -1]);
+  const lean = Math.atan2(under, th), cl = Math.cos(lean), sl = Math.sin(lean);
+  const N = (q) => [q.nx * cl, q.ny * cl, -sl];
+  const outN = (...ps) => { let x = 0, y = 0; for (const q of ps) { x += q.nx; y += q.ny; } return [x, y, 0]; };
+  for (let e = 0; e < 2; e++) {
+    const A = F.slice(e * nf, (e + 1) * nf), Z = B.slice(e * nb, (e + 1) * nb);
+    let i = 0, j = 0;
+    while (i < seg || j < footSeg) {
+      if (j >= footSeg || (i < seg && A[i + 1].t <= Z[j + 1].t)) {
+        emit(P(A[i], top), P(A[i + 1], top), P(Z[j], foot), outN(A[i], A[i + 1], Z[j])); i++;
+      } else {
+        emit(P(A[i], top), P(Z[j], foot), P(Z[j + 1], foot), outN(A[i], Z[j], Z[j + 1])); j++;
+      }
+    }
+  }
+  const sTop = [0, cl, -sl], sBot = [0, -cl, -sl];
+  const q = (a, b, c, d, n) => { emit(a, b, c, n); emit(a, c, d, n); };
+  q(P(F[nf - 1], top), P(F[nf], top), P(B[nb], foot), P(B[nb - 1], foot), sTop);
+  q(P(F[2 * nf - 1], top), P(F[0], top), P(B[0], foot), P(B[2 * nb - 1], foot), sBot);
+  return geom(part(out, zone));
+});
+
 // Axis-aligned block with optional skipped faces. The reference builders use
 // this for readerboards and sign cabinets where a hidden face must not exist.
 node('block', { in: { x0: V.number, x1: V.number, y0: V.number, y1: V.number, z0: V.number, z1: V.number, skip: V.string, zone: V.string }, out: V.geom }, ({ p }) => {
@@ -691,8 +765,12 @@ node('poly', { in: { pts: V.any, zone: V.string, hint: V.vec3, inside: V.vec3, f
     if (dot3(n, hint) < 0) P = P.slice().reverse();
   }
   const out = [];
-  if (p.inside) for (let i = 1; i + 1 < P.length; i++) triOut(out, P[0], P[i], P[i + 1], p.inside);
-  else for (let i = 1; i + 1 < P.length; i++) tri(out, P[0], P[i], P[i + 1]);
+  const pushTri = (a, b, c) => {
+    const n = cross3(sub3(b, a), sub3(c, a));
+    if (Math.hypot(n[0], n[1], n[2]) < 1e-12) return;
+    if (p.inside) triOut(out, a, b, c, p.inside); else tri(out, a, b, c);
+  };
+  for (let i = 1; i + 1 < P.length; i++) pushTri(P[0], P[i], P[i + 1]);
   return geom(part(out, p.zone ?? 'a'));
 });
 

@@ -283,5 +283,155 @@
       20
     ],
     "fit": 1.6
+  },
+  {
+    "id": "prize",
+    "title": "Prize car turntable",
+    "description": "Exact geometric port: revolved deck and foot ring with a live bulb ring.",
+    "category": "props",
+    "status": "port",
+    "file": "prize.pfn",
+    "bytes": 5198,
+    "nodes": 33,
+    "cam": [
+      35,
+      18
+    ],
+    "fit": 1.5
+  },
+  {
+    "id": "grass",
+    "title": "Scorched grass tuft",
+    "description": "Exact geometric port: three-sided lofted blades, per-band burn zones and a pebble ring.",
+    "category": "nature",
+    "status": "port",
+    "file": "grass.pfn",
+    "bytes": 38315,
+    "nodes": 96,
+    "cam": [
+      30,
+      20
+    ],
+    "fit": 1.6
+  },
+  {
+    "id": "coral",
+    "title": "Pillar coral",
+    "description": "Exact geometric port: integrated fluted columns on a four-ring mound.",
+    "category": "nature",
+    "status": "port",
+    "file": "coral.pfn",
+    "bytes": 23419,
+    "nodes": 15,
+    "cam": [
+      25,
+      18
+    ],
+    "fit": 1.5
+  },
+  {
+    "id": "rowboat",
+    "title": "Wooden rowboat",
+    "description": "Exact geometric port: clinker hull lofted from station sections, ribs, thwarts and stowed oars.",
+    "category": "props",
+    "status": "port",
+    "file": "rowboat.pfn",
+    "bytes": 104083,
+    "nodes": 401,
+    "cam": [
+      35,
+      25
+    ],
+    "fit": 1.5
+  },
+  {
+    "id": "basket",
+    "title": "Woven storage basket",
+    "description": "Exact geometric port: checkered weave courses, braided bands, rope handles and optional lid/fill.",
+    "category": "props",
+    "status": "port",
+    "file": "basket.pfn",
+    "bytes": 35783,
+    "nodes": 25,
+    "cam": [
+      30,
+      20
+    ],
+    "fit": 1.5
+  },
+  {
+    "id": "contextmenu",
+    "title": "Context menu list",
+    "description": "Exact geometric port: drafted glass sheet, pill rows and the accent row.",
+    "category": "props",
+    "status": "port",
+    "file": "contextmenu.pfn",
+    "bytes": 8385,
+    "nodes": 13,
+    "cam": [
+      12,
+      6
+    ],
+    "fit": 1.2
+  },
+  {
+    "id": "lookout",
+    "title": "Lookout watchtower",
+    "description": "Exact geometric port: timber trestle, planked shaft, glazed cabin, railing and conical roof.",
+    "category": "architecture",
+    "status": "port",
+    "file": "lookout.pfn",
+    "bytes": 79850,
+    "nodes": 485,
+    "cam": [
+      30,
+      15
+    ],
+    "fit": 1.4
+  },
+  {
+    "id": "cafe",
+    "title": "Cafe table set",
+    "description": "Exact geometric port: faceted table, three chairs and two mugs at the reference term.",
+    "category": "props",
+    "status": "port",
+    "file": "cafe.pfn",
+    "bytes": 25587,
+    "nodes": 122,
+    "cam": [
+      30,
+      20
+    ],
+    "fit": 1.6
+  },
+  {
+    "id": "keyboard",
+    "title": "Keyboard bench",
+    "description": "Exact geometric port: tufted scissor-lift seat, legs, rails and crank.",
+    "category": "props",
+    "status": "port",
+    "file": "keyboard.pfn",
+    "bytes": 31784,
+    "nodes": 113,
+    "cam": [
+      30,
+      18
+    ],
+    "fit": 1.5
+  },
+  {
+    "id": "chair",
+    "title": "Table game chair",
+    "description": "Exact geometric port: swivel drum seat, tufted back pad, nailheads and footring.",
+    "category": "props",
+    "status": "port",
+    "file": "chair.pfn",
+    "bytes": 209527,
+    "nodes": 851,
+    "cam": [
+      30,
+      15
+    ],
+    "fit": 1.5
   }
 ]

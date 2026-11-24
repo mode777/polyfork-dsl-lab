@@ -189,3 +189,24 @@ available as a low-level escape hatch for genuinely irregular soups, but no publ
 example needs it now. The expression language did not need another built-in for this
 set; the repeated value work is covered by `let`/`value`/`preset` and the existing math
 helpers.
+
+
+## 13. Generic-node follow-up
+
+Ten more ports were added without a per-asset runtime node: **prize car turntable**,
+**scorched grass tuft**, **pillar coral**, **wooden rowboat**, **woven storage basket**,
+**context menu list**, **lookout watchtower**, **cafe table set**, **keyboard bench** and
+**table game chair**. They use the existing generic nodes plus a small set of reusable
+extensions:
+
+| extension | used by | why |
+|---|---|---|
+| `loft.zoneField` / `values` | rowboat hull | per-edge zones on one lofted hull |
+| `loft.diagonal='abba'` | coral, rowboat | reference interleaved quad order |
+| `loft.capTopFlip` / `capBottomFlip` / `capTopRaw` / `capBottomRaw` | prize, coral, keyboard | reference fan/cap orientation |
+| `pill` | context menu | rounded UI row with two cap centres |
+| degenerate-triangle skipping | keyboard, chair | reference helpers skip zero-area faces |
+
+No `script`, `module`, `faces` dump or single-asset node is used by the published graphs.
+The shared authoring helpers live in `ports/_kit.mjs` (loft/beam/prism/poly wrappers and
+vector/profile helpers), not in the runtime.

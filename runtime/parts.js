@@ -1,7 +1,7 @@
 // Graph node wrappers for the pure reference builders in builders.mjs.
 // Keeping the builders separate lets ports stay short and lets the .pfn show
 // the construction at asset/part level instead of a raw face dump.
-import { buildPlaza, buildClam, buildTram, buildArmchair, buildWattle, buildQuiver, buildDoor, buildTaxiway, buildRoof, buildCarousel } from './builders.js?v=13';
+import { buildPlaza, buildClam, buildTram, buildArmchair, buildWattle, buildQuiver, buildDoor, buildTaxiway, buildRoof, buildCarousel } from './builders.js?v=14';
 
 export function registerParts({ node, V, geom, part, tri, triOut }) {
   const facesToGeom = (faces) => {

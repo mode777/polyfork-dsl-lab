@@ -6,7 +6,7 @@ example policy changes.
 ## Headline
 
 The showcase is **ports only** while the remaining approximations and studies are
-replaced with real ports. Nineteen reference assets pass the order-independent geometric
+replaced with real ports. Twenty-nine reference assets pass the order-independent geometric
 parity check at `1e-4`, including the ten new ports added in this pass.
 
 ## Example status
@@ -32,13 +32,29 @@ parity check at `1e-4`, including the ten new ports added in this pass.
 | **taxiway** | 408 | **geometric port** | 3 nodes; two-panel arrow face, octagonal casing, legs and concrete pad. |
 | **roof** | 712 | **geometric port** | 3 nodes; gable kawara roof with four stepped courses and closed verges. |
 | **carousel** | 276 | **geometric port** | 3 nodes; sloped plate bed, bumper skirt and three riding bags. |
+| **prize** | 768 | **geometric port** | 33 nodes; live diameter/height lathe, deck/foot ring and bulb ring. |
+| **grass** | 660 | **geometric port** | 96 nodes; lofted three-sided blades, burn/scorch zones and pebble ring. |
+| **coral** | 534 | **geometric port** | 15 nodes; integrated fluted columns and four-ring mound. |
+| **rowboat** | 1262 | **geometric port** | 401 nodes; clinker hull, ribs, thwarts, oarlocks and stowed oars. |
+| **basket** | 672 | **geometric port** | 25 nodes; checkered weave, braided bands, rope handles and lid/fill. |
+| **contextmenu** | 788 | **geometric port** | 13 nodes; drafted glass sheet and pill rows. |
+| **lookout** | 962 | **geometric port** | 485 nodes; trestle, planked shaft, glazed cabin, railing and roof. |
+| **cafe** | 540 | **geometric port** | 122 nodes; faceted table, three chairs and two mugs at term 0.6. |
+| **keyboard** | 698 | **geometric port** | 113 nodes; tufted scissor-lift seat, legs, rails and crank. |
+| **chair** | 848 | **geometric port** | 851 nodes; swivel seat, tufted back pad, nailheads and footring. |
 
 The previous rock/armchair/clam/basket approximations and the hair/jacket/sign/creature
-studies were removed from the published manifest. Armchair and clam are now real ports;
-rock/cheese remain open.
+studies were removed from the published manifest. Armchair, clam and basket are now real
+ports; rock/cheese, the core rulebook and marquee letter remain open.
 
 ## What changed in this pass
 
+- Added ten generic-node ports: **prize car turntable**, **scorched grass tuft**, **pillar coral**,
+  **wooden rowboat**, **woven storage basket**, **context menu list**, **lookout watchtower**,
+  **cafe table set**, **keyboard bench** and **table game chair**. No per-asset node type was
+  added; they use `loft`/`revolve`/`prism`/`block`/`plate`/`poly`/`pill`.
+- Extended the generic DSL: `loft.zoneField`, `diagonal=abba`, raw/flipped caps,
+  degenerate-triangle skipping in `loft`/`poly`, and the reusable `pill` node.
 - Added ten exact ports: **composite plaza tile**, **maxima clam**, **tram track tile**,
   **lounge armchair**, **wattle fence run**, **arrow quiver**, **interior door leaf**,
   **lit taxiway sign**, **tiled roof section** and **baggage carousel**.
@@ -66,7 +82,7 @@ rock/cheese remain open.
 - `let` bindings now expose graph inputs under `s` as well as bare names, matching field
   and `~` param evaluation. Expression built-ins gained `mix`, `deg`/`rad` and
   `vadd`/`vsub`/`vmul`/`vdot`/`vcross`/`vlen`.
-- Bumped the public runtime asset version to `12`.
+- Bumped the public runtime asset version to `14`.
 
 - Fixed the sapphire inversion: the runtime's bottom-cap hint pointed inward; `loft` now
   has `orient`/`orientCenter` and the broken dished cap uses `reverse`.
@@ -93,8 +109,8 @@ rock/cheese remain open.
 
 ## What was verified
 
-- `t-all.mjs`: all nineteen published ports plus six `module` wrappers pass at default;
-  the per-port tests cover parameter variants for the original nine.
+- `t-all.mjs`: all twenty-nine published ports pass at default.
+- `t-ports10b.mjs`: 10/10 generic-node ports pass reference parity and 72 variant checks.
 - `t-ports10.mjs`: 10/10 new ports pass reference parity, 69 colour/variant checks, and
 every colourway leaves the vertex set unchanged.
 - `t-cookie.mjs`: 3/3 variants.
@@ -107,7 +123,7 @@ every colourway leaves the vertex set unchanged.
 - `t-wayfinding.mjs`: 15/15 variants (width/drop extremes, unlit ends, every arrow/letter/icon family, colourway).
 - `t-desk.mjs`: 10/10 variants (width extremes, all three undercarriages, lived-in extremes, colourway).
 - `t-expr.mjs`: 10/10 angle/vector expression helpers.
-- All nineteen showcase graphs parse and cook (`t-examples.mjs`); none contains a `script`
+- All twenty-nine showcase graphs parse and cook (`t-examples.mjs`); none contains a `script`
   node and the runtime never evaluates JavaScript for fields/params.
 - `t-code.mjs`, `t-bool.mjs`, `t-cache.mjs`, `t-sample3.mjs` pass.
 
@@ -125,7 +141,7 @@ every colourway leaves the vertex set unchanged.
    the marquee letter (stroke union/offset).
 2. Exposed but not yet filled: polygon faces with craters (cheese wedge), fused clipped
    lumps (small rock), and more cloth/rigged families.
-3. Regenerate the gallery for the nineteen ports; the old images are stale.
+3. Regenerate the gallery for the twenty-nine ports; the old images are stale.
 
 ## Workspace
 

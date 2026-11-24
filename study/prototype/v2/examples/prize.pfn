@@ -1,0 +1,45 @@
+# polyfork graph v2 — prize
+graph prize
+in colorway enum vegas-gold options=vegas-gold|champagne-slate|crimson-vip|platinum-noir label=Colorway
+in gold color "" label="Gold rim"
+in deck color "" label=Deck
+in skirt color "" label=Skirt
+in lamp color "" label=Bulbs
+in bulbs bool true label="Bulb ring"
+in diameter float 6 min=5 max=6.4 step=0.1 label=Diameter
+in height float 0.25 min=0.25 max=0.45 step=0.01 label=Height
+n n0 let diameter=$diameter height=$height binds={N:"max(8, 2*round(PI*diameter/(2*0.785)))",phase:PI/N,cosH:"cos(PI/N)",r0:diameter/2,yTop:height,yDeck:"height - 0.025",yCham:"height - 0.030",yRimBot:"height - 0.105",rDeck:"r0 - 0.260 - 0.025",rDeckR:"(r0 - 0.260 - 0.025)/cosH",rTopIn:"r0 - 0.260",rTopOut:"r0 - 0.030",rFoot:"r0 - 0.005",rFootR:"(r0 - 0.005)/cosH",rFootTop:"rFoot - 0.010",rWall:"min(r0 - 0.052, (rFootTop - 0.003)*cosH)",rLedgeIn:"(rWall - 0.012)*cosH",wallBot:"0.035 - 0.010",pDeckLip:"[[rDeck,yDeck],[rTopIn,yTop]]",pLipCham:"[[rTopIn,yTop],[rTopOut,yTop]]",pChamFace:"[[rTopOut,yTop],[r0,yCham]]",pFaceWall:"[[r0,yCham],[r0,yRimBot]]",pRimWall:"[[r0,yRimBot],[rWall,yRimBot]]",pSkirt:"[[rWall,yRimBot],[rWall,wallBot]]",pFootLedge:"[[rLedgeIn,0.035],[rFootTop,0.035]]",pFootTop:"[[rFootTop,0.035],[rFoot,0.025]]",pFootWall:"[[rFoot,0.025],[rFoot,0]]",rs:rWall,rsCorner:rWall/cosH}
+n n1 fanRing r=@n0.rDeckR y=@n0.yDeck n=@n0.N phase=@n0.phase apex=[0,@n0.yDeck,0] zone=deck
+n n2 revolve profile=@n0.pDeckLip seg=@n0.N inRadius=true zone=gold flip=true
+n n3 revolve profile=@n0.pLipCham seg=@n0.N inRadius=true zone=gold flip=true
+n n4 revolve profile=@n0.pChamFace seg=@n0.N inRadius=true zone=gold flip=true
+n n5 revolve profile=@n0.pFaceWall seg=@n0.N inRadius=true zone=gold flip=true
+n n6 revolve profile=@n0.pRimWall seg=@n0.N inRadius=true zone=skirt flip=true
+n n7 revolve profile=@n0.pSkirt seg=@n0.N inRadius=true zone=skirt flip=true
+n n8 revolve profile=@n0.pFootLedge seg=@n0.N inRadius=true zone=gold flip=true
+n n9 revolve profile=@n0.pFootTop seg=@n0.N inRadius=true zone=gold flip=true
+n n10 revolve profile=@n0.pFootWall seg=@n0.N inRadius=true zone=gold flip=true
+n n11 fanRing r=@n0.rFootR n=@n0.N phase=@n0.phase y=0 apex=[0,0,0] zone=skirt flip=true
+n n12 let height=$height binds={C:"height - 0.105 - 0.035",single:"0.035 + C/2 - 0.005",low:"0.035 + C/3",high:"0.035 + 2*C/3",two:"C >= 0.25 - 1e-9"}
+n n13 let rs=@n0.rs yc=@n12.single binds={r0:"[[0.048*cos(0*PI/3), yc+0.048*sin(0*PI/3), rs-0.009], [0.048*cos(1*PI/3), yc+0.048*sin(1*PI/3), rs-0.009], [0.048*cos(2*PI/3), yc+0.048*sin(2*PI/3), rs-0.009], [0.048*cos(3*PI/3), yc+0.048*sin(3*PI/3), rs-0.009], [0.048*cos(4*PI/3), yc+0.048*sin(4*PI/3), rs-0.009], [0.048*cos(5*PI/3), yc+0.048*sin(5*PI/3), rs-0.009]]",apex:"[0, yc, rs+0.036]"}
+n n14 loft rings=[@n13.r0] capTop=@n13.apex capTopFlip=true zones={capTop:lamp}
+n n15 let rs=@n0.rsCorner yc=@n12.single binds={r0:"[[0.048*cos(0*PI/3), yc+0.048*sin(0*PI/3), rs-0.009], [0.048*cos(1*PI/3), yc+0.048*sin(1*PI/3), rs-0.009], [0.048*cos(2*PI/3), yc+0.048*sin(2*PI/3), rs-0.009], [0.048*cos(3*PI/3), yc+0.048*sin(3*PI/3), rs-0.009], [0.048*cos(4*PI/3), yc+0.048*sin(4*PI/3), rs-0.009], [0.048*cos(5*PI/3), yc+0.048*sin(5*PI/3), rs-0.009]]",apex:"[0, yc, rs+0.036]"}
+n n16 loft rings=[@n15.r0] capTop=@n15.apex capTopFlip=true zones={capTop:lamp}
+n n17 arrayPolar geom=@n14 count=@n0.N start=0
+n n18 arrayPolar geom=@n16 count=@n0.N start=@n0.phase
+n n19 join geoms=[@n17,@n18]
+n n20 let rs=@n0.rs yc=@n12.low binds={r0:"[[0.048*cos(0*PI/3), yc+0.048*sin(0*PI/3), rs-0.009], [0.048*cos(1*PI/3), yc+0.048*sin(1*PI/3), rs-0.009], [0.048*cos(2*PI/3), yc+0.048*sin(2*PI/3), rs-0.009], [0.048*cos(3*PI/3), yc+0.048*sin(3*PI/3), rs-0.009], [0.048*cos(4*PI/3), yc+0.048*sin(4*PI/3), rs-0.009], [0.048*cos(5*PI/3), yc+0.048*sin(5*PI/3), rs-0.009]]",apex:"[0, yc, rs+0.036]"}
+n n21 loft rings=[@n20.r0] capTop=@n20.apex capTopFlip=true zones={capTop:lamp}
+n n22 let rs=@n0.rsCorner yc=@n12.high binds={r0:"[[0.048*cos(0*PI/3), yc+0.048*sin(0*PI/3), rs-0.009], [0.048*cos(1*PI/3), yc+0.048*sin(1*PI/3), rs-0.009], [0.048*cos(2*PI/3), yc+0.048*sin(2*PI/3), rs-0.009], [0.048*cos(3*PI/3), yc+0.048*sin(3*PI/3), rs-0.009], [0.048*cos(4*PI/3), yc+0.048*sin(4*PI/3), rs-0.009], [0.048*cos(5*PI/3), yc+0.048*sin(5*PI/3), rs-0.009]]",apex:"[0, yc, rs+0.036]"}
+n n23 loft rings=[@n22.r0] capTop=@n22.apex capTopFlip=true zones={capTop:lamp}
+n n24 arrayPolar geom=@n21 count=@n0.N start=0
+n n25 arrayPolar geom=@n23 count=@n0.N start=@n0.phase
+n n26 join geoms=[@n24,@n25]
+n n27 if cond=@n12.two then=@n26 else=@n19
+n n28 join geoms=[]
+n n29 if cond=$bulbs then=@n27 else=@n28
+n n30 preset choice=$colorway overrides={gold:$gold,deck:$deck,skirt:$skirt,lamp:$lamp} presets={vegas-gold:{gold:#b3883a,deck:#2a2a28,skirt:#384451,lamp:#f4f1ee},champagne-slate:{gold:#d29f53,deck:#384451,skirt:#2a2a28,lamp:#f4f1ee},crimson-vip:{gold:#b3883a,deck:#923629,skirt:#2a2a28,lamp:#f4f1ee},platinum-noir:{gold:#e3e3e0,deck:#2a2a28,skirt:#57544f,lamp:#f4f1ee}} fallback=vegas-gold
+n n31 join geoms=[@n1,@n2,@n3,@n4,@n5,@n6,@n7,@n8,@n9,@n10,@n11,@n29]
+n n32 mesh geom=@n31 zones={gold:@n30.gold,deck:@n30.deck,skirt:@n30.skirt,lamp:@n30.lamp}
+out mesh=@n32
+end

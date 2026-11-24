@@ -4,8 +4,8 @@
 three.js-native node graph, the gaps those ports exposed, the nodes added to close them,
 and a compact declarative storage format.
 
-**Code:** `runtime.js` (103 node types), `parts.js`/`builders.js` (ported part nodes and their pure builders), `expr.js`, `dsl.js`, `format.js`, `cache.js`,
-`ports/` (20 ports), `templates.mjs` (20 more). See `SAMPLE3.md` for the third sample. Run `node t-all.mjs` for the order-independent geometric parity table.
+**Code:** `runtime.js` (104 node types), `parts.js`/`builders.js` (ported part nodes and their pure builders), `expr.js`, `dsl.js`, `format.js`, `cache.js`,
+`ports/` (29 published ports), `templates.mjs` (older archetype graphs). See `SAMPLE3.md` for the third sample. Run `node t-all.mjs` for the order-independent geometric parity table.
 
 ---
 
@@ -25,14 +25,14 @@ and a compact declarative storage format.
 | `random` | `{ values, next }` deterministic LCG stream |
 | `object` | a `THREE.Object3D` output |
 
-### Nodes (103)
+### Nodes (104)
 
 | group | nodes |
 |---|---|
 | sources | `ring`, `profile`, `path`, `grid`, `box`, `outlineRect`, `cylinder`, `sphere`, `geometry`, `prim`, `faces`, `random`, `value`, `let`, `list`, `range`, `table`, `preset`, `coalesce`, `draws`, `jitter` |
 | ported parts | `plazaTile`, `clamAnimal`, `tramTile`, `armchair`, `wattleFence`, `quiver`, `doorLeaf`, `taxiwaySign`, `roofGable`, `carousel` |
 | surfaces | `loft`, `cap`, `extrude`, `revolve`, `sweep`, `band`, `inset`, `pocket`, `solidify` |
-| signage | `prism`, `frame`, `plate`, `block`, `gem`, `poly` |
+| signage | `prism`, `frame`, `plate`, `block`, `gem`, `pill`, `poly` |
 | modifiers | `transform`, `center`, `mirror`, `reverse`, `deform`, `clip`, `join`, `centroid`, `lerpPoint`, `mirrorPoint`, `rotateAbout`, `planeCut`, `gridPoint`, `direction`, `lookup`, `first`, `last`, `slice`, `concat` |
 | distribution | `scatter`, `instance`, `arrayPolar`, `arrayLinear` |
 | control | `switch`, `fan`, `cone`, `if`, `map`, `fold`, `pack` |
@@ -46,8 +46,9 @@ Key signatures:
 ```
 ring      n r y sx sz phase radius(field)
 grid      nx nz w d position(field -> [x,y,z])
-loft      rings[] capTop? capBottom? zones{band,capTop,capBottom} diagonal('ab'|'ba')
-          bandZones[]? flip? orient? orientCenter?
+loft      rings[] capTop? capBottom? zones{band,capTop,capBottom} diagonal('ab'|'ba'|'abba')
+          bandZones[]? zoneField? capTopFlip? capBottomFlip? capTopRaw? capBottomRaw?
+          flip? orient? orientCenter?
 revolve   profile[[r,y]] seg phase inRadius axis('y'|'z') ringMode('zx'|'xz')
           zone/zoneField mod(field i,k) orient caps capZoneField
 sweep     path section twist caps
@@ -70,6 +71,7 @@ pack      items[{w,p}] gap maxScale maxWidth x y z side unitHeight zone -> flat 
 chamferBox w h d c x y z ry skip(px nx py ny pz nz) zone -> chamfered block
 prism     ... cap(true|front|back|both|top|bottom) capOrient? zone -> prism
 gem       x y z nx ny nz r ry h n zone -> faceted lamp
+pill      hx cy r seg footSeg foot th under zone -> rounded UI row
 poly      pts zone hint? inside? flip? -> oriented polygon
 faces     faces[{pts,zone?,hint?,inside?,flip?}] -> batched oriented polygons
 random    seed count -> consumable stream
@@ -92,7 +94,8 @@ parameter. They are merged for node evaluation.
 
 - `switch` picks one of several geometry branches by enum (all branches are currently
   evaluated; lazy branches are a TODO).
-- `arrayPolar`/`arrayLinear` cover the common repeats.
+- `arrayPolar`/`arrayLinear` cover the common repeats. `loft`/`poly` skip degenerate
+triangles, matching the reference face helpers.
 - There is **no group/repeat-zone node yet**; ports inline loops or use arrays.
 - `script` is the general escape hatch: typed inputs in, any value out. It sees `THREE`,
   `ADDONS` (`mergeGeometries`, `toCreasedNormals`, `RoundedBoxGeometry`) and `H`
