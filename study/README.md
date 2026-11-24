@@ -9,6 +9,9 @@ the Polyfork reference assets are not**.
 
 **Read `FEASIBILITY.md` for the report, and `NODE_TEST.md` for the executed port test.**
 
+**Operating rules and paths: [`AGENTS.md`](AGENTS.md). Public project rules:
+[`../AGENTS.md`](../AGENTS.md).**
+
 ## Layout
 
 ```

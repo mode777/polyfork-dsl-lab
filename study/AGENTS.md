@@ -26,7 +26,7 @@ Public project:
 ## Layout
 
 ```
-
+scripts/ scripts2/ scripts3/ scripts4/   downloaded Polyfork assets (gitignored)
 data/
   catalogue.json        full catalogue index (3,529 unique, gitignored)
   sample*.json          the three seeded samples

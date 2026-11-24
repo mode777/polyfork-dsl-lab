@@ -63,6 +63,12 @@ Comparing the published viewer against Polyfork `hero.png` conflates **geometry*
    last cookie/skin changes.
 5. If a study stays, add a visible "original design" badge in the viewer next to its name.
 
+## Workspace
+
+The porting workspace is `study/` in this repo. Its downloaded Polyfork `.mjs`
+assets, `node_modules`, renders and bulk catalogue index are gitignored; only the
+study code and docs are published. See `study/AGENTS.md`.
+
 ## Links
 
 - Viewer: https://mode777.github.io/polyfork-dsl-lab/
