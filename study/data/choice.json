@@ -1,0 +1,404 @@
+[
+ {
+  "id": "thermocycler-514a6d",
+  "k": "colorway",
+  "options": 3,
+  "sigs": 1
+ },
+ {
+  "id": "thermocycler-514a6d",
+  "k": "blocks",
+  "options": 2,
+  "sigs": 2
+ },
+ {
+  "id": "raised-pit-platform-8fd586",
+  "k": "colorway",
+  "options": 4,
+  "sigs": 1
+ },
+ {
+  "id": "raised-pit-platform-8fd586",
+  "k": "piece",
+  "options": 6,
+  "sigs": 6
+ },
+ {
+  "id": "sidearm-f35bb5",
+  "k": "colorway",
+  "options": 4,
+  "sigs": 1
+ },
+ {
+  "id": "sidearm-f35bb5",
+  "k": "action",
+  "options": 4,
+  "sigs": 4
+ },
+ {
+  "id": "orc-brute-08c6ca",
+  "k": "hue",
+  "options": 4,
+  "sigs": 1
+ },
+ {
+  "id": "orc-brute-08c6ca",
+  "k": "gear",
+  "options": 3,
+  "sigs": 3
+ },
+ {
+  "id": "orc-brute-08c6ca",
+  "k": "figure",
+  "options": 2,
+  "sigs": 2
+ },
+ {
+  "id": "orc-brute-08c6ca",
+  "k": "age",
+  "options": 4,
+  "sigs": 2
+ },
+ {
+  "id": "clockwork-hand-adornments-loadout-f66238",
+  "k": "colorway",
+  "options": 4,
+  "sigs": 1
+ },
+ {
+  "id": "clockwork-hand-adornments-loadout-f66238",
+  "k": "hand",
+  "options": 2,
+  "sigs": 1
+ },
+ {
+  "id": "clockwork-hand-adornments-loadout-f66238",
+  "k": "pose",
+  "options": 5,
+  "sigs": 1
+ },
+ {
+  "id": "clockwork-hand-adornments-loadout-f66238",
+  "k": "index_intermediate",
+  "options": 4,
+  "sigs": 4
+ },
+ {
+  "id": "clockwork-hand-adornments-loadout-f66238",
+  "k": "middle_proximal",
+  "options": 3,
+  "sigs": 3
+ },
+ {
+  "id": "clockwork-hand-adornments-loadout-f66238",
+  "k": "index_proximal",
+  "options": 3,
+  "sigs": 3
+ },
+ {
+  "id": "clockwork-hand-adornments-loadout-f66238",
+  "k": "middle_finger",
+  "options": 4,
+  "sigs": 4
+ },
+ {
+  "id": "clockwork-hand-adornments-loadout-f66238",
+  "k": "middle_tendon",
+  "options": 2,
+  "sigs": 2
+ },
+ {
+  "id": "clockwork-hand-adornments-loadout-f66238",
+  "k": "index_finger",
+  "options": 3,
+  "sigs": 3
+ },
+ {
+  "id": "clockwork-hand-adornments-loadout-f66238",
+  "k": "pinky_finger",
+  "options": 3,
+  "sigs": 3
+ },
+ {
+  "id": "clockwork-hand-adornments-loadout-f66238",
+  "k": "thumb_tendon",
+  "options": 2,
+  "sigs": 2
+ },
+ {
+  "id": "clockwork-hand-adornments-loadout-f66238",
+  "k": "index_tendon",
+  "options": 2,
+  "sigs": 2
+ },
+ {
+  "id": "clockwork-hand-adornments-loadout-f66238",
+  "k": "pinky_tendon",
+  "options": 2,
+  "sigs": 2
+ },
+ {
+  "id": "clockwork-hand-adornments-loadout-f66238",
+  "k": "ring_finger",
+  "options": 2,
+  "sigs": 2
+ },
+ {
+  "id": "clockwork-hand-adornments-loadout-f66238",
+  "k": "ring_tendon",
+  "options": 2,
+  "sigs": 2
+ },
+ {
+  "id": "clockwork-hand-adornments-loadout-f66238",
+  "k": "middle_tip",
+  "options": 2,
+  "sigs": 2
+ },
+ {
+  "id": "clockwork-hand-adornments-loadout-f66238",
+  "k": "thumb_tip",
+  "options": 3,
+  "sigs": 3
+ },
+ {
+  "id": "clockwork-hand-adornments-loadout-f66238",
+  "k": "index_tip",
+  "options": 2,
+  "sigs": 2
+ },
+ {
+  "id": "clockwork-hand-adornments-loadout-f66238",
+  "k": "ring_tip",
+  "options": 2,
+  "sigs": 2
+ },
+ {
+  "id": "clockwork-hand-adornments-loadout-f66238",
+  "k": "fingers",
+  "options": 2,
+  "sigs": 2
+ },
+ {
+  "id": "clockwork-hand-adornments-loadout-f66238",
+  "k": "harness",
+  "options": 2,
+  "sigs": 2
+ },
+ {
+  "id": "clockwork-hand-adornments-loadout-f66238",
+  "k": "wrist",
+  "options": 7,
+  "sigs": 7
+ },
+ {
+  "id": "clockwork-hand-adornments-loadout-f66238",
+  "k": "thumb",
+  "options": 4,
+  "sigs": 4
+ },
+ {
+  "id": "clockwork-hand-adornments-loadout-f66238",
+  "k": "back",
+  "options": 9,
+  "sigs": 9
+ },
+ {
+  "id": "clockwork-hand-adornments-loadout-f66238",
+  "k": "palm",
+  "options": 3,
+  "sigs": 3
+ },
+ {
+  "id": "clockwork-hand-adornments-loadout-f66238",
+  "k": "whole_hand",
+  "options": 3,
+  "sigs": 3
+ },
+ {
+  "id": "compacted-hardcore-tile-a7a8ee",
+  "k": "colorway",
+  "options": 4,
+  "sigs": 1
+ },
+ {
+  "id": "volantin-398e88",
+  "k": "colorway",
+  "options": 5,
+  "sigs": 5
+ },
+ {
+  "id": "volantin-398e88",
+  "k": "line",
+  "options": 2,
+  "sigs": 2
+ },
+ {
+  "id": "prize-car-turntable-683ae8",
+  "k": "colorway",
+  "options": 4,
+  "sigs": 1
+ },
+ {
+  "id": "breath-scorch-mark-73fc72",
+  "k": "breath",
+  "options": 4,
+  "sigs": 4
+ },
+ {
+  "id": "breath-scorch-mark-73fc72",
+  "k": "colorway",
+  "options": 4,
+  "sigs": 1
+ },
+ {
+  "id": "players-tunnel-4a210b",
+  "k": "colorway",
+  "options": 4,
+  "sigs": 1
+ },
+ {
+  "id": "players-tunnel-4a210b",
+  "k": "head",
+  "options": 3,
+  "sigs": 3
+ },
+ {
+  "id": "wooden-wreck-stern-section-2a2ed4",
+  "k": "colorway",
+  "options": 3,
+  "sigs": 1
+ },
+ {
+  "id": "wooden-wreck-stern-section-2a2ed4",
+  "k": "state",
+  "options": 3,
+  "sigs": 3
+ },
+ {
+  "id": "interior-door-leaf-a02f28",
+  "k": "colorway",
+  "options": 4,
+  "sigs": 1
+ },
+ {
+  "id": "interior-door-leaf-a02f28",
+  "k": "style",
+  "options": 3,
+  "sigs": 3
+ },
+ {
+  "id": "interior-door-leaf-a02f28",
+  "k": "swing",
+  "options": 3,
+  "sigs": 2
+ },
+ {
+  "id": "keyboard-bench-564d56",
+  "k": "colorway",
+  "options": 3,
+  "sigs": 1
+ },
+ {
+  "id": "keyboard-bench-564d56",
+  "k": "era",
+  "options": 3,
+  "sigs": 3
+ },
+ {
+  "id": "table-game-chair-ffa6c1",
+  "k": "colorway",
+  "options": 3,
+  "sigs": 1
+ },
+ {
+  "id": "table-game-chair-ffa6c1",
+  "k": "upholstery",
+  "options": 3,
+  "sigs": 1
+ },
+ {
+  "id": "cookie-2016bb",
+  "k": "colorway",
+  "options": 4,
+  "sigs": 1
+ },
+ {
+  "id": "area-rug-5c56e2",
+  "k": "colorway",
+  "options": 4,
+  "sigs": 1
+ },
+ {
+  "id": "area-rug-5c56e2",
+  "k": "pattern",
+  "options": 3,
+  "sigs": 1
+ },
+ {
+  "id": "area-rug-5c56e2",
+  "k": "size",
+  "options": 2,
+  "sigs": 2
+ },
+ {
+  "id": "side-dock-458f18",
+  "k": "state",
+  "options": 5,
+  "sigs": 1
+ },
+ {
+  "id": "side-dock-458f18",
+  "k": "seats",
+  "options": 3,
+  "sigs": 2
+ },
+ {
+  "id": "side-dock-458f18",
+  "k": "indicator",
+  "options": 2,
+  "sigs": 1
+ },
+ {
+  "id": "side-dock-458f18",
+  "k": "theme",
+  "options": 2,
+  "sigs": 1
+ },
+ {
+  "id": "side-dock-458f18",
+  "k": "accent",
+  "options": 5,
+  "sigs": 1
+ },
+ {
+  "id": "bloom-elemental-base",
+  "k": "grip",
+  "options": 4,
+  "sigs": 3
+ },
+ {
+  "id": "cafe-table-set-1868d1",
+  "k": "colorway",
+  "options": 4,
+  "sigs": 1
+ },
+ {
+  "id": "cafe-table-set-1868d1",
+  "k": "topShape",
+  "options": 2,
+  "sigs": 2
+ },
+ {
+  "id": "lookout-watchtower-f1a5ce",
+  "k": "colorway",
+  "options": 4,
+  "sigs": 1
+ },
+ {
+  "id": "lookout-watchtower-f1a5ce",
+  "k": "cabinFacets",
+  "options": 3,
+  "sigs": 3
+ }
+]

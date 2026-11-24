@@ -10,8 +10,8 @@ browser viewer. Public repo, published with GitHub Pages.
 ## Hard rules
 
 1. **Never commit Polyfork source.** No `.mjs`/`-params.json`/GLB/USD/FBX downloads, no
-   copied code, no original hero renders. The reference files live outside this repo in
-   `../polyfork-node-study/scripts*/` for local comparison only.
+   copied code, no original hero renders. The reference files live under `study/scripts*/` and are **gitignored**;
+   they are for local comparison only and must never be force-added.
 2. **The examples in `examples/*.pfn` are original DSL constructions.** Do not describe
    them as byte-identical Polyfork ports. See `NOTICE`.
 3. **Respect the licence.** Polyfork's `.mjs` source may not be redistributed or used to
@@ -37,6 +37,7 @@ examples/manifest.json id, title, description, category, camera/fit
 docs/                 design, techniques, study, improvements, gallery
 docs/STATUS.md        current state, known gaps, next tasks
 docs/gallery/         clean 900x900 renders of the examples
+study/                authoring/porting workspace (scripts*/ are gitignored)
 ```
 
 ## Run
@@ -52,10 +53,10 @@ node; none of the published examples do (yet).
 
 ## How the two folders fit together
 
-The **authoring/porting workspace is outside this repo**:
+The **authoring/porting workspace is inside this repo under `study/`**:
 
 ```
-../polyfork-node-study/
+study/
   prototype/v2/runtime.mjs        source of runtime/runtime.js
   prototype/v2/format.mjs         source of runtime/format.js
   prototype/v2/dsl.mjs            source of runtime/dsl.js
@@ -70,12 +71,15 @@ The **authoring/porting workspace is outside this repo**:
 
 To change a published example:
 
-1. Edit the port in `../polyfork-node-study/prototype/v2/ports/<name>.mjs`.
-2. Run `node make-examples.mjs` in `../polyfork-node-study/prototype/v2`.
-3. Copy `examples/<name>.pfn` and `examples/manifest.json` into this repo.
+1. Edit the port in `study/prototype/v2/ports/<name>.mjs`.
+2. Run `node make-examples.mjs` in `study/prototype/v2`.
+3. Copy `study/prototype/v2/examples/<name>.pfn` and `manifest.json` into `examples/`.
 4. If runtime changed, copy `runtime.mjs` to `runtime/runtime.js` (keep the `.js` rename).
 5. Test with `node t-examples.mjs`, then serve this repo and check the viewer.
 6. Bump `viewer.js?v=N` in `index.html` if viewer code changed; commit and push.
+
+The study workspace is documented in `study/AGENTS.md`; its downloaded Polyfork
+sources are ignored by `.gitignore` and are not part of the published tree.
 
 The viewer `frame()` uses `current.cam` = `[azimuthDeg, elevationDeg]` and
 `current.fit` = distance multiplier from `examples/manifest.json`.
@@ -97,7 +101,7 @@ The viewer `frame()` uses `current.cam` = `[azimuthDeg, elevationDeg]` and
 1. Decide the public example policy: keep studies labelled, or replace them with exact
    ports of the actual reference assets (taxiway sign ~400 lines, goat ~2.4k, valet ~31k).
 2. For parity work, compare **original module vs `.pfn` in the same renderer**, not
-   hero render vs viewer. The reference modules are outside the repo.
+   hero render vs viewer. The reference modules are under `study/scripts*` (gitignored).
 3. Improve the remaining props: cookie thickness/chunks, clam two-valve shell, armchair
    upholstery, rock facet cuts, basket weave.
 4. Add a `sign` with the stroke-font/SDF contour pipeline rather than segment letters.
@@ -106,7 +110,7 @@ The viewer `frame()` uses `current.cam` = `[azimuthDeg, elevationDeg]` and
 
 ## Tests / checks
 
-From `../polyfork-node-study/prototype/v2`:
+From `study/prototype/v2`:
 
 ```bash
 node t-examples.mjs        # parses/cooks every published pfn

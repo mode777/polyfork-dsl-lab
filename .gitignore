@@ -1,3 +1,22 @@
 node_modules/
 .DS_Store
 *.log
+
+# Local study workspace: downloaded Polyfork assets are NEVER published.
+# The study code/docs are tracked; these paths are not.
+study/scripts/
+study/scripts2/
+study/scripts3/
+study/scripts4/
+study/**/*-params.json
+study/**/*.glb
+study/**/*.gltf
+study/**/*.fbx
+study/**/*.obj
+study/**/*.usdz
+study/**/*.usda
+study/**/*.png
+study/**/renders/
+study/node_modules/
+**/node_modules/
+study/data/catalogue.json

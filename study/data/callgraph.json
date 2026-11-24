@@ -1,0 +1,182 @@
+[
+ {
+  "file": "area-rug-5c56e2",
+  "topFns": 8,
+  "reachable": 8,
+  "depth": 2,
+  "recursion": 0,
+  "reuse": 1,
+  "unusedFns": 0
+ },
+ {
+  "file": "bloom-elemental-base",
+  "topFns": 106,
+  "reachable": 60,
+  "depth": 7,
+  "recursion": 0,
+  "reuse": 20,
+  "unusedFns": 46
+ },
+ {
+  "file": "breath-scorch-mark-73fc72",
+  "topFns": 3,
+  "reachable": 3,
+  "depth": 1,
+  "recursion": 0,
+  "reuse": 0,
+  "unusedFns": 0
+ },
+ {
+  "file": "cafe-table-set-1868d1",
+  "topFns": 7,
+  "reachable": 7,
+  "depth": 1,
+  "recursion": 0,
+  "reuse": 0,
+  "unusedFns": 0
+ },
+ {
+  "file": "clockwork-hand-adornments-loadout-f66238",
+  "topFns": 335,
+  "reachable": 68,
+  "depth": 8,
+  "recursion": 1,
+  "reuse": 66,
+  "unusedFns": 267
+ },
+ {
+  "file": "compacted-hardcore-tile-a7a8ee",
+  "topFns": 22,
+  "reachable": 21,
+  "depth": 3,
+  "recursion": 0,
+  "reuse": 4,
+  "unusedFns": 1
+ },
+ {
+  "file": "cookie-2016bb",
+  "topFns": 11,
+  "reachable": 11,
+  "depth": 3,
+  "recursion": 0,
+  "reuse": 3,
+  "unusedFns": 0
+ },
+ {
+  "file": "interior-door-leaf-a02f28",
+  "topFns": 17,
+  "reachable": 17,
+  "depth": 4,
+  "recursion": 0,
+  "reuse": 6,
+  "unusedFns": 0
+ },
+ {
+  "file": "keyboard-bench-564d56",
+  "topFns": 11,
+  "reachable": 11,
+  "depth": 3,
+  "recursion": 0,
+  "reuse": 3,
+  "unusedFns": 0
+ },
+ {
+  "file": "lookout-watchtower-f1a5ce",
+  "topFns": 22,
+  "reachable": 20,
+  "depth": 4,
+  "recursion": 0,
+  "reuse": 6,
+  "unusedFns": 2
+ },
+ {
+  "file": "orc-brute-08c6ca",
+  "topFns": 359,
+  "reachable": 76,
+  "depth": 9,
+  "recursion": 0,
+  "reuse": 73,
+  "unusedFns": 283
+ },
+ {
+  "file": "players-tunnel-4a210b",
+  "topFns": 18,
+  "reachable": 18,
+  "depth": 7,
+  "recursion": 1,
+  "reuse": 3,
+  "unusedFns": 0
+ },
+ {
+  "file": "prize-car-turntable-683ae8",
+  "topFns": 8,
+  "reachable": 8,
+  "depth": 5,
+  "recursion": 3,
+  "reuse": 3,
+  "unusedFns": 0
+ },
+ {
+  "file": "raised-pit-platform-8fd586",
+  "topFns": 27,
+  "reachable": 27,
+  "depth": 6,
+  "recursion": 0,
+  "reuse": 7,
+  "unusedFns": 0
+ },
+ {
+  "file": "side-dock-458f18",
+  "topFns": 19,
+  "reachable": 14,
+  "depth": 4,
+  "recursion": 0,
+  "reuse": 4,
+  "unusedFns": 5
+ },
+ {
+  "file": "sidearm-f35bb5",
+  "topFns": 15,
+  "reachable": 15,
+  "depth": 5,
+  "recursion": 0,
+  "reuse": 4,
+  "unusedFns": 0
+ },
+ {
+  "file": "table-game-chair-ffa6c1",
+  "topFns": 25,
+  "reachable": 25,
+  "depth": 7,
+  "recursion": 3,
+  "reuse": 12,
+  "unusedFns": 0
+ },
+ {
+  "file": "thermocycler-514a6d",
+  "topFns": 27,
+  "reachable": 27,
+  "depth": 4,
+  "recursion": 0,
+  "reuse": 11,
+  "unusedFns": 0
+ },
+ {
+  "file": "volantin-398e88",
+  "topFns": 18,
+  "reachable": 17,
+  "depth": 4,
+  "recursion": 0,
+  "reuse": 6,
+  "unusedFns": 1
+ },
+ {
+  "file": "wooden-wreck-stern-section-2a2ed4",
+  "topFns": 20,
+  "reachable": 20,
+  "depth": 2,
+  "recursion": 0,
+  "reuse": 7,
+  "unusedFns": 0
+ }
+]

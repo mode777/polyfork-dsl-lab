@@ -1,0 +1,166 @@
+{
+ "matrix": {
+  "thermocycler": [
+   "SHELL",
+   "BOX",
+   "ARR",
+   "MERGE"
+  ],
+  "raised-pit": [
+   "SHELL",
+   "BOX",
+   "MERGE",
+   "LAYOUT"
+  ],
+  "sidearm": [
+   "SHELL",
+   "LATHE",
+   "BOX",
+   "MIR",
+   "MERGE"
+  ],
+  "orc": [
+   "LOFT",
+   "SWEEP",
+   "BOX",
+   "FIELD",
+   "MIR",
+   "MERGE",
+   "SKIN",
+   "LAYOUT"
+  ],
+  "clockwork-hand": [
+   "LOFT",
+   "SWEEP",
+   "LATHE",
+   "BOX",
+   "SCAT",
+   "ARR",
+   "MIR",
+   "MERGE",
+   "SKIN",
+   "LAYOUT"
+  ],
+  "compacted-tile": [
+   "SHELL",
+   "FIELD",
+   "SCAT",
+   "MERGE"
+  ],
+  "volantin": [
+   "SWEEP",
+   "FIELD",
+   "MIR",
+   "MERGE"
+  ],
+  "prize-car": [
+   "LATHE",
+   "BOX",
+   "ARR",
+   "MERGE"
+  ],
+  "breath-scorch": [
+   "FIELD",
+   "SCAT",
+   "MERGE"
+  ],
+  "players-tunnel": [
+   "SHELL",
+   "LATHE",
+   "BOX",
+   "ARR",
+   "MIR",
+   "MERGE",
+   "LAYOUT"
+  ],
+  "wooden-wreck": [
+   "SHELL",
+   "LOFT",
+   "FIELD",
+   "MIR",
+   "MERGE"
+  ],
+  "interior-door": [
+   "SHELL",
+   "BOX",
+   "MIR",
+   "MERGE"
+  ],
+  "keyboard-bench": [
+   "LOFT",
+   "BOX",
+   "ARR",
+   "MERGE"
+  ],
+  "table-game-chair": [
+   "LATHE",
+   "BOX",
+   "ARR",
+   "SCAT",
+   "MERGE"
+  ],
+  "cookie": [
+   "LATHE",
+   "FIELD",
+   "SCAT",
+   "MERGE"
+  ],
+  "area-rug": [
+   "SHELL",
+   "FIELD",
+   "SCAT",
+   "MERGE"
+  ],
+  "side-dock": [
+   "SHELL",
+   "SWEEP",
+   "ARR",
+   "MERGE"
+  ],
+  "bloom": [
+   "LOFT",
+   "SWEEP",
+   "FIELD",
+   "SCAT",
+   "ARR",
+   "MERGE",
+   "SKIN",
+   "LAYOUT"
+  ],
+  "cafe-table": [
+   "LATHE",
+   "BOX",
+   "ARR",
+   "MERGE"
+  ],
+  "lookout": [
+   "LOFT",
+   "SHELL",
+   "BOX",
+   "ARR",
+   "MERGE"
+  ]
+ },
+ "tri": {
+  "thermocycler": 522,
+  "raised-pit": 180,
+  "sidearm": 684,
+  "orc": 2633,
+  "clockwork-hand": 11191,
+  "compacted-tile": 694,
+  "volantin": 442,
+  "prize-car": 768,
+  "breath-scorch": 578,
+  "players-tunnel": 1176,
+  "wooden-wreck": 921,
+  "interior-door": 402,
+  "keyboard-bench": 698,
+  "table-game-chair": 848,
+  "cookie": 174,
+  "area-rug": 392,
+  "side-dock": 804,
+  "bloom": 4997,
+  "cafe-table": 540,
+  "lookout": 962
+ }
+}

@@ -1,0 +1,5383 @@
+[
+ {
+  "id": "thermocycler-514a6d",
+  "params": [
+   {
+    "name": "colorway",
+    "type": "choice",
+    "default": "lab-white",
+    "affects": "colors",
+    "options": 3,
+    "optionsList": [
+     "lab-white",
+     "graphite",
+     "clean-room"
+    ]
+   },
+   {
+    "name": "shift",
+    "type": "range",
+    "default": 0.7,
+    "affects": "geometry",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "blocks",
+    "type": "choice",
+    "default": "single",
+    "affects": "geometry",
+    "options": 2,
+    "optionsList": [
+     "single",
+     "dual"
+    ]
+   },
+   {
+    "name": "lidWindow",
+    "type": "toggle",
+    "default": true,
+    "affects": "geometry",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "body",
+    "type": "color",
+    "default": "#f6f7f6",
+    "affects": "colors",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "console",
+    "type": "color",
+    "default": "#4a8d93",
+    "affects": "colors",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "trim",
+    "type": "color",
+    "default": "#3f3f3f",
+    "affects": "colors",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "dark",
+    "type": "color",
+    "default": "#1a1a1a",
+    "affects": "colors",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "steel",
+    "type": "color",
+    "default": "#f1f3f4",
+    "affects": "colors",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "glass",
+    "type": "color",
+    "default": "#c6e6ee",
+    "affects": "colors",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "display",
+    "type": "color",
+    "default": "#86d8a8",
+    "affects": "colors",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "plate",
+    "type": "color",
+    "default": "#e06a5c",
+    "affects": "colors",
+    "options": null,
+    "optionsList": null
+   }
+  ],
+  "variants": {
+   "colorway": {
+    "type": "choice",
+    "a": {
+     "v": "lab-white",
+     "tris": 522,
+     "meshes": 4,
+     "verts": 1566
+    },
+    "b": {
+     "v": "clean-room",
+     "tris": 522,
+     "meshes": 4,
+     "verts": 1566
+    },
+    "structural": false
+   },
+   "shift": {
+    "type": "range",
+    "a": {
+     "v": 0.7,
+     "tris": 522,
+     "meshes": 4,
+     "verts": 1566
+    },
+    "b": {
+     "v": 0.7,
+     "tris": 522,
+     "meshes": 4,
+     "verts": 1566
+    },
+    "structural": false
+   },
+   "blocks": {
+    "type": "choice",
+    "a": {
+     "v": "single",
+     "tris": 522,
+     "meshes": 4,
+     "verts": 1566
+    },
+    "b": {
+     "v": "dual",
+     "tris": 586,
+     "meshes": 4,
+     "verts": 1758
+    },
+    "structural": true
+   },
+   "lidWindow": {
+    "type": "toggle",
+    "a": {
+     "v": true,
+     "tris": 522,
+     "meshes": 4,
+     "verts": 1566
+    },
+    "b": {
+     "v": false,
+     "tris": 498,
+     "meshes": 3,
+     "verts": 1494
+    },
+    "structural": true
+   }
+  },
+  "exports": [
+   "createAsset",
+   "params",
+   "presets",
+   "rig",
+   "detach",
+   "night",
+   "decals"
+  ],
+  "rigParts": 1,
+  "detachParts": 1,
+  "presets": 3,
+  "decalZones": 1,
+  "buildMs": 57.7,
+  "ops": {
+   "geometry_objects": 15,
+   "op_translate": 2,
+   "op_rotateX": 0,
+   "op_rotateY": 0,
+   "op_rotateZ": 0,
+   "op_scale": 0,
+   "op_applyMatrix4": 2,
+   "op_center": 0,
+   "op_computeVertexNormals": 4,
+   "op_toNonIndexed": 0,
+   "op_deleteAttribute": 0,
+   "op_triangulateShape": 18,
+   "geom_BufferGeometry": 15
+  },
+  "meshes": 4,
+  "skinnedMeshes": 0,
+  "bones": 0,
+  "groups": 3,
+  "triangles": 522,
+  "vertices": 1566,
+  "materials": 2,
+  "colorAttrs": 4,
+  "uvAttrs": 0,
+  "geoTypes": [
+   "BufferGeometry"
+  ],
+  "hashes": [
+   "ec54d77baf36efab",
+   "ec54d77baf36efab"
+  ],
+  "deterministic": true
+ },
+ {
+  "id": "raised-pit-platform-8fd586",
+  "params": [
+   {
+    "name": "colorway",
+    "type": "choice",
+    "default": "crimson-brass",
+    "affects": null,
+    "options": 4,
+    "optionsList": [
+     "crimson-brass",
+     "emerald-high-limit",
+     "slate-chrome",
+     "plum-champagne"
+    ]
+   },
+   {
+    "name": "piece",
+    "type": "choice",
+    "default": "single",
+    "affects": "geometry",
+    "options": 6,
+    "optionsList": [
+     "single",
+     "edge",
+     "outside-corner",
+     "inside-corner",
+     "centre",
+     "step"
+    ]
+   },
+   {
+    "name": "risers",
+    "type": "range",
+    "default": 2,
+    "affects": "geometry",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "nosing",
+    "type": "range",
+    "default": 0.07,
+    "affects": "geometry",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "carpet",
+    "type": "color",
+    "default": "#923629",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "trim",
+    "type": "color",
+    "default": "#B3883A",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "carcass",
+    "type": "color",
+    "default": "#50341E",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "scale",
+    "type": "range",
+    "default": 1,
+    "affects": "geometry",
+    "options": null,
+    "optionsList": null
+   }
+  ],
+  "variants": {
+   "colorway": {
+    "type": "choice",
+    "a": {
+     "v": "crimson-brass",
+     "tris": 180,
+     "meshes": 1,
+     "verts": 540
+    },
+    "b": {
+     "v": "plum-champagne",
+     "tris": 180,
+     "meshes": 1,
+     "verts": 540
+    },
+    "structural": false
+   },
+   "piece": {
+    "type": "choice",
+    "a": {
+     "v": "single",
+     "tris": 180,
+     "meshes": 1,
+     "verts": 540
+    },
+    "b": {
+     "v": "step",
+     "tris": 324,
+     "meshes": 1,
+     "verts": 972
+    },
+    "structural": true
+   },
+   "risers": {
+    "type": "range",
+    "a": {
+     "v": 2,
+     "tris": 180,
+     "meshes": 1,
+     "verts": 540
+    },
+    "b": {
+     "v": 2,
+     "tris": 180,
+     "meshes": 1,
+     "verts": 540
+    },
+    "structural": false
+   },
+   "nosing": {
+    "type": "range",
+    "a": {
+     "v": 0.07,
+     "tris": 180,
+     "meshes": 1,
+     "verts": 540
+    },
+    "b": {
+     "v": 0.07,
+     "tris": 180,
+     "meshes": 1,
+     "verts": 540
+    },
+    "structural": false
+   },
+   "scale": {
+    "type": "range",
+    "a": {
+     "v": 1,
+     "tris": 180,
+     "meshes": 1,
+     "verts": 540
+    },
+    "b": {
+     "v": 1,
+     "tris": 180,
+     "meshes": 1,
+     "verts": 540
+    },
+    "structural": false
+   }
+  },
+  "exports": [
+   "createAsset",
+   "params",
+   "presets",
+   "rig",
+   "detach",
+   "night",
+   "decals",
+   "materials"
+  ],
+  "rigParts": 0,
+  "detachParts": 0,
+  "presets": 4,
+  "decalZones": 0,
+  "buildMs": 29.4,
+  "ops": {
+   "geometry_objects": 1,
+   "op_translate": 0,
+   "op_rotateX": 0,
+   "op_rotateY": 0,
+   "op_rotateZ": 0,
+   "op_scale": 0,
+   "op_applyMatrix4": 0,
+   "op_center": 0,
+   "op_computeVertexNormals": 1,
+   "op_toNonIndexed": 0,
+   "op_deleteAttribute": 0,
+   "op_triangulateShape": 2,
+   "geom_BufferGeometry": 1
+  },
+  "meshes": 1,
+  "skinnedMeshes": 0,
+  "bones": 0,
+  "groups": 1,
+  "triangles": 180,
+  "vertices": 540,
+  "materials": 1,
+  "colorAttrs": 1,
+  "uvAttrs": 0,
+  "geoTypes": [
+   "BufferGeometry"
+  ],
+  "hashes": [
+   "520a7fe0b491143f",
+   "520a7fe0b491143f"
+  ],
+  "deterministic": true
+ },
+ {
+  "id": "sidearm-f35bb5",
+  "params": [
+   {
+    "name": "colorway",
+    "type": "choice",
+    "default": "alloy",
+    "affects": null,
+    "options": 4,
+    "optionsList": [
+     "alloy",
+     "steel",
+     "iron",
+     "wood"
+    ]
+   },
+   {
+    "name": "action",
+    "type": "choice",
+    "default": "slide",
+    "affects": "geometry",
+    "options": 4,
+    "optionsList": [
+     "slide",
+     "revolver",
+     "flintlock",
+     "energy"
+    ]
+   },
+   {
+    "name": "barrelLength",
+    "type": "range",
+    "default": 0.095,
+    "affects": "geometry",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "receiverHeight",
+    "type": "range",
+    "default": 0.041,
+    "affects": "geometry",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "gripRake",
+    "type": "range",
+    "default": 15,
+    "affects": "geometry",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "guard",
+    "type": "toggle",
+    "default": true,
+    "affects": "geometry",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "shroud",
+    "type": "toggle",
+    "default": true,
+    "affects": "geometry",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "cell",
+    "type": "toggle",
+    "default": false,
+    "affects": "geometry",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "receiver",
+    "type": "color",
+    "default": "#6e7b97",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "frame",
+    "type": "color",
+    "default": "#4f6284",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "fittings",
+    "type": "color",
+    "default": "#45495d",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "steel",
+    "type": "color",
+    "default": "#95a0b5",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "gripPanel",
+    "type": "color",
+    "default": "#7f8da3",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "glow",
+    "type": "color",
+    "default": "#5deaff",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   }
+  ],
+  "variants": {
+   "colorway": {
+    "type": "choice",
+    "a": {
+     "v": "alloy",
+     "tris": 684,
+     "meshes": 5,
+     "verts": 2052
+    },
+    "b": {
+     "v": "wood",
+     "tris": 684,
+     "meshes": 5,
+     "verts": 2052
+    },
+    "structural": false
+   },
+   "action": {
+    "type": "choice",
+    "a": {
+     "v": "slide",
+     "tris": 684,
+     "meshes": 5,
+     "verts": 2052
+    },
+    "b": {
+     "v": "energy",
+     "tris": 812,
+     "meshes": 5,
+     "verts": 2436
+    },
+    "structural": true
+   },
+   "barrelLength": {
+    "type": "range",
+    "a": {
+     "v": 0.095,
+     "tris": 684,
+     "meshes": 5,
+     "verts": 2052
+    },
+    "b": {
+     "v": 0.095,
+     "tris": 684,
+     "meshes": 5,
+     "verts": 2052
+    },
+    "structural": false
+   },
+   "receiverHeight": {
+    "type": "range",
+    "a": {
+     "v": 0.041,
+     "tris": 684,
+     "meshes": 5,
+     "verts": 2052
+    },
+    "b": {
+     "v": 0.041,
+     "tris": 684,
+     "meshes": 5,
+     "verts": 2052
+    },
+    "structural": false
+   },
+   "gripRake": {
+    "type": "range",
+    "a": {
+     "v": 15,
+     "tris": 684,
+     "meshes": 5,
+     "verts": 2052
+    },
+    "b": {
+     "v": 15,
+     "tris": 684,
+     "meshes": 5,
+     "verts": 2052
+    },
+    "structural": false
+   },
+   "guard": {
+    "type": "toggle",
+    "a": {
+     "v": true,
+     "tris": 684,
+     "meshes": 5,
+     "verts": 2052
+    },
+    "b": {
+     "v": false,
+     "tris": 644,
+     "meshes": 5,
+     "verts": 1932
+    },
+    "structural": true
+   },
+   "shroud": {
+    "type": "toggle",
+    "a": {
+     "v": true,
+     "tris": 684,
+     "meshes": 5,
+     "verts": 2052
+    },
+    "b": {
+     "v": false,
+     "tris": 652,
+     "meshes": 5,
+     "verts": 1956
+    },
+    "structural": true
+   },
+   "cell": {
+    "type": "toggle",
+    "a": {
+     "v": true,
+     "tris": 812,
+     "meshes": 6,
+     "verts": 2436
+    },
+    "b": {
+     "v": false,
+     "tris": 684,
+     "meshes": 5,
+     "verts": 2052
+    },
+    "structural": true
+   }
+  },
+  "exports": [
+   "createAsset",
+   "params",
+   "presets",
+   "rig",
+   "detach",
+   "night",
+   "decals",
+   "materials"
+  ],
+  "rigParts": 2,
+  "detachParts": 0,
+  "presets": 4,
+  "decalZones": 0,
+  "buildMs": 17.8,
+  "ops": {
+   "geometry_objects": 30,
+   "op_translate": 0,
+   "op_rotateX": 0,
+   "op_rotateY": 0,
+   "op_rotateZ": 0,
+   "op_scale": 0,
+   "op_applyMatrix4": 0,
+   "op_center": 0,
+   "op_computeVertexNormals": 5,
+   "op_toNonIndexed": 0,
+   "op_deleteAttribute": 0,
+   "op_triangulateShape": 38,
+   "geom_BufferGeometry": 30
+  },
+  "meshes": 5,
+  "skinnedMeshes": 0,
+  "bones": 0,
+  "groups": 3,
+  "triangles": 684,
+  "vertices": 2052,
+  "materials": 3,
+  "colorAttrs": 5,
+  "uvAttrs": 0,
+  "geoTypes": [
+   "BufferGeometry"
+  ],
+  "hashes": [
+   "3d108e496d04b14e",
+   "3d108e496d04b14e"
+  ],
+  "deterministic": true
+ },
+ {
+  "id": "orc-brute-08c6ca",
+  "params": [
+   {
+    "name": "hue",
+    "type": "choice",
+    "default": "tan",
+    "affects": "colors",
+    "options": 4,
+    "optionsList": [
+     "tan",
+     "grey-green",
+     "ash",
+     "ruddy"
+    ]
+   },
+   {
+    "name": "gear",
+    "type": "choice",
+    "default": "plate",
+    "affects": "geometry",
+    "options": 3,
+    "optionsList": [
+     "bare",
+     "plate",
+     "harness"
+    ]
+   },
+   {
+    "name": "figure",
+    "type": "choice",
+    "default": "masculine",
+    "affects": "geometry",
+    "options": 2,
+    "optionsList": [
+     "masculine",
+     "feminine"
+    ]
+   },
+   {
+    "name": "age",
+    "type": "choice",
+    "default": "adult",
+    "affects": "geometry",
+    "options": 4,
+    "optionsList": [
+     "kid",
+     "teen",
+     "adult",
+     "old"
+    ]
+   },
+   {
+    "name": "build",
+    "type": "range",
+    "default": 1,
+    "affects": "geometry",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "skin",
+    "type": "color",
+    "default": "#b08462",
+    "affects": "colors",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "fang",
+    "type": "color",
+    "default": "#d3cec7",
+    "affects": "colors",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "eye",
+    "type": "color",
+    "default": "#212429",
+    "affects": "colors",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "plate",
+    "type": "color",
+    "default": "#6e5d55",
+    "affects": "colors",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "tunic",
+    "type": "color",
+    "default": "#9c7a58",
+    "affects": "colors",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "tasset",
+    "type": "color",
+    "default": "#6e5d55",
+    "affects": "colors",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "denim",
+    "type": "color",
+    "default": "#7f5e40",
+    "affects": "colors",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "strap",
+    "type": "color",
+    "default": "#7a5538",
+    "affects": "colors",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "buckleMetal",
+    "type": "color",
+    "default": "#6e5d55",
+    "affects": "colors",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "boot",
+    "type": "color",
+    "default": "#7a5a3e",
+    "affects": "colors",
+    "options": null,
+    "optionsList": null
+   }
+  ],
+  "variants": {
+   "hue": {
+    "type": "choice",
+    "a": {
+     "v": "tan",
+     "tris": 2633,
+     "meshes": 6,
+     "verts": 7899
+    },
+    "b": {
+     "v": "ruddy",
+     "tris": 2633,
+     "meshes": 6,
+     "verts": 7899
+    },
+    "structural": false
+   },
+   "gear": {
+    "type": "choice",
+    "a": {
+     "v": "bare",
+     "tris": 1965,
+     "meshes": 5,
+     "verts": 5895
+    },
+    "b": {
+     "v": "harness",
+     "tris": 2809,
+     "meshes": 6,
+     "verts": 8427
+    },
+    "structural": true
+   },
+   "figure": {
+    "type": "choice",
+    "a": {
+     "v": "masculine",
+     "tris": 2633,
+     "meshes": 6,
+     "verts": 7899
+    },
+    "b": {
+     "v": "feminine",
+     "tris": 2737,
+     "meshes": 6,
+     "verts": 8211
+    },
+    "structural": true
+   },
+   "age": {
+    "type": "choice",
+    "a": {
+     "v": "kid",
+     "tris": 2629,
+     "meshes": 6,
+     "verts": 7887
+    },
+    "b": {
+     "v": "old",
+     "tris": 2633,
+     "meshes": 6,
+     "verts": 7899
+    },
+    "structural": true
+   },
+   "build": {
+    "type": "range",
+    "a": {
+     "v": 1,
+     "tris": 2633,
+     "meshes": 6,
+     "verts": 7899
+    },
+    "b": {
+     "v": 1,
+     "tris": 2633,
+     "meshes": 6,
+     "verts": 7899
+    },
+    "structural": false
+   }
+  },
+  "exports": [
+   "createAsset",
+   "params",
+   "night",
+   "decals",
+   "materials"
+  ],
+  "rigParts": 0,
+  "detachParts": 0,
+  "presets": 0,
+  "decalZones": 0,
+  "buildMs": 82.6,
+  "ops": {
+   "geometry_objects": 107,
+   "op_translate": 48,
+   "op_rotateX": 0,
+   "op_rotateY": 0,
+   "op_rotateZ": 6,
+   "op_scale": 0,
+   "op_applyMatrix4": 54,
+   "op_center": 0,
+   "op_computeVertexNormals": 6,
+   "op_toNonIndexed": 26,
+   "op_deleteAttribute": 150,
+   "op_triangulateShape": 0,
+   "geom_BufferGeometry": 81,
+   "geom_BoxGeometry": 26
+  },
+  "meshes": 6,
+  "skinnedMeshes": 6,
+  "bones": 31,
+  "groups": 8,
+  "triangles": 2633,
+  "vertices": 7899,
+  "materials": 1,
+  "colorAttrs": 6,
+  "uvAttrs": 0,
+  "geoTypes": [
+   "BufferGeometry"
+  ],
+  "hashes": [
+   "df2db7052895ade6",
+   "df2db7052895ade6"
+  ],
+  "deterministic": true
+ },
+ {
+  "id": "clockwork-hand-adornments-loadout-f66238",
+  "params": [
+   {
+    "name": "colorway",
+    "type": "choice",
+    "default": "fair",
+    "affects": null,
+    "options": 4,
+    "optionsList": [
+     "fair",
+     "tan",
+     "brown",
+     "deep"
+    ]
+   },
+   {
+    "name": "skin",
+    "type": "color",
+    "default": "#F2D5BD",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "nail",
+    "type": "color",
+    "default": "#FEECE2",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "hand",
+    "type": "choice",
+    "default": "left",
+    "affects": "geometry",
+    "options": 2,
+    "optionsList": [
+     "left",
+     "right"
+    ]
+   },
+   {
+    "name": "girth",
+    "type": "range",
+    "default": 1,
+    "affects": "geometry",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "knuckles",
+    "type": "range",
+    "default": 1,
+    "affects": "geometry",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "facets",
+    "type": "range",
+    "default": 10,
+    "affects": "geometry",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "pose",
+    "type": "choice",
+    "default": "open",
+    "affects": "geometry",
+    "options": 5,
+    "optionsList": [
+     "open",
+     "relaxed",
+     "point",
+     "pinch",
+     "grab"
+    ]
+   },
+   {
+    "name": "index_intermediate",
+    "type": "choice",
+    "default": "none",
+    "affects": "geometry",
+    "options": 4,
+    "optionsList": [
+     "none",
+     "Articulated Joint Piece",
+     "Decorative Wire Coil",
+     "Hinge Splint"
+    ]
+   },
+   {
+    "name": "middle_proximal",
+    "type": "choice",
+    "default": "none",
+    "affects": "geometry",
+    "options": 3,
+    "optionsList": [
+     "none",
+     "Knuckle Ring",
+     "Simple Band Ring"
+    ]
+   },
+   {
+    "name": "index_proximal",
+    "type": "choice",
+    "default": "none",
+    "affects": "geometry",
+    "options": 3,
+    "optionsList": [
+     "none",
+     "Gear Accent Ring",
+     "Signet Ring"
+    ]
+   },
+   {
+    "name": "middle_finger",
+    "type": "choice",
+    "default": "none",
+    "affects": "geometry",
+    "options": 4,
+    "optionsList": [
+     "none",
+     "Drill-Bit Middle Finger",
+     "Piston Middle Finger",
+     "Wooden Prosthetic Finger"
+    ]
+   },
+   {
+    "name": "middle_tendon",
+    "type": "choice",
+    "default": "none",
+    "affects": "geometry",
+    "options": 2,
+    "optionsList": [
+     "none",
+     "Chain Tendon"
+    ]
+   },
+   {
+    "name": "index_finger",
+    "type": "choice",
+    "default": "none",
+    "affects": "geometry",
+    "options": 3,
+    "optionsList": [
+     "none",
+     "Clockwork Index Finger",
+     "Gauge Index Finger"
+    ]
+   },
+   {
+    "name": "pinky_finger",
+    "type": "choice",
+    "default": "none",
+    "affects": "geometry",
+    "options": 3,
+    "optionsList": [
+     "none",
+     "Winding-Key Pinky",
+     "Telescoping Pinky"
+    ]
+   },
+   {
+    "name": "thumb_tendon",
+    "type": "choice",
+    "default": "none",
+    "affects": "geometry",
+    "options": 2,
+    "optionsList": [
+     "none",
+     "Thumb Strap"
+    ]
+   },
+   {
+    "name": "index_tendon",
+    "type": "choice",
+    "default": "none",
+    "affects": "geometry",
+    "options": 2,
+    "optionsList": [
+     "none",
+     "Pulley Tendon"
+    ]
+   },
+   {
+    "name": "pinky_tendon",
+    "type": "choice",
+    "default": "none",
+    "affects": "geometry",
+    "options": 2,
+    "optionsList": [
+     "none",
+     "Buckle Tendon"
+    ]
+   },
+   {
+    "name": "ring_finger",
+    "type": "choice",
+    "default": "none",
+    "affects": "geometry",
+    "options": 2,
+    "optionsList": [
+     "none",
+     "Articulated Claw Finger"
+    ]
+   },
+   {
+    "name": "ring_tendon",
+    "type": "choice",
+    "default": "none",
+    "affects": "geometry",
+    "options": 2,
+    "optionsList": [
+     "none",
+     "Spring Tendon"
+    ]
+   },
+   {
+    "name": "middle_tip",
+    "type": "choice",
+    "default": "none",
+    "affects": "geometry",
+    "options": 2,
+    "optionsList": [
+     "none",
+     "Mechanical Finger Extender Rod"
+    ]
+   },
+   {
+    "name": "thumb_tip",
+    "type": "choice",
+    "default": "Loupe Thumb Cap",
+    "affects": "geometry",
+    "options": 3,
+    "optionsList": [
+     "none",
+     "Loupe Thumb Cap",
+     "Mechanical Finger Extender Tool Bit"
+    ]
+   },
+   {
+    "name": "index_tip",
+    "type": "choice",
+    "default": "none",
+    "affects": "geometry",
+    "options": 2,
+    "optionsList": [
+     "none",
+     "Thimble Cap"
+    ]
+   },
+   {
+    "name": "ring_tip",
+    "type": "choice",
+    "default": "none",
+    "affects": "geometry",
+    "options": 2,
+    "optionsList": [
+     "none",
+     "Mechanical Finger Extender Gripper"
+    ]
+   },
+   {
+    "name": "fingers",
+    "type": "choice",
+    "default": "none",
+    "affects": "geometry",
+    "options": 2,
+    "optionsList": [
+     "none",
+     "Clockwork Finger Set"
+    ]
+   },
+   {
+    "name": "harness",
+    "type": "choice",
+    "default": "Tendon Harness",
+    "affects": "geometry",
+    "options": 2,
+    "optionsList": [
+     "none",
+     "Tendon Harness"
+    ]
+   },
+   {
+    "name": "wrist",
+    "type": "choice",
+    "default": "Clockwork Cuff Bracelet",
+    "affects": "geometry",
+    "options": 7,
+    "optionsList": [
+     "none",
+     "Clockwork Cuff Bracelet",
+     "Decorative Bracelet Clasp",
+     "Forearm Socket",
+     "Gauntlet Wrist Plate",
+     "Hydraulic Forearm",
+     "Steam Vent Cuff"
+    ]
+   },
+   {
+    "name": "thumb",
+    "type": "choice",
+    "default": "none",
+    "affects": "geometry",
+    "options": 4,
+    "optionsList": [
+     "none",
+     "Clamp Thumb",
+     "Hydraulic Thumb",
+     "Mechanical Thumb"
+    ]
+   },
+   {
+    "name": "back",
+    "type": "choice",
+    "default": "Pocket Watch Mount",
+    "affects": "geometry",
+    "options": 9,
+    "optionsList": [
+     "none",
+     "Clockwork Back Plate",
+     "Hand Lantern",
+     "Pocket Watch Mount",
+     "Tiny Bolt and Nut Set",
+     "Whimsical Energy Crystal Mount",
+     "Whimsical Gear Hub",
+     "Whimsical Lever Arm",
+     "Whimsical Spring Attachment"
+    ]
+   },
+   {
+    "name": "palm",
+    "type": "choice",
+    "default": "none",
+    "affects": "geometry",
+    "options": 3,
+    "optionsList": [
+     "none",
+     "Clockwork Palm",
+     "Wooden Palm"
+    ]
+   },
+   {
+    "name": "whole_hand",
+    "type": "choice",
+    "default": "none",
+    "affects": "geometry",
+    "options": 3,
+    "optionsList": [
+     "none",
+     "Extender Base",
+     "Extender Claw"
+    ]
+   }
+  ],
+  "variants": {
+   "colorway": {
+    "type": "choice",
+    "a": {
+     "v": "fair",
+     "tris": 11191,
+     "meshes": 10,
+     "verts": 33573
+    },
+    "b": {
+     "v": "deep",
+     "tris": 11191,
+     "meshes": 10,
+     "verts": 33573
+    },
+    "structural": false
+   },
+   "hand": {
+    "type": "choice",
+    "a": {
+     "v": "left",
+     "tris": 11191,
+     "meshes": 10,
+     "verts": 33573
+    },
+    "b": {
+     "v": "right",
+     "tris": 11191,
+     "meshes": 10,
+     "verts": 33573
+    },
+    "structural": false
+   },
+   "girth": {
+    "type": "range",
+    "a": {
+     "v": 1,
+     "tris": 11191,
+     "meshes": 10,
+     "verts": 33573
+    },
+    "b": {
+     "v": 1,
+     "tris": 11191,
+     "meshes": 10,
+     "verts": 33573
+    },
+    "structural": false
+   },
+   "knuckles": {
+    "type": "range",
+    "a": {
+     "v": 1,
+     "tris": 11191,
+     "meshes": 10,
+     "verts": 33573
+    },
+    "b": {
+     "v": 1,
+     "tris": 11191,
+     "meshes": 10,
+     "verts": 33573
+    },
+    "structural": false
+   },
+   "facets": {
+    "type": "range",
+    "a": {
+     "v": 10,
+     "tris": 11191,
+     "meshes": 10,
+     "verts": 33573
+    },
+    "b": {
+     "v": 10,
+     "tris": 11191,
+     "meshes": 10,
+     "verts": 33573
+    },
+    "structural": false
+   },
+   "pose": {
+    "type": "choice",
+    "a": {
+     "v": "open",
+     "tris": 11191,
+     "meshes": 10,
+     "verts": 33573
+    },
+    "b": {
+     "v": "grab",
+     "tris": 11191,
+     "meshes": 10,
+     "verts": 33573
+    },
+    "structural": false
+   },
+   "index_intermediate": {
+    "type": "choice",
+    "a": {
+     "v": "none",
+     "tris": 11191,
+     "meshes": 10,
+     "verts": 33573
+    },
+    "b": {
+     "v": "Hinge Splint",
+     "tris": 12035,
+     "meshes": 11,
+     "verts": 36105
+    },
+    "structural": true
+   },
+   "middle_proximal": {
+    "type": "choice",
+    "a": {
+     "v": "none",
+     "tris": 11191,
+     "meshes": 10,
+     "verts": 33573
+    },
+    "b": {
+     "v": "Simple Band Ring",
+     "tris": 11903,
+     "meshes": 11,
+     "verts": 35709
+    },
+    "structural": true
+   },
+   "index_proximal": {
+    "type": "choice",
+    "a": {
+     "v": "none",
+     "tris": 11191,
+     "meshes": 10,
+     "verts": 33573
+    },
+    "b": {
+     "v": "Signet Ring",
+     "tris": 11894,
+     "meshes": 11,
+     "verts": 35682
+    },
+    "structural": true
+   },
+   "middle_finger": {
+    "type": "choice",
+    "a": {
+     "v": "none",
+     "tris": 11191,
+     "meshes": 10,
+     "verts": 33573
+    },
+    "b": {
+     "v": "Wooden Prosthetic Finger",
+     "tris": 11691,
+     "meshes": 10,
+     "verts": 35073
+    },
+    "structural": true
+   },
+   "middle_tendon": {
+    "type": "choice",
+    "a": {
+     "v": "none",
+     "tris": 11191,
+     "meshes": 10,
+     "verts": 33573
+    },
+    "b": {
+     "v": "Chain Tendon",
+     "tris": 12267,
+     "meshes": 11,
+     "verts": 36801
+    },
+    "structural": true
+   },
+   "index_finger": {
+    "type": "choice",
+    "a": {
+     "v": "none",
+     "tris": 11191,
+     "meshes": 10,
+     "verts": 33573
+    },
+    "b": {
+     "v": "Gauge Index Finger",
+     "tris": 11610,
+     "meshes": 10,
+     "verts": 34830
+    },
+    "structural": true
+   },
+   "pinky_finger": {
+    "type": "choice",
+    "a": {
+     "v": "none",
+     "tris": 11191,
+     "meshes": 10,
+     "verts": 33573
+    },
+    "b": {
+     "v": "Telescoping Pinky",
+     "tris": 11607,
+     "meshes": 10,
+     "verts": 34821
+    },
+    "structural": true
+   },
+   "thumb_tendon": {
+    "type": "choice",
+    "a": {
+     "v": "none",
+     "tris": 11191,
+     "meshes": 10,
+     "verts": 33573
+    },
+    "b": {
+     "v": "Thumb Strap",
+     "tris": 12461,
+     "meshes": 11,
+     "verts": 37383
+    },
+    "structural": true
+   },
+   "index_tendon": {
+    "type": "choice",
+    "a": {
+     "v": "none",
+     "tris": 11191,
+     "meshes": 10,
+     "verts": 33573
+    },
+    "b": {
+     "v": "Pulley Tendon",
+     "tris": 12315,
+     "meshes": 11,
+     "verts": 36945
+    },
+    "structural": true
+   },
+   "pinky_tendon": {
+    "type": "choice",
+    "a": {
+     "v": "none",
+     "tris": 11191,
+     "meshes": 10,
+     "verts": 33573
+    },
+    "b": {
+     "v": "Buckle Tendon",
+     "tris": 12261,
+     "meshes": 11,
+     "verts": 36783
+    },
+    "structural": true
+   },
+   "ring_finger": {
+    "type": "choice",
+    "a": {
+     "v": "none",
+     "tris": 11191,
+     "meshes": 10,
+     "verts": 33573
+    },
+    "b": {
+     "v": "Articulated Claw Finger",
+     "tris": 11690,
+     "meshes": 10,
+     "verts": 35070
+    },
+    "structural": true
+   },
+   "ring_tendon": {
+    "type": "choice",
+    "a": {
+     "v": "none",
+     "tris": 11191,
+     "meshes": 10,
+     "verts": 33573
+    },
+    "b": {
+     "v": "Spring Tendon",
+     "tris": 12285,
+     "meshes": 11,
+     "verts": 36855
+    },
+    "structural": true
+   },
+   "middle_tip": {
+    "type": "choice",
+    "a": {
+     "v": "none",
+     "tris": 11191,
+     "meshes": 10,
+     "verts": 33573
+    },
+    "b": {
+     "v": "Mechanical Finger Extender Rod",
+     "tris": 12001,
+     "meshes": 11,
+     "verts": 36003
+    },
+    "structural": true
+   },
+   "thumb_tip": {
+    "type": "choice",
+    "a": {
+     "v": "none",
+     "tris": 10325,
+     "meshes": 9,
+     "verts": 30975
+    },
+    "b": {
+     "v": "Mechanical Finger Extender Tool Bit",
+     "tris": 11111,
+     "meshes": 10,
+     "verts": 33333
+    },
+    "structural": true
+   },
+   "index_tip": {
+    "type": "choice",
+    "a": {
+     "v": "none",
+     "tris": 11191,
+     "meshes": 10,
+     "verts": 33573
+    },
+    "b": {
+     "v": "Thimble Cap",
+     "tris": 12059,
+     "meshes": 11,
+     "verts": 36177
+    },
+    "structural": true
+   },
+   "ring_tip": {
+    "type": "choice",
+    "a": {
+     "v": "none",
+     "tris": 11191,
+     "meshes": 10,
+     "verts": 33573
+    },
+    "b": {
+     "v": "Mechanical Finger Extender Gripper",
+     "tris": 12093,
+     "meshes": 11,
+     "verts": 36279
+    },
+    "structural": true
+   },
+   "fingers": {
+    "type": "choice",
+    "a": {
+     "v": "none",
+     "tris": 11191,
+     "meshes": 10,
+     "verts": 33573
+    },
+    "b": {
+     "v": "Clockwork Finger Set",
+     "tris": 12549,
+     "meshes": 7,
+     "verts": 37647
+    },
+    "structural": true
+   },
+   "harness": {
+    "type": "choice",
+    "a": {
+     "v": "none",
+     "tris": 7985,
+     "meshes": 9,
+     "verts": 23955
+    },
+    "b": {
+     "v": "Tendon Harness",
+     "tris": 11191,
+     "meshes": 10,
+     "verts": 33573
+    },
+    "structural": true
+   },
+   "wrist": {
+    "type": "choice",
+    "a": {
+     "v": "none",
+     "tris": 8546,
+     "meshes": 9,
+     "verts": 25638
+    },
+    "b": {
+     "v": "Steam Vent Cuff",
+     "tris": 11140,
+     "meshes": 10,
+     "verts": 33420
+    },
+    "structural": true
+   },
+   "thumb": {
+    "type": "choice",
+    "a": {
+     "v": "none",
+     "tris": 11191,
+     "meshes": 10,
+     "verts": 33573
+    },
+    "b": {
+     "v": "Mechanical Thumb",
+     "tris": 10913,
+     "meshes": 9,
+     "verts": 32739
+    },
+    "structural": true
+   },
+   "back": {
+    "type": "choice",
+    "a": {
+     "v": "none",
+     "tris": 9717,
+     "meshes": 9,
+     "verts": 29151
+    },
+    "b": {
+     "v": "Whimsical Spring Attachment",
+     "tris": 10823,
+     "meshes": 10,
+     "verts": 32469
+    },
+    "structural": true
+   },
+   "palm": {
+    "type": "choice",
+    "a": {
+     "v": "none",
+     "tris": 11191,
+     "meshes": 10,
+     "verts": 33573
+    },
+    "b": {
+     "v": "Wooden Palm",
+     "tris": 12175,
+     "meshes": 10,
+     "verts": 36525
+    },
+    "structural": true
+   },
+   "whole_hand": {
+    "type": "choice",
+    "a": {
+     "v": "none",
+     "tris": 11191,
+     "meshes": 10,
+     "verts": 33573
+    },
+    "b": {
+     "v": "Extender Claw",
+     "tris": 4979,
+     "meshes": 2,
+     "verts": 14937
+    },
+    "structural": true
+   }
+  },
+  "exports": [
+   "createAsset",
+   "params",
+   "presets",
+   "rig",
+   "detach",
+   "night",
+   "decals"
+  ],
+  "rigParts": 0,
+  "detachParts": 5,
+  "presets": 10,
+  "decalZones": 0,
+  "buildMs": 361.5,
+  "ops": {
+   "geometry_objects": 83,
+   "op_translate": 0,
+   "op_rotateX": 0,
+   "op_rotateY": 0,
+   "op_rotateZ": 0,
+   "op_scale": 0,
+   "op_applyMatrix4": 24,
+   "op_center": 0,
+   "op_computeVertexNormals": 10,
+   "op_toNonIndexed": 0,
+   "op_deleteAttribute": 106,
+   "op_triangulateShape": 0,
+   "geom_BufferGeometry": 83
+  },
+  "meshes": 10,
+  "skinnedMeshes": 10,
+  "bones": 26,
+  "groups": 5,
+  "triangles": 11191,
+  "vertices": 33573,
+  "materials": 1,
+  "colorAttrs": 10,
+  "uvAttrs": 0,
+  "geoTypes": [
+   "BufferGeometry"
+  ],
+  "hashes": [
+   "b0b7a0e954095805",
+   "b0b7a0e954095805"
+  ],
+  "deterministic": true
+ },
+ {
+  "id": "compacted-hardcore-tile-a7a8ee",
+  "params": [
+   {
+    "name": "colorway",
+    "type": "choice",
+    "default": "site-hardcore",
+    "affects": null,
+    "options": 4,
+    "optionsList": [
+     "site-hardcore",
+     "platform-grey",
+     "crushed-brick",
+     "wet-winter"
+    ]
+   },
+   {
+    "name": "compaction",
+    "type": "range",
+    "default": 0.5,
+    "affects": "geometry",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "tracks",
+    "type": "toggle",
+    "default": true,
+    "affects": "geometry",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "kerb",
+    "type": "toggle",
+    "default": true,
+    "affects": "geometry",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "potholes",
+    "type": "range",
+    "default": 0,
+    "affects": "geometry",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "wear",
+    "type": "range",
+    "default": 0.3,
+    "affects": "geometry",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "tone",
+    "type": "range",
+    "default": 0,
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "hardcore",
+    "type": "color",
+    "default": "#6E7373",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "stone",
+    "type": "color",
+    "default": "#AFB2AC",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "rut",
+    "type": "color",
+    "default": "#555E63",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "crust",
+    "type": "color",
+    "default": "#8C9190",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "puddle",
+    "type": "color",
+    "default": "#3A4146",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "mud",
+    "type": "color",
+    "default": "#6B5842",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   }
+  ],
+  "variants": {
+   "colorway": {
+    "type": "choice",
+    "a": {
+     "v": "site-hardcore",
+     "tris": 694,
+     "meshes": 1,
+     "verts": 2082
+    },
+    "b": {
+     "v": "wet-winter",
+     "tris": 694,
+     "meshes": 1,
+     "verts": 2082
+    },
+    "structural": false
+   },
+   "compaction": {
+    "type": "range",
+    "a": {
+     "v": 0.5,
+     "tris": 694,
+     "meshes": 1,
+     "verts": 2082
+    },
+    "b": {
+     "v": 0.5,
+     "tris": 694,
+     "meshes": 1,
+     "verts": 2082
+    },
+    "structural": false
+   },
+   "tracks": {
+    "type": "toggle",
+    "a": {
+     "v": true,
+     "tris": 694,
+     "meshes": 1,
+     "verts": 2082
+    },
+    "b": {
+     "v": false,
+     "tris": 447,
+     "meshes": 1,
+     "verts": 1341
+    },
+    "structural": true
+   },
+   "kerb": {
+    "type": "toggle",
+    "a": {
+     "v": true,
+     "tris": 694,
+     "meshes": 1,
+     "verts": 2082
+    },
+    "b": {
+     "v": false,
+     "tris": 512,
+     "meshes": 1,
+     "verts": 1536
+    },
+    "structural": true
+   },
+   "potholes": {
+    "type": "range",
+    "a": {
+     "v": 0,
+     "tris": 694,
+     "meshes": 1,
+     "verts": 2082
+    },
+    "b": {
+     "v": 0,
+     "tris": 694,
+     "meshes": 1,
+     "verts": 2082
+    },
+    "structural": false
+   },
+   "wear": {
+    "type": "range",
+    "a": {
+     "v": 0.3,
+     "tris": 694,
+     "meshes": 1,
+     "verts": 2082
+    },
+    "b": {
+     "v": 0.3,
+     "tris": 694,
+     "meshes": 1,
+     "verts": 2082
+    },
+    "structural": false
+   },
+   "tone": {
+    "type": "range",
+    "a": {
+     "v": 0,
+     "tris": 694,
+     "meshes": 1,
+     "verts": 2082
+    },
+    "b": {
+     "v": 0,
+     "tris": 694,
+     "meshes": 1,
+     "verts": 2082
+    },
+    "structural": false
+   }
+  },
+  "exports": [
+   "createAsset",
+   "params",
+   "presets",
+   "rig",
+   "detach",
+   "night",
+   "decals",
+   "materials"
+  ],
+  "rigParts": 0,
+  "detachParts": 0,
+  "presets": 4,
+  "decalZones": 0,
+  "buildMs": 28.5,
+  "ops": {
+   "geometry_objects": 4,
+   "op_translate": 0,
+   "op_rotateX": 0,
+   "op_rotateY": 0,
+   "op_rotateZ": 0,
+   "op_scale": 0,
+   "op_applyMatrix4": 0,
+   "op_center": 0,
+   "op_computeVertexNormals": 1,
+   "op_toNonIndexed": 0,
+   "op_deleteAttribute": 0,
+   "op_triangulateShape": 0,
+   "geom_BufferGeometry": 4
+  },
+  "meshes": 1,
+  "skinnedMeshes": 0,
+  "bones": 0,
+  "groups": 1,
+  "triangles": 694,
+  "vertices": 2082,
+  "materials": 1,
+  "colorAttrs": 1,
+  "uvAttrs": 0,
+  "geoTypes": [
+   "BufferGeometry"
+  ],
+  "hashes": [
+   "9d1bb0f45af35970",
+   "9d1bb0f45af35970"
+  ],
+  "deterministic": true
+ },
+ {
+  "id": "volantin-398e88",
+  "params": [
+   {
+    "name": "colorway",
+    "type": "choice",
+    "default": "tricolour",
+    "affects": "geometry",
+    "options": 5,
+    "optionsList": [
+     "tricolour",
+     "estrella",
+     "mitad",
+     "franjas",
+     "ojo"
+    ]
+   },
+   {
+    "name": "line",
+    "type": "choice",
+    "default": "flying",
+    "affects": "geometry",
+    "options": 2,
+    "optionsList": [
+     "none",
+     "flying"
+    ]
+   },
+   {
+    "name": "lineLength",
+    "type": "range",
+    "default": 2,
+    "affects": "geometry",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "aspect",
+    "type": "range",
+    "default": 0.84,
+    "affects": "geometry",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "billow",
+    "type": "range",
+    "default": 0.022,
+    "affects": "geometry",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "wear",
+    "type": "range",
+    "default": 0.2,
+    "affects": "geometry",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "paperA",
+    "type": "color",
+    "default": "#434d97",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "paperB",
+    "type": "color",
+    "default": "#e8e6e6",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "paperC",
+    "type": "color",
+    "default": "#c5192e",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "cane",
+    "type": "color",
+    "default": "#d6bea0",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "thread",
+    "type": "color",
+    "default": "#e0dee1",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   }
+  ],
+  "variants": {
+   "colorway": {
+    "type": "choice",
+    "a": {
+     "v": "tricolour",
+     "tris": 442,
+     "meshes": 2,
+     "verts": 1326
+    },
+    "b": {
+     "v": "ojo",
+     "tris": 630,
+     "meshes": 2,
+     "verts": 1890
+    },
+    "structural": true
+   },
+   "line": {
+    "type": "choice",
+    "a": {
+     "v": "none",
+     "tris": 350,
+     "meshes": 1,
+     "verts": 1050
+    },
+    "b": {
+     "v": "flying",
+     "tris": 442,
+     "meshes": 2,
+     "verts": 1326
+    },
+    "structural": true
+   },
+   "lineLength": {
+    "type": "range",
+    "a": {
+     "v": 2,
+     "tris": 442,
+     "meshes": 2,
+     "verts": 1326
+    },
+    "b": {
+     "v": 2,
+     "tris": 442,
+     "meshes": 2,
+     "verts": 1326
+    },
+    "structural": false
+   },
+   "aspect": {
+    "type": "range",
+    "a": {
+     "v": 0.84,
+     "tris": 442,
+     "meshes": 2,
+     "verts": 1326
+    },
+    "b": {
+     "v": 0.84,
+     "tris": 442,
+     "meshes": 2,
+     "verts": 1326
+    },
+    "structural": false
+   },
+   "billow": {
+    "type": "range",
+    "a": {
+     "v": 0.022,
+     "tris": 442,
+     "meshes": 2,
+     "verts": 1326
+    },
+    "b": {
+     "v": 0.022,
+     "tris": 442,
+     "meshes": 2,
+     "verts": 1326
+    },
+    "structural": false
+   },
+   "wear": {
+    "type": "range",
+    "a": {
+     "v": 0.2,
+     "tris": 442,
+     "meshes": 2,
+     "verts": 1326
+    },
+    "b": {
+     "v": 0.2,
+     "tris": 442,
+     "meshes": 2,
+     "verts": 1326
+    },
+    "structural": false
+   }
+  },
+  "exports": [
+   "createAsset",
+   "params",
+   "presets",
+   "rig",
+   "detach",
+   "night",
+   "decals",
+   "materials"
+  ],
+  "rigParts": 2,
+  "detachParts": 1,
+  "presets": 5,
+  "decalZones": 0,
+  "buildMs": 14.7,
+  "ops": {
+   "geometry_objects": 15,
+   "op_translate": 0,
+   "op_rotateX": 0,
+   "op_rotateY": 0,
+   "op_rotateZ": 0,
+   "op_scale": 0,
+   "op_applyMatrix4": 1,
+   "op_center": 0,
+   "op_computeVertexNormals": 2,
+   "op_toNonIndexed": 0,
+   "op_deleteAttribute": 0,
+   "op_triangulateShape": 0,
+   "geom_BufferGeometry": 15
+  },
+  "meshes": 2,
+  "skinnedMeshes": 0,
+  "bones": 0,
+  "groups": 3,
+  "triangles": 442,
+  "vertices": 1326,
+  "materials": 1,
+  "colorAttrs": 2,
+  "uvAttrs": 0,
+  "geoTypes": [
+   "BufferGeometry"
+  ],
+  "hashes": [
+   "9589cd0e4e808b64",
+   "9589cd0e4e808b64"
+  ],
+  "deterministic": true
+ },
+ {
+  "id": "prize-car-turntable-683ae8",
+  "params": [
+   {
+    "name": "colorway",
+    "type": "choice",
+    "default": "vegas-gold",
+    "affects": null,
+    "options": 4,
+    "optionsList": [
+     "vegas-gold",
+     "champagne-slate",
+     "crimson-vip",
+     "platinum-noir"
+    ]
+   },
+   {
+    "name": "bulbs",
+    "type": "toggle",
+    "default": true,
+    "affects": "geometry",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "diameter",
+    "type": "range",
+    "default": 6,
+    "affects": "geometry",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "height",
+    "type": "range",
+    "default": 0.25,
+    "affects": "geometry",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "gold",
+    "type": "color",
+    "default": "#b3883a",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "deck",
+    "type": "color",
+    "default": "#2a2a28",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "skirt",
+    "type": "color",
+    "default": "#384451",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "lamp",
+    "type": "color",
+    "default": "#f4f1ee",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   }
+  ],
+  "variants": {
+   "colorway": {
+    "type": "choice",
+    "a": {
+     "v": "vegas-gold",
+     "tris": 768,
+     "meshes": 2,
+     "verts": 2304
+    },
+    "b": {
+     "v": "platinum-noir",
+     "tris": 768,
+     "meshes": 2,
+     "verts": 2304
+    },
+    "structural": false
+   },
+   "bulbs": {
+    "type": "toggle",
+    "a": {
+     "v": true,
+     "tris": 768,
+     "meshes": 2,
+     "verts": 2304
+    },
+    "b": {
+     "v": false,
+     "tris": 480,
+     "meshes": 2,
+     "verts": 1440
+    },
+    "structural": true
+   },
+   "diameter": {
+    "type": "range",
+    "a": {
+     "v": 6,
+     "tris": 768,
+     "meshes": 2,
+     "verts": 2304
+    },
+    "b": {
+     "v": 6,
+     "tris": 768,
+     "meshes": 2,
+     "verts": 2304
+    },
+    "structural": false
+   },
+   "height": {
+    "type": "range",
+    "a": {
+     "v": 0.25,
+     "tris": 768,
+     "meshes": 2,
+     "verts": 2304
+    },
+    "b": {
+     "v": 0.25,
+     "tris": 768,
+     "meshes": 2,
+     "verts": 2304
+    },
+    "structural": false
+   }
+  },
+  "exports": [
+   "createAsset",
+   "params",
+   "presets",
+   "rig",
+   "detach",
+   "night",
+   "decals",
+   "materials"
+  ],
+  "rigParts": 1,
+  "detachParts": 0,
+  "presets": 4,
+  "decalZones": 1,
+  "buildMs": 6.6,
+  "ops": {
+   "geometry_objects": 2,
+   "op_translate": 0,
+   "op_rotateX": 0,
+   "op_rotateY": 0,
+   "op_rotateZ": 0,
+   "op_scale": 0,
+   "op_applyMatrix4": 0,
+   "op_center": 0,
+   "op_computeVertexNormals": 2,
+   "op_toNonIndexed": 0,
+   "op_deleteAttribute": 0,
+   "op_triangulateShape": 0,
+   "geom_BufferGeometry": 2
+  },
+  "meshes": 2,
+  "skinnedMeshes": 0,
+  "bones": 0,
+  "groups": 2,
+  "triangles": 768,
+  "vertices": 2304,
+  "materials": 1,
+  "colorAttrs": 2,
+  "uvAttrs": 0,
+  "geoTypes": [
+   "BufferGeometry"
+  ],
+  "hashes": [
+   "f866a516340074b2",
+   "f866a516340074b2"
+  ],
+  "deterministic": true
+ },
+ {
+  "id": "breath-scorch-mark-73fc72",
+  "params": [
+   {
+    "name": "breath",
+    "type": "choice",
+    "default": "soot",
+    "affects": "geometry",
+    "options": 4,
+    "optionsList": [
+     "soot",
+     "acid",
+     "ash",
+     "frost"
+    ]
+   },
+   {
+    "name": "colorway",
+    "type": "choice",
+    "default": "soot-char",
+    "affects": null,
+    "options": 4,
+    "optionsList": [
+     "soot-char",
+     "acid-stain",
+     "violet-ash",
+     "crystal-frost"
+    ]
+   },
+   {
+    "name": "stain",
+    "type": "color",
+    "default": "#16141f",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "rim",
+    "type": "color",
+    "default": "#2f2d36",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "core",
+    "type": "color",
+    "default": "#464448",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "fleck",
+    "type": "color",
+    "default": "#c53815",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "ember",
+    "type": "color",
+    "default": "#fc6113",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "fingers",
+    "type": "range",
+    "default": 16,
+    "affects": "geometry",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "reach",
+    "type": "range",
+    "default": 1,
+    "affects": "geometry",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "sweep",
+    "type": "range",
+    "default": 0,
+    "affects": "geometry",
+    "options": null,
+    "optionsList": null
+   }
+  ],
+  "variants": {
+   "breath": {
+    "type": "choice",
+    "a": {
+     "v": "soot",
+     "tris": 578,
+     "meshes": 1,
+     "verts": 1734
+    },
+    "b": {
+     "v": "frost",
+     "tris": 614,
+     "meshes": 1,
+     "verts": 1842
+    },
+    "structural": true
+   },
+   "colorway": {
+    "type": "choice",
+    "a": {
+     "v": "soot-char",
+     "tris": 578,
+     "meshes": 1,
+     "verts": 1734
+    },
+    "b": {
+     "v": "crystal-frost",
+     "tris": 578,
+     "meshes": 1,
+     "verts": 1734
+    },
+    "structural": false
+   },
+   "fingers": {
+    "type": "range",
+    "a": {
+     "v": 16,
+     "tris": 578,
+     "meshes": 1,
+     "verts": 1734
+    },
+    "b": {
+     "v": 16,
+     "tris": 578,
+     "meshes": 1,
+     "verts": 1734
+    },
+    "structural": false
+   },
+   "reach": {
+    "type": "range",
+    "a": {
+     "v": 1,
+     "tris": 578,
+     "meshes": 1,
+     "verts": 1734
+    },
+    "b": {
+     "v": 1,
+     "tris": 578,
+     "meshes": 1,
+     "verts": 1734
+    },
+    "structural": false
+   },
+   "sweep": {
+    "type": "range",
+    "a": {
+     "v": 0,
+     "tris": 578,
+     "meshes": 1,
+     "verts": 1734
+    },
+    "b": {
+     "v": 0,
+     "tris": 578,
+     "meshes": 1,
+     "verts": 1734
+    },
+    "structural": false
+   }
+  },
+  "exports": [
+   "createAsset",
+   "params",
+   "presets",
+   "rig",
+   "detach",
+   "night",
+   "decals",
+   "materials"
+  ],
+  "rigParts": 0,
+  "detachParts": 0,
+  "presets": 4,
+  "decalZones": 0,
+  "buildMs": 28.6,
+  "ops": {
+   "geometry_objects": 6,
+   "op_translate": 1,
+   "op_rotateX": 0,
+   "op_rotateY": 0,
+   "op_rotateZ": 0,
+   "op_scale": 0,
+   "op_applyMatrix4": 1,
+   "op_center": 0,
+   "op_computeVertexNormals": 1,
+   "op_toNonIndexed": 0,
+   "op_deleteAttribute": 0,
+   "op_triangulateShape": 1,
+   "geom_BufferGeometry": 6
+  },
+  "meshes": 1,
+  "skinnedMeshes": 0,
+  "bones": 0,
+  "groups": 1,
+  "triangles": 578,
+  "vertices": 1734,
+  "materials": 1,
+  "colorAttrs": 1,
+  "uvAttrs": 0,
+  "geoTypes": [
+   "BufferGeometry"
+  ],
+  "hashes": [
+   "164234cdfb1aaf90",
+   "164234cdfb1aaf90"
+  ],
+  "deterministic": true
+ },
+ {
+  "id": "players-tunnel-4a210b",
+  "params": [
+   {
+    "name": "colorway",
+    "type": "choice",
+    "default": "municipal",
+    "affects": null,
+    "options": 4,
+    "optionsList": [
+     "municipal",
+     "precast-grey",
+     "red-brick",
+     "heritage-green"
+    ]
+   },
+   {
+    "name": "matchday",
+    "type": "range",
+    "default": 0.6,
+    "affects": "geometry",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "length",
+    "type": "range",
+    "default": 3,
+    "affects": "geometry",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "head",
+    "type": "choice",
+    "default": "basket",
+    "affects": "geometry",
+    "options": 3,
+    "optionsList": [
+     "basket",
+     "segmental",
+     "flat"
+    ]
+   },
+   {
+    "name": "wall",
+    "type": "color",
+    "default": "#d8c79a",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "plinth",
+    "type": "color",
+    "default": "#7a6444",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "precast",
+    "type": "color",
+    "default": "#a8ada6",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "roof",
+    "type": "color",
+    "default": "#4a5760",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "deck",
+    "type": "color",
+    "default": "#7c868c",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "lining",
+    "type": "color",
+    "default": "#8f8d83",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "floor",
+    "type": "color",
+    "default": "#66757f",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "lamp",
+    "type": "color",
+    "default": "#edf5ff",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "shutter",
+    "type": "color",
+    "default": "#33383c",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "steel",
+    "type": "color",
+    "default": "#9ba3a6",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "banner",
+    "type": "color",
+    "default": "#c0372f",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "mat",
+    "type": "color",
+    "default": "#b0503a",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "trim",
+    "type": "color",
+    "default": "#f6f7f5",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "cone",
+    "type": "color",
+    "default": "#f2a71b",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "scale",
+    "type": "range",
+    "default": 1,
+    "affects": "geometry",
+    "options": null,
+    "optionsList": null
+   }
+  ],
+  "variants": {
+   "colorway": {
+    "type": "choice",
+    "a": {
+     "v": "municipal",
+     "tris": 1176,
+     "meshes": 5,
+     "verts": 3528
+    },
+    "b": {
+     "v": "heritage-green",
+     "tris": 1176,
+     "meshes": 5,
+     "verts": 3528
+    },
+    "structural": false
+   },
+   "matchday": {
+    "type": "range",
+    "a": {
+     "v": 0.6,
+     "tris": 1176,
+     "meshes": 5,
+     "verts": 3528
+    },
+    "b": {
+     "v": 0.6,
+     "tris": 1176,
+     "meshes": 5,
+     "verts": 3528
+    },
+    "structural": false
+   },
+   "length": {
+    "type": "range",
+    "a": {
+     "v": 3,
+     "tris": 1176,
+     "meshes": 5,
+     "verts": 3528
+    },
+    "b": {
+     "v": 3,
+     "tris": 1176,
+     "meshes": 5,
+     "verts": 3528
+    },
+    "structural": false
+   },
+   "head": {
+    "type": "choice",
+    "a": {
+     "v": "basket",
+     "tris": 1176,
+     "meshes": 5,
+     "verts": 3528
+    },
+    "b": {
+     "v": "flat",
+     "tris": 992,
+     "meshes": 5,
+     "verts": 2976
+    },
+    "structural": true
+   },
+   "scale": {
+    "type": "range",
+    "a": {
+     "v": 1,
+     "tris": 1176,
+     "meshes": 5,
+     "verts": 3528
+    },
+    "b": {
+     "v": 1,
+     "tris": 1176,
+     "meshes": 5,
+     "verts": 3528
+    },
+    "structural": false
+   }
+  },
+  "exports": [
+   "createAsset",
+   "params",
+   "presets",
+   "rig",
+   "detach",
+   "night",
+   "decals",
+   "materials"
+  ],
+  "rigParts": 1,
+  "detachParts": 3,
+  "presets": 4,
+  "decalZones": 1,
+  "buildMs": 7.3,
+  "ops": {
+   "geometry_objects": 23,
+   "op_translate": 0,
+   "op_rotateX": 0,
+   "op_rotateY": 0,
+   "op_rotateZ": 0,
+   "op_scale": 0,
+   "op_applyMatrix4": 0,
+   "op_center": 0,
+   "op_computeVertexNormals": 5,
+   "op_toNonIndexed": 0,
+   "op_deleteAttribute": 0,
+   "op_triangulateShape": 0,
+   "geom_BufferGeometry": 23
+  },
+  "meshes": 5,
+  "skinnedMeshes": 0,
+  "bones": 0,
+  "groups": 5,
+  "triangles": 1176,
+  "vertices": 3528,
+  "materials": 1,
+  "colorAttrs": 5,
+  "uvAttrs": 0,
+  "geoTypes": [
+   "BufferGeometry"
+  ],
+  "hashes": [
+   "627458cef6a37d09",
+   "627458cef6a37d09"
+  ],
+  "deterministic": true
+ },
+ {
+  "id": "wooden-wreck-stern-section-2a2ed4",
+  "params": [
+   {
+    "name": "colorway",
+    "type": "choice",
+    "default": "reef-oak",
+    "affects": null,
+    "options": 3,
+    "optionsList": [
+     "reef-oak",
+     "silver-driftwood",
+     "tarred-galleon"
+    ]
+   },
+   {
+    "name": "health",
+    "type": "range",
+    "default": 0.85,
+    "affects": "geometry",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "state",
+    "type": "choice",
+    "default": "holed",
+    "affects": "geometry",
+    "options": 3,
+    "optionsList": [
+     "sound",
+     "holed",
+     "caved-in"
+    ]
+   },
+   {
+    "name": "length",
+    "type": "range",
+    "default": 6,
+    "affects": "geometry",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "tone",
+    "type": "range",
+    "default": 0.35,
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "planks",
+    "type": "color",
+    "default": "#8a3a26",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "timber",
+    "type": "color",
+    "default": "#8d7a5c",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "interior",
+    "type": "color",
+    "default": "#3c4448",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "weed",
+    "type": "color",
+    "default": "#5f7a63",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "crust",
+    "type": "color",
+    "default": "#c079b0",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "polyp",
+    "type": "color",
+    "default": "#d94f4f",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "iron",
+    "type": "color",
+    "default": "#b8452f",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   }
+  ],
+  "variants": {
+   "colorway": {
+    "type": "choice",
+    "a": {
+     "v": "reef-oak",
+     "tris": 921,
+     "meshes": 5,
+     "verts": 2763
+    },
+    "b": {
+     "v": "tarred-galleon",
+     "tris": 921,
+     "meshes": 5,
+     "verts": 2763
+    },
+    "structural": false
+   },
+   "health": {
+    "type": "range",
+    "a": {
+     "v": 0.85,
+     "tris": 921,
+     "meshes": 5,
+     "verts": 2763
+    },
+    "b": {
+     "v": 0.85,
+     "tris": 921,
+     "meshes": 5,
+     "verts": 2763
+    },
+    "structural": false
+   },
+   "state": {
+    "type": "choice",
+    "a": {
+     "v": "sound",
+     "tris": 833,
+     "meshes": 5,
+     "verts": 2499
+    },
+    "b": {
+     "v": "caved-in",
+     "tris": 893,
+     "meshes": 5,
+     "verts": 2679
+    },
+    "structural": true
+   },
+   "length": {
+    "type": "range",
+    "a": {
+     "v": 6,
+     "tris": 921,
+     "meshes": 5,
+     "verts": 2763
+    },
+    "b": {
+     "v": 6,
+     "tris": 921,
+     "meshes": 5,
+     "verts": 2763
+    },
+    "structural": false
+   },
+   "tone": {
+    "type": "range",
+    "a": {
+     "v": 0.35,
+     "tris": 921,
+     "meshes": 5,
+     "verts": 2763
+    },
+    "b": {
+     "v": 0.35,
+     "tris": 921,
+     "meshes": 5,
+     "verts": 2763
+    },
+    "structural": false
+   }
+  },
+  "exports": [
+   "createAsset",
+   "params",
+   "presets",
+   "rig",
+   "detach",
+   "night",
+   "decals",
+   "materials"
+  ],
+  "rigParts": 4,
+  "detachParts": 0,
+  "presets": 3,
+  "decalZones": 1,
+  "buildMs": 10.9,
+  "ops": {
+   "geometry_objects": 6,
+   "op_translate": 1,
+   "op_rotateX": 0,
+   "op_rotateY": 0,
+   "op_rotateZ": 0,
+   "op_scale": 0,
+   "op_applyMatrix4": 1,
+   "op_center": 0,
+   "op_computeVertexNormals": 5,
+   "op_toNonIndexed": 0,
+   "op_deleteAttribute": 0,
+   "op_triangulateShape": 21,
+   "geom_BufferGeometry": 6
+  },
+  "meshes": 5,
+  "skinnedMeshes": 0,
+  "bones": 0,
+  "groups": 5,
+  "triangles": 921,
+  "vertices": 2763,
+  "materials": 1,
+  "colorAttrs": 5,
+  "uvAttrs": 0,
+  "geoTypes": [
+   "BufferGeometry"
+  ],
+  "hashes": [
+   "236a71c279ec1885",
+   "236a71c279ec1885"
+  ],
+  "deterministic": true
+ },
+ {
+  "id": "interior-door-leaf-a02f28",
+  "params": [
+   {
+    "name": "colorway",
+    "type": "choice",
+    "default": "pale-oak",
+    "affects": null,
+    "options": 4,
+    "optionsList": [
+     "pale-oak",
+     "chalk-white",
+     "walnut",
+     "sage-painted"
+    ]
+   },
+   {
+    "name": "leaf",
+    "type": "color",
+    "default": "#E3CBA5",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "panel",
+    "type": "color",
+    "default": "#D2B084",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "glass",
+    "type": "color",
+    "default": "#47423C",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "brass",
+    "type": "color",
+    "default": "#C9A24B",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "style",
+    "type": "choice",
+    "default": "glazed",
+    "affects": "geometry",
+    "options": 3,
+    "optionsList": [
+     "glazed",
+     "four-panel",
+     "flat"
+    ]
+   },
+   {
+    "name": "swing",
+    "type": "choice",
+    "default": "closed",
+    "affects": "geometry",
+    "options": 3,
+    "optionsList": [
+     "closed",
+     "ajar",
+     "open"
+    ]
+   },
+   {
+    "name": "width",
+    "type": "range",
+    "default": 0.9,
+    "affects": "geometry",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "lived_in",
+    "type": "range",
+    "default": 0.35,
+    "affects": "geometry",
+    "options": null,
+    "optionsList": null
+   }
+  ],
+  "variants": {
+   "colorway": {
+    "type": "choice",
+    "a": {
+     "v": "pale-oak",
+     "tris": 402,
+     "meshes": 2,
+     "verts": 1206
+    },
+    "b": {
+     "v": "sage-painted",
+     "tris": 402,
+     "meshes": 2,
+     "verts": 1206
+    },
+    "structural": false
+   },
+   "style": {
+    "type": "choice",
+    "a": {
+     "v": "glazed",
+     "tris": 402,
+     "meshes": 2,
+     "verts": 1206
+    },
+    "b": {
+     "v": "flat",
+     "tris": 302,
+     "meshes": 1,
+     "verts": 906
+    },
+    "structural": true
+   },
+   "swing": {
+    "type": "choice",
+    "a": {
+     "v": "closed",
+     "tris": 402,
+     "meshes": 2,
+     "verts": 1206
+    },
+    "b": {
+     "v": "open",
+     "tris": 412,
+     "meshes": 2,
+     "verts": 1236
+    },
+    "structural": true
+   },
+   "width": {
+    "type": "range",
+    "a": {
+     "v": 0.9,
+     "tris": 402,
+     "meshes": 2,
+     "verts": 1206
+    },
+    "b": {
+     "v": 0.9,
+     "tris": 402,
+     "meshes": 2,
+     "verts": 1206
+    },
+    "structural": false
+   },
+   "lived_in": {
+    "type": "range",
+    "a": {
+     "v": 0.35,
+     "tris": 402,
+     "meshes": 2,
+     "verts": 1206
+    },
+    "b": {
+     "v": 0.35,
+     "tris": 402,
+     "meshes": 2,
+     "verts": 1206
+    },
+    "structural": false
+   }
+  },
+  "exports": [
+   "createAsset",
+   "params",
+   "presets",
+   "rig",
+   "detach",
+   "night",
+   "decals",
+   "materials"
+  ],
+  "rigParts": 1,
+  "detachParts": 0,
+  "presets": 4,
+  "decalZones": 0,
+  "buildMs": 14,
+  "ops": {
+   "geometry_objects": 34,
+   "op_translate": 5,
+   "op_rotateX": 0,
+   "op_rotateY": 3,
+   "op_rotateZ": 1,
+   "op_scale": 0,
+   "op_applyMatrix4": 11,
+   "op_center": 0,
+   "op_computeVertexNormals": 2,
+   "op_toNonIndexed": 3,
+   "op_deleteAttribute": 36,
+   "op_triangulateShape": 0,
+   "geom_BufferGeometry": 31,
+   "geom_CylinderGeometry": 3
+  },
+  "meshes": 2,
+  "skinnedMeshes": 0,
+  "bones": 0,
+  "groups": 2,
+  "triangles": 402,
+  "vertices": 1206,
+  "materials": 2,
+  "colorAttrs": 2,
+  "uvAttrs": 0,
+  "geoTypes": [
+   "BufferGeometry"
+  ],
+  "hashes": [
+   "ed4487e090fcdf59",
+   "ed4487e090fcdf59"
+  ],
+  "deterministic": true
+ },
+ {
+  "id": "keyboard-bench-564d56",
+  "params": [
+   {
+    "name": "colorway",
+    "type": "choice",
+    "default": "rosewood-velvet",
+    "affects": null,
+    "options": 3,
+    "optionsList": [
+     "rosewood-velvet",
+     "black-lacquer",
+     "gilt-silk"
+    ]
+   },
+   {
+    "name": "era",
+    "type": "choice",
+    "default": "1800s",
+    "affects": "geometry",
+    "options": 3,
+    "optionsList": [
+     "1800s",
+     "modern",
+     "1700s"
+    ]
+   },
+   {
+    "name": "seatHeight",
+    "type": "range",
+    "default": 0.48,
+    "affects": "geometry",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "width",
+    "type": "range",
+    "default": 0.9,
+    "affects": "geometry",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "wood",
+    "type": "color",
+    "default": "#5b3e2a",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "cushion",
+    "type": "color",
+    "default": "#7a2430",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "metal",
+    "type": "color",
+    "default": "#ce9157",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   }
+  ],
+  "variants": {
+   "colorway": {
+    "type": "choice",
+    "a": {
+     "v": "rosewood-velvet",
+     "tris": 698,
+     "meshes": 4,
+     "verts": 2094
+    },
+    "b": {
+     "v": "gilt-silk",
+     "tris": 698,
+     "meshes": 4,
+     "verts": 2094
+    },
+    "structural": false
+   },
+   "era": {
+    "type": "choice",
+    "a": {
+     "v": "1800s",
+     "tris": 698,
+     "meshes": 4,
+     "verts": 2094
+    },
+    "b": {
+     "v": "1700s",
+     "tris": 906,
+     "meshes": 4,
+     "verts": 2718
+    },
+    "structural": true
+   },
+   "seatHeight": {
+    "type": "range",
+    "a": {
+     "v": 0.48,
+     "tris": 698,
+     "meshes": 4,
+     "verts": 2094
+    },
+    "b": {
+     "v": 0.48,
+     "tris": 698,
+     "meshes": 4,
+     "verts": 2094
+    },
+    "structural": false
+   },
+   "width": {
+    "type": "range",
+    "a": {
+     "v": 0.9,
+     "tris": 698,
+     "meshes": 4,
+     "verts": 2094
+    },
+    "b": {
+     "v": 0.9,
+     "tris": 698,
+     "meshes": 4,
+     "verts": 2094
+    },
+    "structural": false
+   }
+  },
+  "exports": [
+   "createAsset",
+   "params",
+   "presets",
+   "rig",
+   "detach",
+   "night",
+   "decals",
+   "materials"
+  ],
+  "rigParts": 2,
+  "detachParts": 0,
+  "presets": 3,
+  "decalZones": 0,
+  "buildMs": 6.9,
+  "ops": {
+   "geometry_objects": 6,
+   "op_translate": 0,
+   "op_rotateX": 0,
+   "op_rotateY": 0,
+   "op_rotateZ": 0,
+   "op_scale": 0,
+   "op_applyMatrix4": 0,
+   "op_center": 0,
+   "op_computeVertexNormals": 4,
+   "op_toNonIndexed": 0,
+   "op_deleteAttribute": 0,
+   "op_triangulateShape": 0,
+   "geom_BufferGeometry": 6
+  },
+  "meshes": 4,
+  "skinnedMeshes": 0,
+  "bones": 0,
+  "groups": 3,
+  "triangles": 698,
+  "vertices": 2094,
+  "materials": 2,
+  "colorAttrs": 4,
+  "uvAttrs": 0,
+  "geoTypes": [
+   "BufferGeometry"
+  ],
+  "hashes": [
+   "0ea3516130096051",
+   "0ea3516130096051"
+  ],
+  "deterministic": true
+ },
+ {
+  "id": "table-game-chair-ffa6c1",
+  "params": [
+   {
+    "name": "colorway",
+    "type": "choice",
+    "default": "walnut-brass",
+    "affects": null,
+    "options": 3,
+    "optionsList": [
+     "walnut-brass",
+     "honey-champagne",
+     "espresso-nickel"
+    ]
+   },
+   {
+    "name": "upholstery",
+    "type": "choice",
+    "default": "crimson",
+    "affects": null,
+    "options": 3,
+    "optionsList": [
+     "crimson",
+     "black",
+     "emerald"
+    ]
+   },
+   {
+    "name": "seatHeight",
+    "type": "range",
+    "default": 0.58,
+    "affects": "geometry",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "backHeight",
+    "type": "range",
+    "default": 0.31,
+    "affects": "geometry",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "back",
+    "type": "toggle",
+    "default": true,
+    "affects": "geometry",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "vinyl",
+    "type": "color",
+    "default": "#923629",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "wood",
+    "type": "color",
+    "default": "#644628",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "trim",
+    "type": "color",
+    "default": "#B3883A",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   }
+  ],
+  "variants": {
+   "colorway": {
+    "type": "choice",
+    "a": {
+     "v": "walnut-brass",
+     "tris": 848,
+     "meshes": 2,
+     "verts": 2544
+    },
+    "b": {
+     "v": "espresso-nickel",
+     "tris": 848,
+     "meshes": 2,
+     "verts": 2544
+    },
+    "structural": false
+   },
+   "upholstery": {
+    "type": "choice",
+    "a": {
+     "v": "crimson",
+     "tris": 848,
+     "meshes": 2,
+     "verts": 2544
+    },
+    "b": {
+     "v": "emerald",
+     "tris": 848,
+     "meshes": 2,
+     "verts": 2544
+    },
+    "structural": false
+   },
+   "seatHeight": {
+    "type": "range",
+    "a": {
+     "v": 0.58,
+     "tris": 848,
+     "meshes": 2,
+     "verts": 2544
+    },
+    "b": {
+     "v": 0.58,
+     "tris": 848,
+     "meshes": 2,
+     "verts": 2544
+    },
+    "structural": false
+   },
+   "backHeight": {
+    "type": "range",
+    "a": {
+     "v": 0.31,
+     "tris": 848,
+     "meshes": 2,
+     "verts": 2544
+    },
+    "b": {
+     "v": 0.31,
+     "tris": 848,
+     "meshes": 2,
+     "verts": 2544
+    },
+    "structural": false
+   },
+   "back": {
+    "type": "toggle",
+    "a": {
+     "v": true,
+     "tris": 848,
+     "meshes": 2,
+     "verts": 2544
+    },
+    "b": {
+     "v": false,
+     "tris": 624,
+     "meshes": 2,
+     "verts": 1872
+    },
+    "structural": true
+   }
+  },
+  "exports": [
+   "createAsset",
+   "params",
+   "presets",
+   "rig",
+   "detach",
+   "night",
+   "decals",
+   "materials"
+  ],
+  "rigParts": 1,
+  "detachParts": 0,
+  "presets": 3,
+  "decalZones": 0,
+  "buildMs": 9,
+  "ops": {
+   "geometry_objects": 6,
+   "op_translate": 1,
+   "op_rotateX": 0,
+   "op_rotateY": 0,
+   "op_rotateZ": 0,
+   "op_scale": 0,
+   "op_applyMatrix4": 1,
+   "op_center": 0,
+   "op_computeVertexNormals": 2,
+   "op_toNonIndexed": 0,
+   "op_deleteAttribute": 0,
+   "op_triangulateShape": 0,
+   "geom_BufferGeometry": 6
+  },
+  "meshes": 2,
+  "skinnedMeshes": 0,
+  "bones": 0,
+  "groups": 2,
+  "triangles": 848,
+  "vertices": 2544,
+  "materials": 1,
+  "colorAttrs": 2,
+  "uvAttrs": 0,
+  "geoTypes": [
+   "BufferGeometry"
+  ],
+  "hashes": [
+   "b118727be6d2887d",
+   "b118727be6d2887d"
+  ],
+  "deterministic": true
+ },
+ {
+  "id": "cookie-2016bb",
+  "params": [
+   {
+    "name": "colorway",
+    "type": "choice",
+    "default": "classic",
+    "affects": "colors",
+    "options": 4,
+    "optionsList": [
+     "classic",
+     "double-chocolate",
+     "oatmeal-raisin",
+     "matcha"
+    ]
+   },
+   {
+    "name": "thickness",
+    "type": "range",
+    "default": 0.024,
+    "affects": "geometry",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "chips",
+    "type": "range",
+    "default": 9,
+    "affects": "geometry",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "chipColor",
+    "type": "color",
+    "default": "#3d2113",
+    "affects": "colors",
+    "options": null,
+    "optionsList": null
+   }
+  ],
+  "variants": {
+   "colorway": {
+    "type": "choice",
+    "a": {
+     "v": "classic",
+     "tris": 174,
+     "meshes": 1,
+     "verts": 522
+    },
+    "b": {
+     "v": "matcha",
+     "tris": 174,
+     "meshes": 1,
+     "verts": 522
+    },
+    "structural": false
+   },
+   "thickness": {
+    "type": "range",
+    "a": {
+     "v": 0.024,
+     "tris": 174,
+     "meshes": 1,
+     "verts": 522
+    },
+    "b": {
+     "v": 0.024,
+     "tris": 174,
+     "meshes": 1,
+     "verts": 522
+    },
+    "structural": false
+   },
+   "chips": {
+    "type": "range",
+    "a": {
+     "v": 9,
+     "tris": 174,
+     "meshes": 1,
+     "verts": 522
+    },
+    "b": {
+     "v": 9,
+     "tris": 174,
+     "meshes": 1,
+     "verts": 522
+    },
+    "structural": false
+   }
+  },
+  "exports": [
+   "createAsset",
+   "params",
+   "presets",
+   "rig",
+   "detach",
+   "decals"
+  ],
+  "rigParts": 0,
+  "detachParts": 0,
+  "presets": 4,
+  "decalZones": 0,
+  "buildMs": 3.8,
+  "ops": {
+   "geometry_objects": 12,
+   "op_translate": 0,
+   "op_rotateX": 0,
+   "op_rotateY": 0,
+   "op_rotateZ": 0,
+   "op_scale": 0,
+   "op_applyMatrix4": 0,
+   "op_center": 0,
+   "op_computeVertexNormals": 1,
+   "op_toNonIndexed": 11,
+   "op_deleteAttribute": 22,
+   "op_triangulateShape": 0,
+   "geom_BufferGeometry": 12
+  },
+  "meshes": 1,
+  "skinnedMeshes": 0,
+  "bones": 0,
+  "groups": 1,
+  "triangles": 174,
+  "vertices": 522,
+  "materials": 1,
+  "colorAttrs": 1,
+  "uvAttrs": 0,
+  "geoTypes": [
+   "BufferGeometry"
+  ],
+  "hashes": [
+   "abe244c40e79e181",
+   "abe244c40e79e181"
+  ],
+  "deterministic": true
+ },
+ {
+  "id": "area-rug-5c56e2",
+  "params": [
+   {
+    "name": "colorway",
+    "type": "choice",
+    "default": "linen-sage",
+    "affects": null,
+    "options": 4,
+    "optionsList": [
+     "linen-sage",
+     "oat-terracotta",
+     "walnut-ochre",
+     "slate-teal"
+    ]
+   },
+   {
+    "name": "field",
+    "type": "color",
+    "default": "#F3EEE8",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "border",
+    "type": "color",
+    "default": "#7E9179",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "motif",
+    "type": "color",
+    "default": "#B8946A",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "backing",
+    "type": "color",
+    "default": "#A89A85",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "pattern",
+    "type": "choice",
+    "default": "geometric",
+    "affects": null,
+    "options": 3,
+    "optionsList": [
+     "plain",
+     "bordered",
+     "geometric"
+    ]
+   },
+   {
+    "name": "size",
+    "type": "choice",
+    "default": "small",
+    "affects": "geometry",
+    "options": 2,
+    "optionsList": [
+     "small",
+     "large"
+    ]
+   },
+   {
+    "name": "pile",
+    "type": "range",
+    "default": 0.25,
+    "affects": "geometry",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "lived_in",
+    "type": "range",
+    "default": 0.35,
+    "affects": "geometry",
+    "options": null,
+    "optionsList": null
+   }
+  ],
+  "variants": {
+   "colorway": {
+    "type": "choice",
+    "a": {
+     "v": "linen-sage",
+     "tris": 392,
+     "meshes": 1,
+     "verts": 1176
+    },
+    "b": {
+     "v": "slate-teal",
+     "tris": 392,
+     "meshes": 1,
+     "verts": 1176
+    },
+    "structural": false
+   },
+   "pattern": {
+    "type": "choice",
+    "a": {
+     "v": "plain",
+     "tris": 392,
+     "meshes": 1,
+     "verts": 1176
+    },
+    "b": {
+     "v": "geometric",
+     "tris": 392,
+     "meshes": 1,
+     "verts": 1176
+    },
+    "structural": false
+   },
+   "size": {
+    "type": "choice",
+    "a": {
+     "v": "small",
+     "tris": 392,
+     "meshes": 1,
+     "verts": 1176
+    },
+    "b": {
+     "v": "large",
+     "tris": 700,
+     "meshes": 1,
+     "verts": 2100
+    },
+    "structural": true
+   },
+   "pile": {
+    "type": "range",
+    "a": {
+     "v": 0.25,
+     "tris": 392,
+     "meshes": 1,
+     "verts": 1176
+    },
+    "b": {
+     "v": 0.25,
+     "tris": 392,
+     "meshes": 1,
+     "verts": 1176
+    },
+    "structural": false
+   },
+   "lived_in": {
+    "type": "range",
+    "a": {
+     "v": 0.35,
+     "tris": 392,
+     "meshes": 1,
+     "verts": 1176
+    },
+    "b": {
+     "v": 0.35,
+     "tris": 392,
+     "meshes": 1,
+     "verts": 1176
+    },
+    "structural": false
+   }
+  },
+  "exports": [
+   "createAsset",
+   "params",
+   "presets",
+   "rig",
+   "detach",
+   "night"
+  ],
+  "rigParts": 0,
+  "detachParts": 0,
+  "presets": 4,
+  "decalZones": 0,
+  "buildMs": 3.3,
+  "ops": {
+   "geometry_objects": 5,
+   "op_translate": 0,
+   "op_rotateX": 0,
+   "op_rotateY": 0,
+   "op_rotateZ": 0,
+   "op_scale": 0,
+   "op_applyMatrix4": 0,
+   "op_center": 0,
+   "op_computeVertexNormals": 1,
+   "op_toNonIndexed": 0,
+   "op_deleteAttribute": 8,
+   "op_triangulateShape": 0,
+   "geom_BufferGeometry": 5
+  },
+  "meshes": 1,
+  "skinnedMeshes": 0,
+  "bones": 0,
+  "groups": 1,
+  "triangles": 392,
+  "vertices": 1176,
+  "materials": 1,
+  "colorAttrs": 1,
+  "uvAttrs": 0,
+  "geoTypes": [
+   "BufferGeometry"
+  ],
+  "hashes": [
+   "7bccbb4fbe787e5c",
+   "7bccbb4fbe787e5c"
+  ],
+  "deterministic": true
+ },
+ {
+  "id": "side-dock-458f18",
+  "params": [
+   {
+    "name": "state",
+    "type": "choice",
+    "default": "idle",
+    "affects": "geometry",
+    "options": 5,
+    "optionsList": [
+     "idle",
+     "hover",
+     "pressed",
+     "selected",
+     "disabled"
+    ]
+   },
+   {
+    "name": "slots",
+    "type": "range",
+    "default": 6,
+    "affects": "geometry",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "active",
+    "type": "range",
+    "default": 2,
+    "affects": "geometry",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "seats",
+    "type": "choice",
+    "default": "tile",
+    "affects": "geometry",
+    "options": 3,
+    "optionsList": [
+     "tile",
+     "disc",
+     "none"
+    ]
+   },
+   {
+    "name": "indicator",
+    "type": "choice",
+    "default": "right",
+    "affects": "geometry",
+    "options": 2,
+    "optionsList": [
+     "right",
+     "left"
+    ]
+   },
+   {
+    "name": "theme",
+    "type": "choice",
+    "default": "light",
+    "affects": null,
+    "options": 2,
+    "optionsList": [
+     "light",
+     "dark"
+    ]
+   },
+   {
+    "name": "accent",
+    "type": "choice",
+    "default": "blue",
+    "affects": null,
+    "options": 5,
+    "optionsList": [
+     "blue",
+     "green",
+     "amber",
+     "red",
+     "violet"
+    ]
+   },
+   {
+    "name": "glass",
+    "type": "color",
+    "default": "#99b1c1",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "rim",
+    "type": "color",
+    "default": "#caf1fb",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "tile",
+    "type": "color",
+    "default": "#eef4ff",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "muted",
+    "type": "color",
+    "default": "#b5c0c4",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "glow",
+    "type": "color",
+    "default": "#0a84ff",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   }
+  ],
+  "variants": {
+   "state": {
+    "type": "choice",
+    "a": {
+     "v": "idle",
+     "tris": 804,
+     "meshes": 3,
+     "verts": 2412
+    },
+    "b": {
+     "v": "disabled",
+     "tris": 804,
+     "meshes": 3,
+     "verts": 2412
+    },
+    "structural": false
+   },
+   "slots": {
+    "type": "range",
+    "a": {
+     "v": 6,
+     "tris": 804,
+     "meshes": 3,
+     "verts": 2412
+    },
+    "b": {
+     "v": 6,
+     "tris": 804,
+     "meshes": 3,
+     "verts": 2412
+    },
+    "structural": false
+   },
+   "active": {
+    "type": "range",
+    "a": {
+     "v": 2,
+     "tris": 804,
+     "meshes": 3,
+     "verts": 2412
+    },
+    "b": {
+     "v": 2,
+     "tris": 804,
+     "meshes": 3,
+     "verts": 2412
+    },
+    "structural": false
+   },
+   "seats": {
+    "type": "choice",
+    "a": {
+     "v": "tile",
+     "tris": 804,
+     "meshes": 3,
+     "verts": 2412
+    },
+    "b": {
+     "v": "none",
+     "tris": 336,
+     "meshes": 3,
+     "verts": 1008
+    },
+    "structural": true
+   },
+   "indicator": {
+    "type": "choice",
+    "a": {
+     "v": "right",
+     "tris": 804,
+     "meshes": 3,
+     "verts": 2412
+    },
+    "b": {
+     "v": "left",
+     "tris": 804,
+     "meshes": 3,
+     "verts": 2412
+    },
+    "structural": false
+   },
+   "theme": {
+    "type": "choice",
+    "a": {
+     "v": "light",
+     "tris": 804,
+     "meshes": 3,
+     "verts": 2412
+    },
+    "b": {
+     "v": "dark",
+     "tris": 804,
+     "meshes": 3,
+     "verts": 2412
+    },
+    "structural": false
+   },
+   "accent": {
+    "type": "choice",
+    "a": {
+     "v": "blue",
+     "tris": 804,
+     "meshes": 3,
+     "verts": 2412
+    },
+    "b": {
+     "v": "violet",
+     "tris": 804,
+     "meshes": 3,
+     "verts": 2412
+    },
+    "structural": false
+   }
+  },
+  "exports": [
+   "createAsset",
+   "params",
+   "presets",
+   "rig",
+   "detach",
+   "night",
+   "decals",
+   "materials"
+  ],
+  "rigParts": 0,
+  "detachParts": 0,
+  "presets": 7,
+  "decalZones": 6,
+  "buildMs": 4.9,
+  "ops": {
+   "geometry_objects": 3,
+   "op_translate": 0,
+   "op_rotateX": 0,
+   "op_rotateY": 0,
+   "op_rotateZ": 0,
+   "op_scale": 0,
+   "op_applyMatrix4": 0,
+   "op_center": 0,
+   "op_computeVertexNormals": 0,
+   "op_toNonIndexed": 0,
+   "op_deleteAttribute": 0,
+   "op_triangulateShape": 0,
+   "geom_BufferGeometry": 3
+  },
+  "meshes": 3,
+  "skinnedMeshes": 0,
+  "bones": 0,
+  "groups": 1,
+  "triangles": 804,
+  "vertices": 2412,
+  "materials": 3,
+  "colorAttrs": 3,
+  "uvAttrs": 0,
+  "geoTypes": [
+   "BufferGeometry"
+  ],
+  "hashes": [
+   "8416e401d4e1343c",
+   "8416e401d4e1343c"
+  ],
+  "deterministic": true
+ },
+ {
+  "id": "bloom-elemental-base",
+  "params": [
+   {
+    "name": "bark",
+    "type": "color",
+    "default": 8021560,
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "wood",
+    "type": "color",
+    "default": 10126150,
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "vine",
+    "type": "color",
+    "default": 11572304,
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "thorn",
+    "type": "color",
+    "default": 12885124,
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "leaf",
+    "type": "color",
+    "default": 11180618,
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "leafDark",
+    "type": "color",
+    "default": 8747580,
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "leafRed",
+    "type": "color",
+    "default": 9390652,
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "leafMaroon",
+    "type": "color",
+    "default": 7093555,
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "leafShade",
+    "type": "color",
+    "default": 6050092,
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "petal",
+    "type": "color",
+    "default": 14462608,
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "petalRed",
+    "type": "color",
+    "default": 10635842,
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "petalBack",
+    "type": "color",
+    "default": 10112066,
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "seed",
+    "type": "color",
+    "default": 11780679,
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "sepal",
+    "type": "color",
+    "default": 9605182,
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "bud",
+    "type": "color",
+    "default": 12748149,
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "budDark",
+    "type": "color",
+    "default": 5909287,
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "height",
+    "type": "range",
+    "default": 1.9,
+    "affects": "geometry",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "build",
+    "type": "range",
+    "default": 0.5,
+    "affects": "geometry",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "bloomSize",
+    "type": "range",
+    "default": 1,
+    "affects": "geometry",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "skirtLength",
+    "type": "range",
+    "default": 0.5,
+    "affects": "geometry",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "tendrils",
+    "type": "range",
+    "default": 3,
+    "affects": "geometry",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "grip",
+    "type": "choice",
+    "default": "open",
+    "affects": null,
+    "options": 4,
+    "optionsList": [
+     "open",
+     "right",
+     "left",
+     "both"
+    ]
+   }
+  ],
+  "variants": {
+   "height": {
+    "type": "range",
+    "a": {
+     "v": 1.9,
+     "tris": 4997,
+     "meshes": 3,
+     "verts": 14991
+    },
+    "b": {
+     "v": 1.9,
+     "tris": 4997,
+     "meshes": 3,
+     "verts": 14991
+    },
+    "structural": false
+   },
+   "build": {
+    "type": "range",
+    "a": {
+     "v": 0.5,
+     "tris": 4997,
+     "meshes": 3,
+     "verts": 14991
+    },
+    "b": {
+     "v": 0.5,
+     "tris": 4997,
+     "meshes": 3,
+     "verts": 14991
+    },
+    "structural": false
+   },
+   "bloomSize": {
+    "type": "range",
+    "a": {
+     "v": 1,
+     "tris": 4997,
+     "meshes": 3,
+     "verts": 14991
+    },
+    "b": {
+     "v": 1,
+     "tris": 4997,
+     "meshes": 3,
+     "verts": 14991
+    },
+    "structural": false
+   },
+   "skirtLength": {
+    "type": "range",
+    "a": {
+     "v": 0.5,
+     "tris": 4997,
+     "meshes": 3,
+     "verts": 14991
+    },
+    "b": {
+     "v": 0.5,
+     "tris": 4997,
+     "meshes": 3,
+     "verts": 14991
+    },
+    "structural": false
+   },
+   "tendrils": {
+    "type": "range",
+    "a": {
+     "v": 3,
+     "tris": 4997,
+     "meshes": 3,
+     "verts": 14991
+    },
+    "b": {
+     "v": 3,
+     "tris": 4997,
+     "meshes": 3,
+     "verts": 14991
+    },
+    "structural": false
+   },
+   "grip": {
+    "type": "choice",
+    "a": {
+     "v": "open",
+     "tris": 4997,
+     "meshes": 3,
+     "verts": 14991
+    },
+    "b": {
+     "v": "both",
+     "tris": 4977,
+     "meshes": 3,
+     "verts": 14931
+    },
+    "structural": true
+   }
+  },
+  "exports": [
+   "createAsset",
+   "params",
+   "rig",
+   "detach",
+   "materials"
+  ],
+  "rigParts": 16,
+  "detachParts": 0,
+  "presets": 0,
+  "decalZones": 0,
+  "buildMs": 283.8,
+  "ops": {
+   "geometry_objects": 4,
+   "op_translate": 1,
+   "op_rotateX": 0,
+   "op_rotateY": 0,
+   "op_rotateZ": 0,
+   "op_scale": 0,
+   "op_applyMatrix4": 1,
+   "op_center": 0,
+   "op_computeVertexNormals": 1,
+   "op_toNonIndexed": 0,
+   "op_deleteAttribute": 0,
+   "op_triangulateShape": 0,
+   "geom_BufferGeometry": 4
+  },
+  "meshes": 3,
+  "skinnedMeshes": 3,
+  "bones": 22,
+  "groups": 1,
+  "triangles": 4997,
+  "vertices": 14991,
+  "materials": 1,
+  "colorAttrs": 3,
+  "uvAttrs": 0,
+  "geoTypes": [
+   "BufferGeometry"
+  ],
+  "hashes": [
+   "08aa660c156d37f9",
+   "08aa660c156d37f9"
+  ],
+  "deterministic": true
+ },
+ {
+  "id": "cafe-table-set-1868d1",
+  "params": [
+   {
+    "name": "colorway",
+    "type": "choice",
+    "default": "union-oak",
+    "affects": null,
+    "options": 4,
+    "optionsList": [
+     "union-oak",
+     "charcoal-pedestal",
+     "pale-birch",
+     "walnut-sage"
+    ]
+   },
+   {
+    "name": "timber",
+    "type": "color",
+    "default": "#c59a73",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "frame",
+    "type": "color",
+    "default": "#523f34",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "base",
+    "type": "color",
+    "default": "#5b4f45",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "cups",
+    "type": "color",
+    "default": "#efeae3",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "coffee",
+    "type": "color",
+    "default": "#936e4b",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "device",
+    "type": "color",
+    "default": "#70757e",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "chairs",
+    "type": "range",
+    "default": 3,
+    "affects": "geometry",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "topShape",
+    "type": "choice",
+    "default": "round",
+    "affects": "geometry",
+    "options": 2,
+    "optionsList": [
+     "round",
+     "square"
+    ]
+   },
+   {
+    "name": "term",
+    "type": "range",
+    "default": 0.6,
+    "affects": "geometry",
+    "options": null,
+    "optionsList": null
+   }
+  ],
+  "variants": {
+   "colorway": {
+    "type": "choice",
+    "a": {
+     "v": "union-oak",
+     "tris": 540,
+     "meshes": 2,
+     "verts": 1620
+    },
+    "b": {
+     "v": "walnut-sage",
+     "tris": 540,
+     "meshes": 2,
+     "verts": 1620
+    },
+    "structural": false
+   },
+   "chairs": {
+    "type": "range",
+    "a": {
+     "v": 3,
+     "tris": 540,
+     "meshes": 2,
+     "verts": 1620
+    },
+    "b": {
+     "v": 3,
+     "tris": 540,
+     "meshes": 2,
+     "verts": 1620
+    },
+    "structural": false
+   },
+   "topShape": {
+    "type": "choice",
+    "a": {
+     "v": "round",
+     "tris": 540,
+     "meshes": 2,
+     "verts": 1620
+    },
+    "b": {
+     "v": "square",
+     "tris": 516,
+     "meshes": 2,
+     "verts": 1548
+    },
+    "structural": true
+   },
+   "term": {
+    "type": "range",
+    "a": {
+     "v": 0.6,
+     "tris": 540,
+     "meshes": 2,
+     "verts": 1620
+    },
+    "b": {
+     "v": 0.6,
+     "tris": 540,
+     "meshes": 2,
+     "verts": 1620
+    },
+    "structural": false
+   }
+  },
+  "exports": [
+   "createAsset",
+   "params",
+   "presets",
+   "rig",
+   "detach",
+   "night",
+   "decals"
+  ],
+  "rigParts": 0,
+  "detachParts": 1,
+  "presets": 4,
+  "decalZones": 0,
+  "buildMs": 14.4,
+  "ops": {
+   "geometry_objects": 7,
+   "op_translate": 0,
+   "op_rotateX": 0,
+   "op_rotateY": 0,
+   "op_rotateZ": 0,
+   "op_scale": 0,
+   "op_applyMatrix4": 0,
+   "op_center": 0,
+   "op_computeVertexNormals": 2,
+   "op_toNonIndexed": 0,
+   "op_deleteAttribute": 0,
+   "op_triangulateShape": 0,
+   "geom_BufferGeometry": 7
+  },
+  "meshes": 2,
+  "skinnedMeshes": 0,
+  "bones": 0,
+  "groups": 2,
+  "triangles": 540,
+  "vertices": 1620,
+  "materials": 1,
+  "colorAttrs": 2,
+  "uvAttrs": 0,
+  "geoTypes": [
+   "BufferGeometry"
+  ],
+  "hashes": [
+   "bf5bbd721e5ba36a",
+   "bf5bbd721e5ba36a"
+  ],
+  "deterministic": true
+ },
+ {
+  "id": "lookout-watchtower-f1a5ce",
+  "params": [
+   {
+    "name": "colorway",
+    "type": "choice",
+    "default": "weathered-oak",
+    "affects": null,
+    "options": 4,
+    "optionsList": [
+     "weathered-oak",
+     "sun-bleached",
+     "tarred-storm",
+     "harbour-red"
+    ]
+   },
+   {
+    "name": "towerHeight",
+    "type": "range",
+    "default": 1,
+    "affects": "geometry",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "legSplay",
+    "type": "range",
+    "default": 1,
+    "affects": "geometry",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "platformWidth",
+    "type": "range",
+    "default": 1,
+    "affects": "geometry",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "roofFlare",
+    "type": "range",
+    "default": 1,
+    "affects": "geometry",
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "cabinFacets",
+    "type": "choice",
+    "default": "octagon",
+    "affects": "geometry",
+    "options": 3,
+    "optionsList": [
+     "square",
+     "hex",
+     "octagon"
+    ]
+   },
+   {
+    "name": "timber",
+    "type": "color",
+    "default": "#6B4526",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "plank",
+    "type": "color",
+    "default": "#9C6B3C",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "deck",
+    "type": "color",
+    "default": "#A88458",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "roof",
+    "type": "color",
+    "default": "#C9975C",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "trim",
+    "type": "color",
+    "default": "#C4A46A",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "pane",
+    "type": "color",
+    "default": "#1C6B84",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   },
+   {
+    "name": "doorway",
+    "type": "color",
+    "default": "#2A2320",
+    "affects": null,
+    "options": null,
+    "optionsList": null
+   }
+  ],
+  "variants": {
+   "colorway": {
+    "type": "choice",
+    "a": {
+     "v": "weathered-oak",
+     "tris": 962,
+     "meshes": 2,
+     "verts": 2886
+    },
+    "b": {
+     "v": "harbour-red",
+     "tris": 962,
+     "meshes": 2,
+     "verts": 2886
+    },
+    "structural": false
+   },
+   "towerHeight": {
+    "type": "range",
+    "a": {
+     "v": 1,
+     "tris": 962,
+     "meshes": 2,
+     "verts": 2886
+    },
+    "b": {
+     "v": 1,
+     "tris": 962,
+     "meshes": 2,
+     "verts": 2886
+    },
+    "structural": false
+   },
+   "legSplay": {
+    "type": "range",
+    "a": {
+     "v": 1,
+     "tris": 962,
+     "meshes": 2,
+     "verts": 2886
+    },
+    "b": {
+     "v": 1,
+     "tris": 962,
+     "meshes": 2,
+     "verts": 2886
+    },
+    "structural": false
+   },
+   "platformWidth": {
+    "type": "range",
+    "a": {
+     "v": 1,
+     "tris": 962,
+     "meshes": 2,
+     "verts": 2886
+    },
+    "b": {
+     "v": 1,
+     "tris": 962,
+     "meshes": 2,
+     "verts": 2886
+    },
+    "structural": false
+   },
+   "roofFlare": {
+    "type": "range",
+    "a": {
+     "v": 1,
+     "tris": 962,
+     "meshes": 2,
+     "verts": 2886
+    },
+    "b": {
+     "v": 1,
+     "tris": 962,
+     "meshes": 2,
+     "verts": 2886
+    },
+    "structural": false
+   },
+   "cabinFacets": {
+    "type": "choice",
+    "a": {
+     "v": "square",
+     "tris": 862,
+     "meshes": 2,
+     "verts": 2586
+    },
+    "b": {
+     "v": "octagon",
+     "tris": 962,
+     "meshes": 2,
+     "verts": 2886
+    },
+    "structural": true
+   }
+  },
+  "exports": [
+   "createAsset",
+   "params",
+   "presets",
+   "rig",
+   "detach",
+   "night"
+  ],
+  "rigParts": 0,
+  "detachParts": 1,
+  "presets": 4,
+  "decalZones": 0,
+  "buildMs": 14,
+  "ops": {
+   "geometry_objects": 92,
+   "op_translate": 19,
+   "op_rotateX": 11,
+   "op_rotateY": 8,
+   "op_rotateZ": 0,
+   "op_scale": 0,
+   "op_applyMatrix4": 64,
+   "op_center": 0,
+   "op_computeVertexNormals": 2,
+   "op_toNonIndexed": 90,
+   "op_deleteAttribute": 180,
+   "op_triangulateShape": 0,
+   "geom_BufferGeometry": 92
+  },
+  "meshes": 2,
+  "skinnedMeshes": 0,
+  "bones": 0,
+  "groups": 2,
+  "triangles": 962,
+  "vertices": 2886,
+  "materials": 1,
+  "colorAttrs": 2,
+  "uvAttrs": 0,
+  "geoTypes": [
+   "BufferGeometry"
+  ],
+  "hashes": [
+   "cdf7fd9793aa4304",
+   "cdf7fd9793aa4304"
+  ],
+  "deterministic": true
+ }
+]

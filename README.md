@@ -23,6 +23,7 @@ runtime/dsl.js        JavaScript authoring DSL
 runtime/cache.js      content-addressed array pool + Float32 cache
 examples/*.pfn        12 example graphs
 docs/                 design notes, study, format, techniques
+study/                authoring/porting workspace (reference assets gitignored)
 ```
 
 **No Polyfork source code or assets are included.** See `NOTICE`. The examples are original
@@ -103,6 +104,7 @@ The parser, serializer and evaluator are in `runtime/`. `.pfn` is the authoring 
 
 - [AGENTS.md](AGENTS.md) — operating rules, layout, authoring loop, known traps
 - [docs/STATUS.md](docs/STATUS.md) — current example status, verified work, next tasks
+- [study/AGENTS.md](study/AGENTS.md) — authoring/porting workspace; downloaded assets are gitignored
 - [docs/DESIGN.md](docs/DESIGN.md) — API, node signatures, format
 - [docs/TECHNIQUES.md](docs/TECHNIQUES.md) — how the studied assets build hair, clothes, text
 - [docs/STUDY.md](docs/STUDY.md) — three random samples, gap analysis, ring-array optimisation

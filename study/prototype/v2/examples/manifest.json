@@ -1,0 +1,170 @@
+[
+  {
+    "id": "cookie",
+    "title": "Cookie",
+    "description": "Parametric loft, seeded scatter and instanced chips.",
+    "category": "props",
+    "file": "cookie.pfn",
+    "bytes": 996,
+    "nodes": 9,
+    "cam": [
+      25,
+      35
+    ],
+    "fit": 1.25
+  },
+  {
+    "id": "sapphire",
+    "title": "Rough sapphire",
+    "description": "Chamfered profile, loft along stations, pointed/truncated ends.",
+    "category": "props",
+    "file": "sapphire.pfn",
+    "bytes": 1064,
+    "nodes": 5,
+    "cam": [
+      20,
+      12
+    ],
+    "fit": 1.5
+  },
+  {
+    "id": "tire",
+    "title": "Tire",
+    "description": "Revolved tread with per-facet modulation, caps, hub and lug ring.",
+    "category": "props",
+    "file": "tire.pfn",
+    "bytes": 2043,
+    "nodes": 10,
+    "cam": [
+      58,
+      14
+    ],
+    "fit": 1.75
+  },
+  {
+    "id": "rock",
+    "title": "Small rock",
+    "description": "Deformed sphere clipped by two planes with capped cuts.",
+    "category": "props",
+    "file": "rock.pfn",
+    "bytes": 549,
+    "nodes": 7,
+    "cam": [
+      35,
+      18
+    ],
+    "fit": 1.7
+  },
+  {
+    "id": "armchair",
+    "title": "Lounge armchair",
+    "description": "Lofted shell, cylinder legs, bevel box cushion.",
+    "category": "props",
+    "file": "armchair.pfn",
+    "bytes": 1423,
+    "nodes": 10,
+    "cam": [
+      25,
+      15
+    ],
+    "fit": 1.8
+  },
+  {
+    "id": "clam",
+    "title": "Maxima clam",
+    "description": "Ribbed shell bands with hinge cap.",
+    "category": "nature",
+    "file": "clam.pfn",
+    "bytes": 1071,
+    "nodes": 5,
+    "cam": [
+      35,
+      28
+    ],
+    "fit": 1.7
+  },
+  {
+    "id": "hair",
+    "title": "Stylized hair",
+    "description": "Solid curl primitives scattered on a head volume.",
+    "category": "character",
+    "file": "hair.pfn",
+    "bytes": 1095,
+    "nodes": 15,
+    "cam": [
+      150,
+      10
+    ],
+    "fit": 1.55
+  },
+  {
+    "id": "jacket",
+    "title": "Stylized jacket",
+    "description": "Wrapped shell with a front gap, lining, lapels and collar.",
+    "category": "character",
+    "file": "jacket.pfn",
+    "bytes": 1415,
+    "nodes": 16,
+    "cam": [
+      15,
+      8
+    ],
+    "fit": 1.9
+  },
+  {
+    "id": "sign",
+    "title": "Sign",
+    "description": "Extruded segment letters on a panel.",
+    "category": "props",
+    "file": "sign.pfn",
+    "bytes": 1141,
+    "nodes": 16,
+    "cam": [
+      18,
+      6
+    ],
+    "fit": 2.25
+  },
+  {
+    "id": "creature",
+    "title": "Creature (skinned)",
+    "description": "Lofted body, bone tree and soft skin weights.",
+    "category": "character",
+    "file": "creature.pfn",
+    "bytes": 8321,
+    "nodes": 28,
+    "cam": [
+      30,
+      10
+    ],
+    "fit": 1.75
+  },
+  {
+    "id": "basket",
+    "title": "Storage basket",
+    "description": "Revolved weave bands and handle.",
+    "category": "props",
+    "file": "basket.pfn",
+    "bytes": 2161,
+    "nodes": 11,
+    "cam": [
+      25,
+      18
+    ],
+    "fit": 1.7
+  },
+  {
+    "id": "pumpkin",
+    "title": "Pumpkin",
+    "description": "Lobed revolve with stem.",
+    "category": "nature",
+    "file": "pumpkin.pfn",
+    "bytes": 394,
+    "nodes": 4,
+    "cam": [
+      30,
+      14
+    ],
+    "fit": 1.65
+  }
+]
