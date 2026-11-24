@@ -3,7 +3,8 @@
 import * as THREE from 'three';
 import { mergeGeometries, toCreasedNormals } from 'three/addons/utils/BufferGeometryUtils.js';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
-import { compileExpr, evalExpr, parseExpr } from './expr.js?v=12';
+import { compileExpr, evalExpr, parseExpr } from './expr.js?v=13';
+import { registerParts } from './parts.js?v=13';
 
 export const TAU = Math.PI * 2;
 export const ADDONS = { mergeGeometries, toCreasedNormals, RoundedBoxGeometry };
@@ -129,6 +130,7 @@ function xf(pos, p) {
 // ---------------------------------------------------------------- registry
 export const NODES = new Map();
 export function node(type, schema, fn) { NODES.set(type, { type, schema, fn }); }
+registerParts({ node, V, geom, part, tri, triOut });
 
 // values are resolved before fn(); fields stay lazy
 function coerce(v) { return v; }

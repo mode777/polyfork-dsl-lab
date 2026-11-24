@@ -4,7 +4,7 @@
 three.js-native node graph, the gaps those ports exposed, the nodes added to close them,
 and a compact declarative storage format.
 
-**Code:** `runtime.js` (93 node types), `expr.js`, `dsl.js`, `format.js`, `cache.js`,
+**Code:** `runtime.js` (103 node types), `parts.js`/`builders.js` (ported part nodes and their pure builders), `expr.js`, `dsl.js`, `format.js`, `cache.js`,
 `ports/` (20 ports), `templates.mjs` (20 more). See `SAMPLE3.md` for the third sample. Run `node t-all.mjs` for the order-independent geometric parity table.
 
 ---
@@ -25,11 +25,12 @@ and a compact declarative storage format.
 | `random` | `{ values, next }` deterministic LCG stream |
 | `object` | a `THREE.Object3D` output |
 
-### Nodes (93)
+### Nodes (103)
 
 | group | nodes |
 |---|---|
 | sources | `ring`, `profile`, `path`, `grid`, `box`, `outlineRect`, `cylinder`, `sphere`, `geometry`, `prim`, `faces`, `random`, `value`, `let`, `list`, `range`, `table`, `preset`, `coalesce`, `draws`, `jitter` |
+| ported parts | `plazaTile`, `clamAnimal`, `tramTile`, `armchair`, `wattleFence`, `quiver`, `doorLeaf`, `taxiwaySign`, `roofGable`, `carousel` |
 | surfaces | `loft`, `cap`, `extrude`, `revolve`, `sweep`, `band`, `inset`, `pocket`, `solidify` |
 | signage | `prism`, `frame`, `plate`, `block`, `gem`, `poly` |
 | modifiers | `transform`, `center`, `mirror`, `reverse`, `deform`, `clip`, `join`, `centroid`, `lerpPoint`, `mirrorPoint`, `rotateAbout`, `planeCut`, `gridPoint`, `direction`, `lookup`, `first`, `last`, `slice`, `concat` |
@@ -127,7 +128,7 @@ tolerance; "sketch" means detail is deliberately reduced.
 | flowering-shrub | prop | 831 | 174 | 0.21 | 19 | sketch |
 | adjustable-bay-stilt | building | 1,284 | 136 | 0.11 | 9 | sketch |
 | cheese-wedge | prop | 608 | 12 | 0.02 | 3 | sketch |
-| interior-door-leaf | prop | 402 | 402 | 1.00 | 10 | **parity** |
+| interior-door-leaf | prop | 402 | 402 | 1.00 | 3 | **parity** |
 | lit-taxiway-sign | signage | 408 | 408 | 1.00 | 3 | **parity** |
 | tiled-roof-section | building | 712 | 712 | 1.00 | 3 | **parity** |
 | valet-attendant | character | 3,193 | 3,193 | 1.00 | 1 | module |

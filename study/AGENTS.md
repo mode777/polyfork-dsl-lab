@@ -45,7 +45,9 @@ prototype/
   models/*.mjs          v1 exact ports (cookie, rug)
   bench*.mjs            v1 parity benches
   v2/
-    runtime.mjs         93-node typed runtime + Three bridge (source of public runtime.js)
+    runtime.mjs         103-node typed runtime + Three bridge (source of public runtime.js)
+    parts.mjs           part-node wrappers (source of public runtime/parts.js)
+    builders.mjs        pure geometry builders used by parts.mjs
     expr.mjs            parsed expression language (source of public runtime/expr.js)
     dsl.mjs             authoring DSL
     format.mjs          .pfn text + JSON (source of public format.js)
@@ -87,7 +89,7 @@ From `prototype/v2`:
 node make-examples.mjs              # writes examples/*.pfn + manifest
 node t-examples.mjs                 # parse + cook all published examples
 node t-all.mjs                      # order-independent geometric parity
-node t-ports10.mjs                  # ten new ports: parity + colourway invariance
+node t-ports10.mjs                  # ten new ports: parity + variants + colourways
 node t-cookie.mjs                   # cookie default / 3-chip / 14-chip
 node t-tire.mjs             # 8 tire variants
 node t-sapphire.mjs                 # 13 sapphire variants
@@ -115,7 +117,9 @@ Commit/push the public repo, check
 
 ## Current state (24 Nov 2026)
 
-- Runtime: 93 nodes; **19 published examples, all geometric ports, zero script nodes**.
+- Runtime: 103 nodes; **19 published examples, all geometric ports, zero script nodes**.
+- The ten newest ports are dedicated part nodes backed by `builders.mjs`; their `.pfn`
+  files are ~0.7-1.3 KB and expose geometry options as graph inputs.
 - **Geometric parity** (vertices, bbox and winding at 1e-4): `cookie` (174),
   `sapphire` (48), `tire` (520), `pumpkin` (120), `area rug` (392/700), `chalkboard`
   (194), `theatre` (667), `wayfinding` (482), `desk` (280), `plaza` (292), `clam` (792),
@@ -133,7 +137,7 @@ Commit/push the public repo, check
 
 ## Known issues / next
 
-1. Port more reference props. The batched `faces` source plus the signage/furniture
+1. Port more reference props. The dedicated part nodes plus the signage/furniture
    primitives (`prism`, `frame`, `plate`, `block`, `gem`, `poly`) cover the remaining
    face-soup assets; exposed gaps remain polygon faces with craters (cheese wedge),
    fused clipped lumps (small rock), and cloth/rigged families.

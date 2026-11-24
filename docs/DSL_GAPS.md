@@ -166,15 +166,26 @@ are separate geometry features, not layout escapes.
 ## 12. Face-soup follow-up
 
 Ten more ports (plaza, clam, tram, armchair, wattle, quiver, door, taxiway, roof and
-carousel) are reference face builders rather than primitive assemblies. They use one
-generic source:
+carousel) are reference face builders rather than primitive assemblies. Rather than
+serialize one raw face dump, each has a dedicated part node backed by a pure builder:
 
-| node / option | replaces |
-|---|---|
-| `faces` | batches of hand-authored polygons with per-face `zone`, `hint`, `inside` and `flip`; fan-triangulates each face like `poly` |
-| `faces` + `prim`/`deform` | mixed face/Three-primitive assets (door hinge knuckles under the lived-in shear) |
+| node | builder | what it keeps together |
+|---|---|---|
+| `plazaTile` | `buildPlaza` | deck, seams, light bars, service socket |
+| `clamAnimal` | `buildClam` | ribbed valves and mantle |
+| `tramTile` | `buildTram` | road section, rails, base course |
+| `armchair` | `buildArmchair` | shell, legs, two cushions |
+| `wattleFence` | `buildWattle` | stakes, lashings, woven withies |
+| `quiver` | `buildQuiver` | tube, stitches, strap, buckle, arrows |
+| `doorLeaf` | `buildDoor` | leaf, panels, glass, lever, hinges |
+| `taxiwaySign` | `buildTaxiway` | casing, lit faces, legs, footing |
+| `roofGable` | `buildRoof` | courses, rolls, ridge, verges |
+| `carousel` | `buildCarousel` | plate bed, bumper, bags |
 
-The `faces` source is data-only, like `profile` and `path`; it does not execute code.
-It keeps the graph readable while preserving the reference vertex set and winding at
-`1e-4`. The expression language did not need another built-in for this set; the repeated
-value work was already covered by `let`/`value`/`preset` and the existing math helpers.
+The builders are pure geometry helpers in `builders.mjs`; `parts.mjs` registers the
+graph nodes and converts their face lists to geometry. The `.pfn` files stay small and
+readable, and the reference vertex set/winding is preserved at `1e-4`. `faces` remains
+available as a low-level escape hatch for genuinely irregular soups, but no published
+example needs it now. The expression language did not need another built-in for this
+set; the repeated value work is covered by `let`/`value`/`preset` and the existing math
+helpers.

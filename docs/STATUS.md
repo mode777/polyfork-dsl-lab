@@ -28,7 +28,7 @@ parity check at `1e-4`, including the ten new ports added in this pass.
 | **armchair** | 460 | **geometric port** | 3 nodes; tub shell, splayed legs and two loose cushions. |
 | **wattle** | 802 | **geometric port** | 3 nodes; lashed stakes, mirrored sails and eleven woven withy rows. |
 | **quiver** | 658 | **geometric port** | 3 nodes; stitched leather tube, shoulder strap, buckle and seven arrows. |
-| **door** | 402 | **geometric port** | 10 nodes; glazed leaf, moulded panels, brass lever and three hinges; glass on its own material slot. |
+| **door** | 402 | **geometric port** | 3 nodes; glazed leaf, moulded panels, brass lever and three hinges; glass on its own material slot. |
 | **taxiway** | 408 | **geometric port** | 3 nodes; two-panel arrow face, octagonal casing, legs and concrete pad. |
 | **roof** | 712 | **geometric port** | 3 nodes; gable kawara roof with four stepped courses and closed verges. |
 | **carousel** | 276 | **geometric port** | 3 nodes; sloped plate bed, bumper skirt and three riding bags. |
@@ -42,10 +42,12 @@ rock/cheese remain open.
 - Added ten exact ports: **composite plaza tile**, **maxima clam**, **tram track tile**,
   **lounge armchair**, **wattle fence run**, **arrow quiver**, **interior door leaf**,
   **lit taxiway sign**, **tiled roof section** and **baggage carousel**.
-- Added the generic `faces` source: a batch of `{pts, zone, hint}` polygons in one node,
-  so reference face-soup builders stay compact instead of emitting hundreds of `poly`
-  nodes. `door` also uses `prim` + `deform` to apply the reference's lived-in shear to
-  its hinge knuckles, and keeps glass on a separate material slot.
+- Added ten dedicated part nodes (`plazaTile`, `clamAnimal`, `tramTile`, `armchair`,
+  `wattleFence`, `quiver`, `doorLeaf`, `taxiwaySign`, `roofGable`, `carousel`) backed by
+  `builders.mjs`. The `.pfn` examples now show the part construction at a readable level
+  (~0.7-1.3 KB each) instead of a batched face dump; `faces` remains the low-level escape
+  hatch. `doorLeaf` keeps glass on a separate material slot and bakes the lived-in shear
+  through its hinge knuckles.
 - Added two more exact ports: the **overhead wayfinding sign** (fourth reference sample)
   and the **office desk** (third sample). Both keep their reference options live.
 - Added three generic nodes: `pack` (flat legend layout), `outlineRect` (chamfered
@@ -93,8 +95,8 @@ rock/cheese remain open.
 
 - `t-all.mjs`: all nineteen published ports plus six `module` wrappers pass at default;
   the per-port tests cover parameter variants for the original nine.
-- `t-ports10.mjs`: 10/10 new ports pass reference parity and every colourway leaves the
-  vertex set unchanged.
+- `t-ports10.mjs`: 10/10 new ports pass reference parity, 69 colour/variant checks, and
+every colourway leaves the vertex set unchanged.
 - `t-cookie.mjs`: 3/3 variants.
 - `t-tire.mjs`: 8/8 variants.
 - `t-sapphire.mjs`: 13/13 variants (all params, including broken/truncated/irregular).

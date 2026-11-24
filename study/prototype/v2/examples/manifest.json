@@ -141,7 +141,7 @@
     "category": "architecture",
     "status": "port",
     "file": "plaza.pfn",
-    "bytes": 17966,
+    "bytes": 1216,
     "nodes": 3,
     "cam": [
       35,
@@ -156,7 +156,7 @@
     "category": "nature",
     "status": "port",
     "file": "clam.pfn",
-    "bytes": 112703,
+    "bytes": 1070,
     "nodes": 3,
     "cam": [
       25,
@@ -171,7 +171,7 @@
     "category": "architecture",
     "status": "port",
     "file": "tram.pfn",
-    "bytes": 9433,
+    "bytes": 773,
     "nodes": 3,
     "cam": [
       35,
@@ -186,8 +186,8 @@
     "category": "props",
     "status": "port",
     "file": "armchair.pfn",
-    "bytes": 78531,
-    "nodes": 3,
+    "bytes": 1170,
+    "nodes": 4,
     "cam": [
       30,
       18
@@ -201,7 +201,7 @@
     "category": "nature",
     "status": "port",
     "file": "wattle.pfn",
-    "bytes": 115698,
+    "bytes": 663,
     "nodes": 3,
     "cam": [
       30,
@@ -216,7 +216,7 @@
     "category": "props",
     "status": "port",
     "file": "quiver.pfn",
-    "bytes": 115201,
+    "bytes": 1315,
     "nodes": 3,
     "cam": [
       25,
@@ -231,8 +231,8 @@
     "category": "architecture",
     "status": "port",
     "file": "door.pfn",
-    "bytes": 31510,
-    "nodes": 10,
+    "bytes": 1054,
+    "nodes": 3,
     "cam": [
       18,
       8
@@ -246,7 +246,7 @@
     "category": "signage",
     "status": "port",
     "file": "taxiway.pfn",
-    "bytes": 40676,
+    "bytes": 723,
     "nodes": 3,
     "cam": [
       25,
@@ -261,7 +261,7 @@
     "category": "architecture",
     "status": "port",
     "file": "roof.pfn",
-    "bytes": 83326,
+    "bytes": 839,
     "nodes": 3,
     "cam": [
       35,
@@ -276,7 +276,7 @@
     "category": "props",
     "status": "port",
     "file": "carousel.pfn",
-    "bytes": 25329,
+    "bytes": 671,
     "nodes": 3,
     "cam": [
       35,

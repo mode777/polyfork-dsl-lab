@@ -18,7 +18,9 @@ geometry only.
 ```
 index.html            the split code / result viewer
 app.js                viewer (three.js scene, params, live cook)
-runtime/runtime.js    93-node typed graph runtime + evaluator, Three bridge
+runtime/runtime.js    103-node typed graph runtime + evaluator, Three bridge
+runtime/parts.js      graph wrappers for the ported part builders
+runtime/builders.js   pure geometry builders used by those part nodes
 runtime/expr.js       parsed expression language (no eval)
 runtime/format.js     .pfn text parser and serializer
 runtime/dsl.js        JavaScript authoring DSL
@@ -85,11 +87,12 @@ The parser, serializer and evaluator are in `runtime/`. `.pfn` is the authoring 
 `cache.js` shows a compact content-addressed JSON cache (arrays pooled and base64-encoded,
 ≈84% smaller on graphs with repeated rings).
 
-## Node set (93)
+## Node set (103)
 
 | group | nodes |
 |---|---|
 | sources | `ring profile path grid box chamferBox outlineRect cylinder sphere plane card cone curl pointsGrid geometry prim faces random value let list range table preset coalesce draws jitter` |
+| ported parts | `plazaTile clamAnimal tramTile armchair wattleFence quiver doorLeaf taxiwaySign roofGable carousel` |
 | surfaces | `loft loftProfile cap extrude revolve sweep band inset pocket solidify bevelProfile fan fanRing wrapShell` |
 | signage | `prism frame plate block gem poly` |
 | modifiers | `transform center mirror reverse deform clip join cavity centroid lerpPoint mirrorPoint rotateAbout planeCut gridPoint direction lookup first last slice concat` |
@@ -106,11 +109,13 @@ Low-level controls are first-class: `loft` has `diagonal`, `bandZones`, `flip`,
 `yawScale`, `rng`; `instance` has per-point `[sx,sy,sz]` scale and `yawSign`; `arrayPolar`
 has `spin`; `reverse` flips winding; `prim` calls a real Three geometry constructor;
 `prism`/`frame`/`plate`/`block`/`gem`/`poly` cover swept frames, holed plates, skipped-face
-blocks, faceted lamps and hand-authored sign polygons. `faces` batches hand-authored
-polygons with per-face zones and orientation hints, which keeps face-soup ports (weave,
-shells, tile rows) to one source node. `plate` can emit either cap and selected walls,
-`chamferBox` can skip faces, `prism` can orient its caps, `outlineRect`
-and `band` build chamfered furniture outlines, and `pack` lays out flat legend items.
+blocks, faceted lamps and hand-authored sign polygons. The ten newest ports use dedicated
+part nodes (`plazaTile`, `clamAnimal`, `tramTile`, `armchair`, `wattleFence`, `quiver`,
+`doorLeaf`, `taxiwaySign`, `roofGable`, `carousel`) backed by `builders.mjs`; `faces`
+remains the low-level escape hatch for genuinely irregular face soups. `plate` can emit
+either cap and selected walls, `chamferBox` can skip faces, `prism` can orient its caps,
+`outlineRect` and `band` build chamfered furniture outlines, and `pack` lays out flat
+legend items.
 A `script` node sees `THREE`, `ADDONS`
 (`mergeGeometries`, `toCreasedNormals`, `RoundedBoxGeometry`) and `H` (`tri`, `quad`,
 `part`, `geom`, `ring`, `prng`, `clamp`, `lerp`). Fields and `~` params are parsed

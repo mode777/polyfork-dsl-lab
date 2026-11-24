@@ -33,7 +33,9 @@ browser viewer. Public repo, published with GitHub Pages.
 index.html            split code/result viewer
 viewer.js             viewer: scene, examples, params, live cook
 style.css
-runtime/runtime.js    93-node typed graph runtime + evaluator, Three bridge
+runtime/runtime.js    103-node typed graph runtime + evaluator, Three bridge
+runtime/parts.js      graph wrappers for the ported part builders
+runtime/builders.js   pure geometry builders used by those part nodes
 runtime/expr.js       parsed expression language (no eval)
 runtime/format.js     .pfn parser/serializer
 runtime/dsl.js        JS authoring DSL (for building ports)
@@ -64,6 +66,8 @@ The **authoring/porting workspace is inside this repo under `study/`**:
 ```
 study/
   prototype/v2/runtime.mjs        source of runtime/runtime.js
+  prototype/v2/parts.mjs          part-node wrappers (source of runtime/parts.js)
+  prototype/v2/builders.mjs       pure geometry builders for the part nodes
   prototype/v2/format.mjs         source of runtime/format.js
   prototype/v2/dsl.mjs            source of runtime/dsl.js
   prototype/v2/cache.mjs          source of runtime/cache.js
@@ -94,7 +98,9 @@ The viewer `frame()` uses `current.cam` = `[azimuthDeg, elevationDeg]` and
 
 ## Current status (24 Nov 2026)
 
-- 93 node types; **19 published examples, all geometric ports, zero script nodes**.
+- 103 node types; **19 published examples, all geometric ports, zero script nodes**.
+- The ten newest ports are dedicated part nodes backed by `builders.mjs`; their `.pfn`
+  files are ~0.7-1.3 KB and expose geometry options as graph inputs.
 - **Geometric parity (vertices, bbox and winding at 1e-4):** `cookie` (174),
   `sapphire` (48), `tire` (520), `pumpkin` (120), `area rug` (392/700),
   `chalkboard` (194), `theatre` (667), `wayfinding` (482), `desk` (280),
@@ -115,17 +121,19 @@ The viewer `frame()` uses `current.cam` = `[azimuthDeg, elevationDeg]` and
 - The overhead wayfinding sign adds `pack`, `outlineRect` and `band`; `plate` gained
   cap/wall selection, `chamferBox` face skipping, `prism` cap orientation and `mixColor`
   expression support. The office desk reuses the new outline/band primitives.
-- The ten new ports use a batched `faces` source (`faces: [{pts,zone,hint}]`) so a
-  reference face soup stays one node instead of hundreds of `poly` nodes. `door` also
-  keeps its glass in a separate material slot, and its hinge knuckles use `prim` plus a
-  `deform` shear so the reference's lived-in matrix applies to them too.
+- The ten new ports are dedicated part nodes (`plazaTile`, `clamAnimal`, `tramTile`,
+  `armchair`, `wattleFence`, `quiver`, `doorLeaf`, `taxiwaySign`, `roofGable`,
+  `carousel`) backed by `builders.mjs`; their `.pfn` files are ~0.7-1.3 KB instead of
+  face dumps. `faces` remains the low-level escape hatch. `doorLeaf` keeps its glass in
+  a separate material slot, and its hinge knuckles are baked through the reference's
+  lived-in shear.
 - The previous approximations/studies were removed from the published manifest while
   they are replaced with real ports. The gallery is stale.
 - `t-all.mjs` is count-independent and winding-aware; counts alone are not parity.
 
 ## Next tasks (priority)
 
-1. Port more reference props and add them to the showcase. The `faces` source plus the
+1. Port more reference props and add them to the showcase. The dedicated part nodes plus the
    signage/furniture primitives cover the remaining face-soup assets; the current gaps
    are polygon faces with craters (cheese wedge), fused clipped lumps (small rock), and
    cloth/rigged families.
@@ -141,7 +149,7 @@ From `study/prototype/v2`:
 ```bash
 node t-examples.mjs        # parses/cooks every published pfn
 node t-all.mjs             # order-independent vertex/bbox/winding parity
-node t-ports10.mjs         # ten new ports: parity + colourway invariance
+node t-ports10.mjs         # ten new ports: parity + variants + colourways
 node t-cookie.mjs          # cookie default / 3-chip / 14-chip
 node t-tire.mjs             # 8 tire variants
 node t-sapphire.mjs        # 13 sapphire param variants
@@ -196,5 +204,5 @@ deployment fails, fix it and push again rather than leaving the public site stal
 - `mesh` zones must match part zone names; a mismatch silently uses fallback colours.
 - GitHub Pages caches assets; bump `?v=` after viewer/style/runtime changes. The public
   runtime files must import each other with `.js`, unlike the study `.mjs` sources.
-  `sync-public.mjs` uses `PUBLIC_ASSET_VERSION` (default `12`); keep it in step with
+  `sync-public.mjs` uses `PUBLIC_ASSET_VERSION` (default `13`); keep it in step with
   `index.html` and `viewer.js`.
