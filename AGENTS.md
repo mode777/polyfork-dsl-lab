@@ -155,5 +155,7 @@ gh api repos/mode777/polyfork-dsl-lab/pages/builds/latest --jq '.status,.commit'
 - `loft.diagonal='ba'` flips the quad diagonal; `loft.bandZones` is a per-band zone array;
   `loft.flip` reverses winding.
 - `mesh` zones must match part zone names; a mismatch silently uses fallback colours.
-- GitHub Pages caches assets; bump `?v=` after viewer/style changes. The public runtime
-  files must import each other with `.js`, unlike the study `.mjs` sources.
+- GitHub Pages caches assets; bump `?v=` after viewer/style/runtime changes. The public
+  runtime files must import each other with `.js`, unlike the study `.mjs` sources.
+  `sync-public.mjs` uses `PUBLIC_ASSET_VERSION` (default `3`); keep it in step with
+  `index.html` and `viewer.js`.
