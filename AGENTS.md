@@ -33,9 +33,7 @@ browser viewer. Public repo, published with GitHub Pages.
 index.html            split code/result viewer
 viewer.js             viewer: scene, examples, params, live cook
 style.css
-runtime/runtime.js    111-node typed graph runtime + evaluator, Three bridge
-runtime/parts.js      graph wrappers for the ported part builders
-runtime/builders.js   pure geometry builders used by those part nodes
+runtime/runtime.js    101-node typed graph runtime + evaluator, Three bridge
 runtime/expr.js       parsed expression language (no eval)
 runtime/format.js     .pfn parser/serializer
 runtime/dsl.js        JS authoring DSL (for building ports)
@@ -66,8 +64,6 @@ The **authoring/porting workspace is inside this repo under `study/`**:
 ```
 study/
   prototype/v2/runtime.mjs        source of runtime/runtime.js
-  prototype/v2/parts.mjs          part-node wrappers (source of runtime/parts.js)
-  prototype/v2/builders.mjs       pure geometry builders for the part nodes
   prototype/v2/format.mjs         source of runtime/format.js
   prototype/v2/dsl.mjs            source of runtime/dsl.js
   prototype/v2/cache.mjs          source of runtime/cache.js
@@ -98,10 +94,11 @@ The viewer `frame()` uses `current.cam` = `[azimuthDeg, elevationDeg]` and
 
 ## Current status (24 Nov 2026)
 
-- 111 node types; **29 published examples, all geometric ports, zero script nodes**.
-- The ten face-soup ports are dedicated part nodes backed by `builders.mjs`; their `.pfn`
-  files are ~0.7-1.3 KB and expose geometry options as graph inputs. The next ten ports
-  are built only from generic nodes, not per-asset runtime types.
+- 101 node types; **29 published examples, all geometric ports, zero script nodes**.
+- All 29 examples are generic-node graphs. The ten earlier face-soup ports (plaza, clam,
+  tram, armchair, wattle, quiver, door, taxiway, roof, carousel) were re-expressed with
+  `loft`/`frustum`/`block`/`poly`/`fan`/`stud`/`prim`; no per-asset node remains and
+  `builders.mjs`/`parts.mjs` were deleted.
 - **Geometric parity (vertices, bbox and winding at 1e-4):** `cookie` (174),
   `sapphire` (48), `tire` (520), `pumpkin` (120), `area rug` (392/700),
   `chalkboard` (194), `theatre` (667), `wayfinding` (482), `desk` (280),
@@ -128,11 +125,12 @@ The viewer `frame()` uses `current.cam` = `[azimuthDeg, elevationDeg]` and
   (oriented strut), `frustum` (tapered box), `opening` (recessed window/door), `stud`
   (nail/button), `quiltedPad` (tufted panel), `bandPath` (bent rib), `bridge` (stitched
   profile transition) and `pill` (rounded UI row). `loft` gained `zoneField`, `skipEdges`,
-  `abba`/`short` diagonals, raw/flipped caps and degenerate-triangle skipping; `poly`
-  now skips degenerate triangles and flat loft caps keep their raw winding. No per-asset
-  node was added. `faces` remains the low-level escape hatch. `doorLeaf`
-  keeps its glass in a separate material slot, and its hinge knuckles are baked through
-  the reference's lived-in shear.
+  `abba`/`short` diagonals, raw/flipped caps, `inside`, `keepDegenerate` and
+  degenerate-triangle skipping; `poly` now skips degenerate triangles and flat loft caps
+  keep their raw winding. `stud` gained an elliptical second radius and inside orientation;
+  `frustum` gained inside orientation. No per-asset node was added. `faces` remains the
+  low-level escape hatch. The door port keeps its glass in a separate material slot and
+  applies the reference's lived-in shear with `deform`.
 - The previous approximations/studies were removed from the published manifest while
   they are replaced with real ports. The gallery is stale.
 - `t-all.mjs` is count-independent and winding-aware; counts alone are not parity.

@@ -141,8 +141,8 @@
     "category": "architecture",
     "status": "port",
     "file": "plaza.pfn",
-    "bytes": 1216,
-    "nodes": 3,
+    "bytes": 9844,
+    "nodes": 35,
     "cam": [
       35,
       35
@@ -156,8 +156,8 @@
     "category": "nature",
     "status": "port",
     "file": "clam.pfn",
-    "bytes": 1070,
-    "nodes": 3,
+    "bytes": 53297,
+    "nodes": 27,
     "cam": [
       25,
       20
@@ -171,8 +171,8 @@
     "category": "architecture",
     "status": "port",
     "file": "tram.pfn",
-    "bytes": 773,
-    "nodes": 3,
+    "bytes": 8344,
+    "nodes": 55,
     "cam": [
       35,
       35
@@ -186,8 +186,8 @@
     "category": "props",
     "status": "port",
     "file": "armchair.pfn",
-    "bytes": 1170,
-    "nodes": 4,
+    "bytes": 18778,
+    "nodes": 20,
     "cam": [
       30,
       18
@@ -201,8 +201,8 @@
     "category": "nature",
     "status": "port",
     "file": "wattle.pfn",
-    "bytes": 663,
-    "nodes": 3,
+    "bytes": 42379,
+    "nodes": 67,
     "cam": [
       30,
       15
@@ -216,8 +216,8 @@
     "category": "props",
     "status": "port",
     "file": "quiver.pfn",
-    "bytes": 1315,
-    "nodes": 3,
+    "bytes": 40563,
+    "nodes": 77,
     "cam": [
       25,
       15
@@ -231,8 +231,8 @@
     "category": "architecture",
     "status": "port",
     "file": "door.pfn",
-    "bytes": 1054,
-    "nodes": 3,
+    "bytes": 7789,
+    "nodes": 46,
     "cam": [
       18,
       8
@@ -246,8 +246,8 @@
     "category": "signage",
     "status": "port",
     "file": "taxiway.pfn",
-    "bytes": 723,
-    "nodes": 3,
+    "bytes": 14890,
+    "nodes": 78,
     "cam": [
       25,
       12
@@ -261,8 +261,8 @@
     "category": "architecture",
     "status": "port",
     "file": "roof.pfn",
-    "bytes": 839,
-    "nodes": 3,
+    "bytes": 20440,
+    "nodes": 85,
     "cam": [
       35,
       20
@@ -276,8 +276,8 @@
     "category": "props",
     "status": "port",
     "file": "carousel.pfn",
-    "bytes": 671,
-    "nodes": 3,
+    "bytes": 16458,
+    "nodes": 52,
     "cam": [
       35,
       20

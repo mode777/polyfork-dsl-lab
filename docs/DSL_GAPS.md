@@ -163,33 +163,27 @@ The remaining fourth-sample signs are still open: the core rulebook is mostly
 plates/bands but has two states, and the marquee letter needs stroke union/offset. Those
 are separate geometry features, not layout escapes.
 
-## 12. Face-soup follow-up
+## 12. Face-soup ports replaced
 
-Ten more ports (plaza, clam, tram, armchair, wattle, quiver, door, taxiway, roof and
-carousel) are reference face builders rather than primitive assemblies. Rather than
-serialize one raw face dump, each has a dedicated part node backed by a pure builder:
+The ten earlier face-soup ports (plaza, clam, tram, armchair, wattle, quiver, door,
+taxiway, roof and carousel) are now generic graphs. Their per-asset part nodes and the
+`builders.mjs`/`parts.mjs` wrappers were removed. The recurring techniques are:
 
-| node | builder | what it keeps together |
-|---|---|---|
-| `plazaTile` | `buildPlaza` | deck, seams, light bars, service socket |
-| `clamAnimal` | `buildClam` | ribbed valves and mantle |
-| `tramTile` | `buildTram` | road section, rails, base course |
-| `armchair` | `buildArmchair` | shell, legs, two cushions |
-| `wattleFence` | `buildWattle` | stakes, lashings, woven withies |
-| `quiver` | `buildQuiver` | tube, stitches, strap, buckle, arrows |
-| `doorLeaf` | `buildDoor` | leaf, panels, glass, lever, hinges |
-| `taxiwaySign` | `buildTaxiway` | casing, lit faces, legs, footing |
-| `roofGable` | `buildRoof` | courses, rolls, ridge, verges |
-| `carousel` | `buildCarousel` | plate bed, bumper, bags |
+| technique | used by |
+|---|---|
+| zoned profile/ring lofts | tram, plaza, clam, carousel, roof |
+| short-diagonal lofts | armchair shell and cushions |
+| `frustum` sweeps and caps | roof rolls, quiver vanes, taxiway gussets, door panel returns |
+| fan caps | clam valves/mantle, armchair shell/cushions |
+| `stud` fasteners | quiver stitches, taxiway bolts |
+| `block` / `prim` | door ironmongery, taxiway frame, carousel cases |
+| `loft.inside` / `keepDegenerate` | wattle rods/stakes, armchair shell |
+| isolated `poly` faces | tram end curtains, taxiway sign faces, roof bargeboards |
 
-The builders are pure geometry helpers in `builders.mjs`; `parts.mjs` registers the
-graph nodes and converts their face lists to geometry. The `.pfn` files stay small and
-readable, and the reference vertex set/winding is preserved at `1e-4`. `faces` remains
-available as a low-level escape hatch for genuinely irregular soups, but no published
-example needs it now. The expression language did not need another built-in for this
-set; the repeated value work is covered by `let`/`value`/`preset` and the existing math
-helpers.
-
+`faces` remains available as a low-level escape hatch for genuinely irregular soups, but
+no published example needs it now. The expression language did not need another built-in
+for this set; the repeated value work is covered by `let`/`value`/`preset` and the existing
+math helpers.
 
 ## 13. Generic-node follow-up
 

@@ -45,9 +45,7 @@ prototype/
   models/*.mjs          v1 exact ports (cookie, rug)
   bench*.mjs            v1 parity benches
   v2/
-    runtime.mjs         111-node typed runtime + Three bridge (source of public runtime.js)
-    parts.mjs           part-node wrappers (source of public runtime/parts.js)
-    builders.mjs        pure geometry builders used by parts.mjs
+    runtime.mjs         101-node typed runtime + Three bridge (source of public runtime.js)
     expr.mjs            parsed expression language (source of public runtime/expr.js)
     dsl.mjs             authoring DSL
     format.mjs          .pfn text + JSON (source of public format.js)
@@ -119,12 +117,12 @@ Commit/push the public repo, check
 
 ## Current state (24 Nov 2026)
 
-- Runtime: 111 nodes; **29 published examples, all geometric ports, zero script nodes**.
-- The ten face-soup ports are dedicated part nodes backed by `builders.mjs`; their `.pfn`
-  files are ~0.7-1.3 KB and expose geometry options as graph inputs. The next ten ports
-  are generic-node graphs and add no per-asset runtime type; their repeated parts use the
-  reusable `beam`, `frustum`, `opening`, `stud`, `quiltedPad`, `bandPath`, `bridge` and
-  `pill` primitives instead of per-face `poly` dumps.
+- Runtime: 101 nodes; **29 published examples, all geometric ports, zero script nodes**.
+- All 29 examples are generic-node graphs. The ten earlier face-soup ports (plaza, clam,
+  tram, armchair, wattle, quiver, door, taxiway, roof, carousel) were re-expressed with
+  `loft`/`frustum`/`block`/`poly`/`fan`/`stud`/`prim`; no per-asset node remains and
+  `builders.mjs`/`parts.mjs` were deleted. Repeated parts use the reusable `beam`,
+  `frustum`, `opening`, `stud`, `quiltedPad`, `bandPath`, `bridge` and `pill` primitives.
 - **Geometric parity** (vertices, bbox and winding at 1e-4): `cookie` (174),
   `sapphire` (48), `tire` (520), `pumpkin` (120), `area rug` (392/700), `chalkboard`
   (194), `theatre` (667), `wayfinding` (482), `desk` (280), `plaza` (292), `clam` (792),

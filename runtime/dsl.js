@@ -1,6 +1,6 @@
 // Compact authoring DSL over the v2 IR. Every call records a node; scalars,
 // refs, arrays and field expressions all serialise (fields as source strings).
-import { Graph, field, isField, expr } from './runtime.js?v=15';
+import { Graph, field, isField, expr } from './runtime.js?v=16';
 
 const F = (v) => (isField(v) || typeof v !== 'string' && typeof v !== 'function' ? v : field(v));
 const strip = (o, ks) => { const q = { ...o }; for (const k of ks) delete q[k]; return q; };

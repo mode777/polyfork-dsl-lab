@@ -8,7 +8,50 @@ in brass color "" label=Ironmongery
 in width float 0.9 min=0.7 max=0.95 step=0.05 label="Leaf width (m)"
 in lived_in float 0.35 min=0 max=1 step=0.05 label="Lived in"
 n n0 preset choice=$colorway overrides={leaf:$leaf,panel:$panel,glass:$glass,brass:$brass} presets={pale-oak:{leaf:#E3CBA5,panel:#D2B084,glass:#47423C,brass:#C9A24B},chalk-white:{leaf:#FAF8F3,panel:#F3EEE8,glass:#47423C,brass:#C9A24B},walnut:{leaf:#8A6244,panel:#6B4A32,glass:#2E2A26,brass:#E0C078},sage-painted:{leaf:#7E9179,panel:#5B8551,glass:#47423C,brass:#E0C078}} fallback=pale-oak
-n n1 doorLeaf width=$width lived=$lived_in
-n n2 mesh geom=@n1 zones={leaf:@n0.leaf,panel:@n0.panel,glass:@n0.glass,brass:@n0.brass,wear:#ddc6a2} materials={glass:{slot:glass,transparent:true,opacity:0.6,roughness:0.25,metalness:0}} name=interior-door-leaf
-out mesh=@n2
+n n1 let binds={W:"min(0.95, max(0.70, width))",lived:"min(1, max(0, lived_in))",CH:"0.008 + lived * 0.004",SAG:"lived * 0.009",ZF:0.0225,ZS:"0.0225 - CH",mZS:-ZS,c0:CH,c1:0.115,c2:"W - 0.115",c3:"W - CH",r0:CH,r1:0.205,r2:0.625,r3:0.725,r4:0.905,r5:1.085,r6:1.965,r7:"2.1 - CH",pX0:"c1 + 0.022",pX1:"c2 - 0.022",pY1a:"r1 + 0.022",pY1b:"r2 - 0.022",pY3a:"r3 + 0.022",pY3b:"r4 - 0.022",zPanel:"ZF - 0.011",gX0:"c1 + 0.025",gX1:"c2 - 0.025",gY0:"r5 + 0.025",gY1:"r6 - 0.025",paneX0:"c1 + 0.025 - 0.004",paneX1:"c2 - 0.025 + 0.004",paneY0:"r5 + 0.025 - 0.004",paneY1:"r6 - 0.025 + 0.004",aX1:"W - CH",aY1:"2.1 - CH",cx:"W - 0.070",droop:"lived * 4 * PI / 180",ca:"cos(droop)",sa:"sin(droop)",tx:"cx - (cx * ca - 1.0 * sa)",ty:"1.0 - (cx * sa + 1.0 * ca)",lvX0:"W - 0.105",lvX1:"W - 0.035",barX0:"W - 0.185",barX1:"cx + 0.014",bar2X1:"W - 0.157",latchX0:"W - 0.002",latchX1:"W + 0.002",rx0:"cx + 0.9238795325112867 * 0.020",ry0:"1.0 + 0.3826834323650898 * 0.020",rx1:"cx + 0.38268343236508984 * 0.020",ry1:"1.0 + 0.9238795325112867 * 0.020",rx2:"cx + -0.3826834323650897 * 0.020",ry2:"1.0 + 0.9238795325112867 * 0.020",rx3:"cx + -0.9238795325112867 * 0.020",ry3:"1.0 + 0.3826834323650899 * 0.020",rx4:"cx + -0.9238795325112868 * 0.020",ry4:"1.0 + -0.38268343236508967 * 0.020",rx5:"cx + -0.38268343236509034 * 0.020",ry5:"1.0 + -0.9238795325112865 * 0.020",rx6:"cx + 0.38268343236509 * 0.020",ry6:"1.0 + -0.9238795325112866 * 0.020",rx7:"cx + 0.9238795325112865 * 0.020",ry7:"1.0 + -0.3826834323650904 * 0.020"}
+n n2 value args={base:@n0.leaf,t:@n1.lived} expr="mixColor(base, \"#8C837A\", 0.20 * t)"
+n n3 value args={base:@n0.brass,t:@n1.lived} expr="mixColor(base, \"#8A6E2E\", 0.22 * t)"
+n n4 poly pts=[[@n1.c0,@n1.r0,@n1.ZF],[@n1.c3,@n1.r0,@n1.ZF],[@n1.c3,@n1.r1,@n1.ZF],[@n1.c0,@n1.r1,@n1.ZF]] zone=wear
+n n5 poly pts=[[@n1.c0,@n1.r1,@n1.ZF],[@n1.c1,@n1.r1,@n1.ZF],[@n1.c1,@n1.r2,@n1.ZF],[@n1.c0,@n1.r2,@n1.ZF]] zone=leaf
+n n6 poly pts=[[@n1.c2,@n1.r1,@n1.ZF],[@n1.c3,@n1.r1,@n1.ZF],[@n1.c3,@n1.r2,@n1.ZF],[@n1.c2,@n1.r2,@n1.ZF]] zone=leaf
+n n7 poly pts=[[@n1.c0,@n1.r3,@n1.ZF],[@n1.c1,@n1.r3,@n1.ZF],[@n1.c1,@n1.r4,@n1.ZF],[@n1.c0,@n1.r4,@n1.ZF]] zone=leaf
+n n8 poly pts=[[@n1.c2,@n1.r3,@n1.ZF],[@n1.c3,@n1.r3,@n1.ZF],[@n1.c3,@n1.r4,@n1.ZF],[@n1.c2,@n1.r4,@n1.ZF]] zone=leaf
+n n9 poly pts=[[@n1.c0,@n1.r5,@n1.ZF],[@n1.c1,@n1.r5,@n1.ZF],[@n1.c1,@n1.r6,@n1.ZF],[@n1.c0,@n1.r6,@n1.ZF]] zone=leaf
+n n10 poly pts=[[@n1.c2,@n1.r5,@n1.ZF],[@n1.c3,@n1.r5,@n1.ZF],[@n1.c3,@n1.r6,@n1.ZF],[@n1.c2,@n1.r6,@n1.ZF]] zone=leaf
+n n11 poly pts=[[@n1.c0,@n1.r2,@n1.ZF],[@n1.c3,@n1.r2,@n1.ZF],[@n1.c3,@n1.r3,@n1.ZF],[@n1.c0,@n1.r3,@n1.ZF]] zone=leaf
+n n12 poly pts=[[@n1.c0,@n1.r4,@n1.ZF],[@n1.c3,@n1.r4,@n1.ZF],[@n1.c3,@n1.r5,@n1.ZF],[@n1.c0,@n1.r5,@n1.ZF]] zone=leaf
+n n13 poly pts=[[@n1.c0,@n1.r6,@n1.ZF],[@n1.c3,@n1.r6,@n1.ZF],[@n1.c3,@n1.r7,@n1.ZF],[@n1.c0,@n1.r7,@n1.ZF]] zone=leaf
+n n14 frustum a=[[@n1.c1,@n1.r1,@n1.ZF],[@n1.c2,@n1.r1,@n1.ZF],[@n1.c2,@n1.r2,@n1.ZF],[@n1.c1,@n1.r2,@n1.ZF]] b=[[@n1.pX0,@n1.pY1a,@n1.zPanel],[@n1.pX1,@n1.pY1a,@n1.zPanel],[@n1.pX1,@n1.pY1b,@n1.zPanel],[@n1.pX0,@n1.pY1b,@n1.zPanel]] capA=false capB=false zone=leaf
+n n15 poly pts=[[@n1.pX0,@n1.pY1a,@n1.zPanel],[@n1.pX1,@n1.pY1a,@n1.zPanel],[@n1.pX1,@n1.pY1b,@n1.zPanel],[@n1.pX0,@n1.pY1b,@n1.zPanel]] zone=panel
+n n16 frustum a=[[@n1.c1,@n1.r3,@n1.ZF],[@n1.c2,@n1.r3,@n1.ZF],[@n1.c2,@n1.r4,@n1.ZF],[@n1.c1,@n1.r4,@n1.ZF]] b=[[@n1.pX0,@n1.pY3a,@n1.zPanel],[@n1.pX1,@n1.pY3a,@n1.zPanel],[@n1.pX1,@n1.pY3b,@n1.zPanel],[@n1.pX0,@n1.pY3b,@n1.zPanel]] capA=false capB=false zone=leaf
+n n17 poly pts=[[@n1.pX0,@n1.pY3a,@n1.zPanel],[@n1.pX1,@n1.pY3a,@n1.zPanel],[@n1.pX1,@n1.pY3b,@n1.zPanel],[@n1.pX0,@n1.pY3b,@n1.zPanel]] zone=panel
+n n18 frustum a=[[@n1.c1,@n1.r5,@n1.ZF],[@n1.c2,@n1.r5,@n1.ZF],[@n1.c2,@n1.r6,@n1.ZF],[@n1.c1,@n1.r6,@n1.ZF]] b=[[@n1.gX0,@n1.gY0,0.008],[@n1.gX1,@n1.gY0,0.008],[@n1.gX1,@n1.gY1,0.008],[@n1.gX0,@n1.gY1,0.008]] capA=false capB=false zone=leaf
+n n19 poly pts=[[@n1.paneX0,@n1.paneY0,0.003],[@n1.paneX1,@n1.paneY0,0.003],[@n1.paneX1,@n1.paneY1,0.003],[@n1.paneX0,@n1.paneY1,0.003]] zone=glass
+n n20 frustum a=[[0,0,@n1.ZS],[@n1.W,0,@n1.ZS],[@n1.W,2.1,@n1.ZS],[0,2.1,@n1.ZS]] b=[[@n1.CH,@n1.CH,@n1.ZF],[@n1.aX1,@n1.CH,@n1.ZF],[@n1.aX1,@n1.aY1,@n1.ZF],[@n1.CH,@n1.aY1,@n1.ZF]] capA=false capB=false zone=leaf
+n n21 join geoms=[@n4,@n5,@n6,@n7,@n8,@n9,@n10,@n11,@n12,@n13,@n14,@n15,@n16,@n17,@n18,@n19,@n20]
+n n22 mirror geom=@n21 axis=z
+n n23 frustum a=[[0,0,@n1.mZS],[@n1.W,0,@n1.mZS],[@n1.W,2.1,@n1.mZS],[0,2.1,@n1.mZS]] b=[[0,0,@n1.ZS],[@n1.W,0,@n1.ZS],[@n1.W,2.1,@n1.ZS],[0,2.1,@n1.ZS]] skip=0 capA=false capB=false zone=leaf
+n n24 poly pts=[[0,0,@n1.mZS],[@n1.W,0,@n1.mZS],[@n1.W,0,@n1.ZS],[0,0,@n1.ZS]] zone=wear
+n n25 join geoms=[@n23,@n24]
+n n26 frustum a=[[@n1.gX0,@n1.gY0,0.008],[@n1.gX1,@n1.gY0,0.008],[@n1.gX1,@n1.gY1,0.008],[@n1.gX0,@n1.gY1,0.008]] b=[[@n1.gX0,@n1.gY0,-0.008],[@n1.gX1,@n1.gY0,-0.008],[@n1.gX1,@n1.gY1,-0.008],[@n1.gX0,@n1.gY1,-0.008]] capA=false capB=false zone=leaf
+n n27 block x0=0.014 x1=0.078 y0=0.21500000000000002 y1=0.34500000000000003 z0=0.0215 z1=0.0255 skip=nz zone=brass
+n n28 prim type=CylinderGeometry args=[0.01,0.01,0.13,8] ry=0.39269908169872414 x=0.008 y=0.28 z=0.0225 zone=brass
+n n29 mirror geom=@n27 axis=z
+n n30 join geoms=[@n29,@n28]
+n n31 arrayLinear geom=@n30 count=3 dy=0.77
+n n32 block x0=@n1.lvX0 x1=@n1.lvX1 y0=0.885 y1=1.115 z0=0.0215 z1=0.0265 skip=nz zone=brassWear
+n n33 frustum a=[[@n1.rx0,@n1.ry0,0.0215],[@n1.rx1,@n1.ry1,0.0215],[@n1.rx2,@n1.ry2,0.0215],[@n1.rx3,@n1.ry3,0.0215],[@n1.rx4,@n1.ry4,0.0215],[@n1.rx5,@n1.ry5,0.0215],[@n1.rx6,@n1.ry6,0.0215],[@n1.rx7,@n1.ry7,0.0215]] b=[[@n1.rx0,@n1.ry0,0.0505],[@n1.rx1,@n1.ry1,0.0505],[@n1.rx2,@n1.ry2,0.0505],[@n1.rx3,@n1.ry3,0.0505],[@n1.rx4,@n1.ry4,0.0505],[@n1.rx5,@n1.ry5,0.0505],[@n1.rx6,@n1.ry6,0.0505],[@n1.rx7,@n1.ry7,0.0505]] capA=false capB=false zone=brassWear
+n n34 poly pts=[[@n1.rx0,@n1.ry0,0.0505],[@n1.rx1,@n1.ry1,0.0505],[@n1.rx2,@n1.ry2,0.0505],[@n1.rx3,@n1.ry3,0.0505],[@n1.rx4,@n1.ry4,0.0505],[@n1.rx5,@n1.ry5,0.0505],[@n1.rx6,@n1.ry6,0.0505],[@n1.rx7,@n1.ry7,0.0505]] zone=brassWear
+n n35 join geoms=[@n33,@n34]
+n n36 block x0=@n1.barX0 x1=@n1.barX1 y0=0.986 y1=1.013 z0=0.0385 z1=0.07250000000000001 zone=brassWear
+n n37 block x0=@n1.barX0 x1=@n1.bar2X1 y0=0.956 y1=0.992 z0=0.0445 z1=0.07050000000000001 skip="py nz" zone=brassWear
+n n38 join geoms=[@n36,@n37]
+n n39 transform geom=@n38 rz=@n1.droop tx=@n1.tx ty=@n1.ty
+n n40 join geoms=[@n32,@n35,@n39]
+n n41 mirror geom=@n40 axis=z
+n n42 block x0=@n1.latchX0 x1=@n1.latchX1 y0=0.945 y1=1.055 z0=-0.008 z1=0.008 skip=nx zone=brass
+n n43 join geoms=[@n22,@n25,@n26,@n31,@n41,@n42]
+n n44 deform geom=@n43 values=@n1 expr=`[x - vals.W / 2, y + (-vals.SAG / vals.W) * x + vals.SAG, z]`
+n n45 mesh geom=@n44 zones={leaf:@n0.leaf,panel:@n0.panel,glass:@n0.glass,brass:@n0.brass,wear:@n2,brassWear:@n3} materials={glass:{slot:glass,transparent:true,opacity:0.6,roughness:0.25,metalness:0}} name=interior-door-leaf
+out mesh=@n45
 end

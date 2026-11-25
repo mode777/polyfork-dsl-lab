@@ -8,21 +8,17 @@ import { fileURLToPath } from 'node:url';
 const here = path.dirname(fileURLToPath(import.meta.url));
 const repo = path.resolve(here, '../../..');
 const out = (p) => path.join(repo, p);
-const V = process.env.PUBLIC_ASSET_VERSION ?? '15';
+const V = process.env.PUBLIC_ASSET_VERSION ?? '16';
 const rewrite = (src) => src
   .replaceAll("from './runtime.mjs'", `from './runtime.js?v=${V}'`)
   .replaceAll("from './format.mjs'", `from './format.js?v=${V}'`)
   .replaceAll("from './dsl.mjs'", `from './dsl.js?v=${V}'`)
   .replaceAll("from './cache.mjs'", `from './cache.js?v=${V}'`)
-  .replaceAll("from './expr.mjs'", `from './expr.js?v=${V}'`)
-  .replaceAll("from './parts.mjs'", `from './parts.js?v=${V}'`)
-  .replaceAll("from './builders.mjs'", `from './builders.js?v=${V}'`);
+  .replaceAll("from './expr.mjs'", `from './expr.js?v=${V}'`);
 
 for (const [src, dst] of [
   ['runtime.mjs', 'runtime/runtime.js'],
   ['expr.mjs', 'runtime/expr.js'],
-  ['parts.mjs', 'runtime/parts.js'],
-  ['builders.mjs', 'runtime/builders.js'],
   ['dsl.mjs', 'runtime/dsl.js'],
   ['format.mjs', 'runtime/format.js'],
   ['cache.mjs', 'runtime/cache.js'],

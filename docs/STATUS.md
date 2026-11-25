@@ -22,16 +22,16 @@ parity check at `1e-4`, including the ten new ports added in this pass.
 | **theatre** | 667 | **geometric port** | 374 nodes; three prebuilt word layouts, banded readerboard, enamel glyph plates, marquee lamps, three crowns, steel bracket. |
 | **wayfinding** | 482 | **geometric port** | 157 nodes; chamfered lit cabinet, recessed face rings, packed arrow/letter/icon legends, hanger rods, ceiling channel, tie bar and knee braces. |
 | **desk** | 280 | **geometric port** | 209 nodes; chamfered slab with cable slot, folded steel sleds, drawer/plain/pedestal undercarriage, live width and lived-in wear. |
-| **plaza** | 292 | **geometric port** | 3 nodes; twin recessed seams, lit bars, raised field and service socket, all faces batched through `faces`. |
-| **clam** | 792 | **geometric port** | 3 nodes; ribbed valves, pearly dish, mantle rays and inhalant spots. |
-| **tram** | 170 | **geometric port** | 3 nodes; grooved steel rails in a swept asphalt slab with a base course. |
-| **armchair** | 460 | **geometric port** | 3 nodes; tub shell, splayed legs and two loose cushions. |
-| **wattle** | 802 | **geometric port** | 3 nodes; lashed stakes, mirrored sails and eleven woven withy rows. |
-| **quiver** | 658 | **geometric port** | 3 nodes; stitched leather tube, shoulder strap, buckle and seven arrows. |
-| **door** | 402 | **geometric port** | 3 nodes; glazed leaf, moulded panels, brass lever and three hinges; glass on its own material slot. |
-| **taxiway** | 408 | **geometric port** | 3 nodes; two-panel arrow face, octagonal casing, legs and concrete pad. |
-| **roof** | 712 | **geometric port** | 3 nodes; gable kawara roof with four stepped courses and closed verges. |
-| **carousel** | 276 | **geometric port** | 3 nodes; sloped plate bed, bumper skirt and three riding bags. |
+| **plaza** | 292 | **geometric port** | 35 nodes; twin recessed seams, lit bars, raised field and service socket; seam/ring lofts. |
+| **clam** | 792 | **geometric port** | 27 nodes; ribbed valves, pearly dish, mantle rays and inhalant spots; zoned lofts and fan caps. |
+| **tram** | 170 | **geometric port** | 55 nodes; grooved steel rails in a swept asphalt slab with a base course; one zoned loft plus end curtains. |
+| **armchair** | 460 | **geometric port** | 20 nodes; tub shell, splayed legs and two loose cushions; short-diagonal lofts and frustum legs. |
+| **wattle** | 802 | **geometric port** | 67 nodes; lashed stakes, mirrored sails and eleven woven withy rows; hex and three-sided lofts. |
+| **quiver** | 658 | **geometric port** | 77 nodes; stitched leather tube, shoulder strap, buckle and seven arrows; stud stitches and frustum vanes. |
+| **door** | 402 | **geometric port** | 46 nodes; glazed leaf, moulded panels, brass lever and three hinges; `frustum`/`block`/`prim` with a `deform` shear. |
+| **taxiway** | 408 | **geometric port** | 78 nodes; two-panel arrow face, octagonal casing, legs and concrete pad; casing loft, studs and frustum gussets. |
+| **roof** | 712 | **geometric port** | 85 nodes; gable kawara roof with four stepped courses and closed verges; slope/roll frustums and a ridge loft. |
+| **carousel** | 276 | **geometric port** | 52 nodes; sloped plate bed, bumper skirt and three riding bags; profile loft, plate lofts and bag lofts. |
 | **prize** | 768 | **geometric port** | 33 nodes; live diameter/height lathe, deck/foot ring and bulb ring. |
 | **grass** | 660 | **geometric port** | 96 nodes; lofted three-sided blades, burn/scorch zones and pebble ring. |
 | **coral** | 534 | **geometric port** | 15 nodes; integrated fluted columns and four-ring mound. |
@@ -64,12 +64,11 @@ ports; rock/cheese, the core rulebook and marquee letter remain open.
 - Added ten exact ports: **composite plaza tile**, **maxima clam**, **tram track tile**,
   **lounge armchair**, **wattle fence run**, **arrow quiver**, **interior door leaf**,
   **lit taxiway sign**, **tiled roof section** and **baggage carousel**.
-- Added ten dedicated part nodes (`plazaTile`, `clamAnimal`, `tramTile`, `armchair`,
-  `wattleFence`, `quiver`, `doorLeaf`, `taxiwaySign`, `roofGable`, `carousel`) backed by
-  `builders.mjs`. The `.pfn` examples now show the part construction at a readable level
-  (~0.7-1.3 KB each) instead of a batched face dump; `faces` remains the low-level escape
-  hatch. `doorLeaf` keeps glass on a separate material slot and bakes the lived-in shear
-  through its hinge knuckles.
+- Replaced the ten dedicated part nodes (`plazaTile`, `clamAnimal`, `tramTile`, `armchair`,
+  `wattleFence`, `quiver`, `doorLeaf`, `taxiwaySign`, `roofGable`, `carousel`) with generic
+  graphs. `builders.mjs` and `parts.mjs` were deleted, the runtime is now 101 nodes, and
+  `faces` remains only as the low-level escape hatch. Door glass stays on its own material
+  slot and its lived-in shear is applied with `deform`.
 - Added two more exact ports: the **overhead wayfinding sign** (fourth reference sample)
   and the **office desk** (third sample). Both keep their reference options live.
 - Added three generic nodes: `pack` (flat legend layout), `outlineRect` (chamfered
