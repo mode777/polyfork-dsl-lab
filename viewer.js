@@ -18,6 +18,32 @@ const staticNote = $('#staticNote');
 const runBtn = $('#run');
 const editBtn = $('#edit');
 const downloadEl = $('#download');
+const sidebarEl = $('#examples');
+const menuBtn = $('#menu');
+const closeMenuBtn = $('#closeMenu');
+const backdropEl = $('#backdrop');
+const examplesLink = $('#examplesLink');
+const mobileQuery = matchMedia('(max-width: 900px)');
+const pointerQuery = matchMedia('(pointer: coarse)');
+const orbitHint = () => (pointerQuery.matches || navigator.maxTouchPoints > 0)
+  ? 'drag to orbit · pinch to zoom'
+  : 'drag to orbit · scroll to zoom';
+
+function setMenu(open, restoreFocus = true) {
+  const wasOpen = sidebarEl.classList.contains('open');
+  sidebarEl.classList.toggle('open', open);
+  backdropEl.hidden = !open;
+  document.body.classList.toggle('menu-open', open && mobileQuery.matches);
+  for (const el of document.querySelectorAll('.work, .about, .foot')) el.inert = open && mobileQuery.matches;
+  menuBtn.setAttribute('aria-expanded', String(open));
+  menuBtn.setAttribute('aria-label', open ? 'Close examples' : 'Open examples');
+  if (open) {
+    const active = sidebarEl.querySelector('.item.active') ?? sidebarEl.querySelector('.item');
+    if (active) setTimeout(() => { active.focus(); active.scrollIntoView({ block: 'nearest' }); }, 60);
+  } else if (wasOpen && restoreFocus && mobileQuery.matches) {
+    menuBtn.focus();
+  }
+}
 
 let manifest = [];
 let current = null;
@@ -348,10 +374,14 @@ async function loadExample(id, push = true) {
   const meta = manifest.find((m) => m.id === id) ?? manifest[0];
   if (!meta) return;
   current = meta;
+  if (mobileQuery.matches) {
+    if (sidebarEl.classList.contains('open')) setMenu(false, false);
+    if (push) window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
   document.querySelectorAll('.item').forEach((b) => b.classList.toggle('active', b.dataset.id === meta.id));
   if (push) history.replaceState(null, '', `#${meta.id}`);
   const statusLabel = { port: 'geometric port', close: 'close', approx: 'approximation', study: 'original study' }[meta.status];
-  badgeEl.textContent = `${meta.title}${statusLabel ? ' · ' + statusLabel : ''} — drag to orbit · scroll to zoom`;
+  badgeEl.textContent = `${meta.title}${statusLabel ? ' · ' + statusLabel : ''} — ${orbitHint()}`;
   fileEl.textContent = `${meta.id}.pfn`;
   downloadEl.href = `examples/${meta.file}`;
   downloadEl.setAttribute('download', downloadName(meta.id));
@@ -417,6 +447,27 @@ editorEl.addEventListener('keydown', (e) => {
 });
 $('#copy').addEventListener('click', async () => {
   try { await navigator.clipboard.writeText(codeText); $('#copy').textContent = 'copied'; setTimeout(() => $('#copy').textContent = 'copy', 900); } catch {}
+});
+
+menuBtn.addEventListener('click', () => setMenu(!sidebarEl.classList.contains('open')));
+closeMenuBtn.addEventListener('click', () => setMenu(false));
+backdropEl.addEventListener('click', () => setMenu(false));
+examplesLink.addEventListener('click', (e) => {
+  if (!mobileQuery.matches) return;
+  e.preventDefault();
+  setMenu(true);
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && sidebarEl.classList.contains('open')) setMenu(false);
+});
+mobileQuery.addEventListener('change', (e) => {
+  if (!e.matches) setMenu(false, false);
+});
+pointerQuery.addEventListener('change', () => {
+  if (current) {
+    const statusLabel = { port: 'geometric port', close: 'close', approx: 'approximation', study: 'original study' }[current.status];
+    badgeEl.textContent = `${current.title}${statusLabel ? ' · ' + statusLabel : ''} — ${orbitHint()}`;
+  }
 });
 
 // splitter

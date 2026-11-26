@@ -3,9 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0d1015">
 <title>Polyfork DSL Lab — declarative three.js geometry</title>
 <meta name="description" content="A small declarative node-graph DSL for stylized three.js assets. Browse examples, edit the graph, tweak parameters, see the mesh.">
-<link rel="stylesheet" href="style.css?v=3">
+<link rel="stylesheet" href="style.css?v=7">
 <script type="importmap">
 {
   "imports": {
@@ -18,6 +19,7 @@
 </head>
 <body>
 <header class="top">
+  <button id="menu" class="menu-btn" type="button" aria-label="Open examples" aria-controls="examples" aria-expanded="false">☰</button>
   <div class="brand">
     <span class="mark" aria-hidden="true"></span>
     <div>
@@ -26,15 +28,16 @@
     </div>
   </div>
   <nav class="topnav">
-    <a href="#examples">examples</a>
+    <a id="examplesLink" href="#examples">examples</a>
     <a href="#about">about</a>
     <a id="repo" href="https://github.com/mode777/polyfork-dsl-lab" target="_blank" rel="noreferrer">github ↗</a>
   </nav>
 </header>
+<div id="backdrop" class="backdrop" hidden></div>
 
 <main class="shell">
-  <aside class="sidebar" id="examples">
-    <div class="side-head">Examples</div>
+  <aside class="sidebar" id="examples" aria-label="Examples">
+    <div class="side-head"><span>Examples</span><button id="closeMenu" class="menu-close" type="button" aria-label="Close examples">×</button></div>
     <div id="list" class="list"></div>
     <div class="side-foot">
       <span class="dot"></span> no Polyfork source included
@@ -48,7 +51,7 @@
           <div class="tabs"><span class="tab active">DSL</span><span id="file" class="file"></span></div>
           <div class="actions">
             <button id="edit" class="btn ghost">edit</button>
-            <button id="run" class="btn accent" hidden>run ⌘↵</button>
+            <button id="run" class="btn accent" hidden>run <span class="kbd">⌘↵</span></button>
             <button id="copy" class="btn ghost">copy</button>
             <a id="download" class="btn ghost" download>download</a>
           </div>
@@ -115,6 +118,6 @@
   <span id="version">graph v2</span>
 </footer>
 
-<script type="module" src="viewer.js?v=16"></script>
+<script type="module" src="viewer.js?v=19"></script>
 </body>
 </html>
